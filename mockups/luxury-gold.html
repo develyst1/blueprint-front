@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Blueprint · luxury gold</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai+Looped:wght@400;500;600&family=Noto+Serif+Thai:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  /* luxury gold — a bound dossier: a navy-and-gold spine, two dense columns, medallions and a ledger. */
+  :root {
+    --cream: #FBF7EF;
+    --cream-2: #F3EBDA;
+    --paper: #FFFDF8;
+    --navy: #16264F;
+    --navy-2: #22366B;
+    --gold: #9A7124;
+    --gold-soft: #E3C27A;
+    --gold-line: #DCC79A;
+    --ink: #24263A;
+    --ink-2: #57566A;
+    --wine: #8C2F39;
+    --wine-tint: #F8EAE7;
+    --k-role: #2F55A4; --k-screen: #B8862B; --k-api: #8E4FB0; --k-system: #1E9A7A;
+    --serif: "Noto Serif Thai", "Thonburi", serif;
+    --sans: "IBM Plex Sans Thai Looped", "Sukhumvit Set", system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body { background: var(--cream); color: var(--ink); font: 400 15px/1.6 var(--sans); }
+  :focus-visible { outline: 2px solid var(--navy); outline-offset: 2px; box-shadow: 0 0 0 5px var(--gold-soft); }
+
+  .book { display: grid; grid-template-columns: 252px minmax(0, 1fr); min-height: 100vh; }
+  .spine { background: var(--cream-2); border-right: 1px solid var(--gold-line); padding: 32px 20px; position: sticky; top: 0; height: 100vh; }
+  .crest { display: flex; align-items: center; gap: 10px; font: 600 22px/1 var(--serif); color: var(--navy); padding: 0 8px 28px; margin-bottom: 20px; border-bottom: 1px solid var(--gold-line); }
+  .crest svg { flex: none; }
+  .nav { display: flex; flex-direction: column; gap: 2px; }
+  .nav span { padding: 9px 14px; border-radius: 10px; color: var(--ink-2); font-weight: 500; }
+  .nav span[aria-current] { background: var(--navy); color: var(--gold-soft); }
+
+  .folio { padding: 36px 44px 64px; min-width: 0; }
+  .title-row { display: flex; align-items: flex-end; gap: 24px; flex-wrap: wrap; }
+  h1 { font: 700 44px/1.2 var(--serif); color: var(--navy); margin: 0; letter-spacing: -0.01em; }
+  .ornament { display: flex; align-items: center; gap: 10px; color: var(--gold); margin: 14px 0 26px; }
+  .ornament::before, .ornament::after { content: ""; flex: 1; height: 1px; background: var(--gold-line); }
+  .ribbon { margin-left: auto; display: flex; align-items: center; gap: 14px; background: var(--navy); color: var(--gold-soft); padding: 10px 18px 10px 14px; border-radius: 12px; }
+  .ribbon b { font: 600 16px var(--serif); }
+  .seal { width: 22px; height: 22px; border-radius: 50%; background: var(--wine); color: #fff; display: inline-grid; place-items: center; font-size: 13px; font-weight: 700; line-height: 1; border: 1px solid var(--gold-soft); flex: none; }
+  .pips { display: flex; gap: 5px; }
+  .pips i { width: 10px; height: 10px; transform: rotate(45deg); background: var(--gold-soft); display: block; }
+  .pips i.is-stuck { background: var(--wine); outline: 1px solid var(--gold-soft); }
+
+  .grid { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 9fr); gap: 22px; }
+  .leaf { background: var(--paper); border: 1px solid var(--gold-line); border-radius: 16px; padding: 20px 22px; min-width: 0; }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+  .leaf h2 { font: 600 18px/1.3 var(--serif); color: var(--navy); margin: 0 0 14px; display: flex; align-items: center; gap: 10px; }
+  .leaf h2::before { content: ""; width: 8px; height: 8px; transform: rotate(45deg); background: var(--gold); flex: none; }
+
+  .steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; }
+  .steps li { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border: 1px solid var(--gold-line); border-radius: 12px; background: var(--cream); position: relative; }
+  .medal { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; flex: none; font: 600 15px var(--serif); color: var(--gold-soft); background: radial-gradient(circle at 35% 30%, var(--navy-2), var(--navy)); border: 1.5px solid var(--gold-soft); }
+  .steps li.is-end .medal { color: var(--navy); background: radial-gradient(circle at 35% 30%, #F6E3B4, var(--gold-soft)); border-color: var(--gold); }
+  .steps li.is-stuck { background: var(--wine-tint); border-color: #D9A9A6; }
+  .steps li.is-stuck .medal { background: var(--wine); }
+  .steps .t { font-weight: 600; line-height: 1.35; }
+  .steps .seal { margin-left: auto; }
+
+  .scroll { overflow-x: auto; overscroll-behavior-x: contain; }
+  .flow svg { display: block; margin: 0 auto; }
+  .flow .edge { fill: none; stroke: var(--gold); stroke-width: 1.5; }
+  .flow .node .halo { fill: none; stroke: var(--gold); stroke-width: 1.5; stroke-dasharray: 4 4; }
+  .flow .edge-label { font: 500 14px var(--sans); fill: var(--ink-2); paint-order: stroke; stroke: var(--paper); stroke-width: 5px; stroke-linejoin: round; }
+  .flow .node .ring { fill: var(--navy); stroke: var(--gold-soft); stroke-width: 2; }
+  .flow .node.is-end .ring { fill: var(--gold-soft); stroke: var(--gold); }
+  .flow .node.is-stuck .ring { fill: var(--wine); }
+  .flow .node .num { font: 600 19px var(--serif); fill: var(--gold-soft); }
+  .flow .node.is-end .num { fill: var(--navy); }
+  .flow .node .name { font: 600 15px var(--sans); fill: var(--ink); }
+
+  .row-2 { margin-top: 22px; display: grid; grid-template-columns: minmax(0, 8fr) minmax(0, 4fr); gap: 22px; }
+  table.ledger { border-collapse: collapse; width: 100%; min-width: 640px; }
+  .ledger th, .ledger td { border-bottom: 1px solid var(--cream-2); padding: 8px 4px; text-align: center; }
+  .ledger thead th { font: 500 12px/1.35 var(--sans); color: var(--ink-2); vertical-align: bottom; border-bottom: 1px solid var(--gold-line); width: 9%; }
+  .ledger thead th i { display: block; width: 8px; height: 8px; transform: rotate(45deg); margin: 0 auto 6px; }
+  .ledger tbody th { text-align: left; white-space: nowrap; font: 600 14px var(--serif); color: var(--navy); }
+  .ledger tbody th b { color: #7E5C1A; margin-right: 8px; }
+  .ledger tbody tr:nth-child(even) { background: var(--cream); }
+  .ledger .gem { display: inline-block; width: 16px; height: 16px; transform: rotate(45deg); border: 1px solid rgba(255,255,255,.7); box-shadow: 0 0 0 1px var(--gold-line); }
+
+  .side { display: flex; flex-direction: column; gap: 22px; }
+  .stuck-card { border: 1px solid #D9A9A6; background: var(--wine-tint); border-radius: 12px; padding: 14px; display: flex; gap: 12px; }
+  .stuck-card p { margin: 0; }
+  .stuck-card .k { font-weight: 600; color: var(--wine); }
+  .stuck-card .q { font: 600 15px/1.45 var(--serif); color: var(--ink); margin-top: 2px; }
+  .tag { display: inline-flex; align-items: center; gap: 6px; margin-top: 8px; padding: 2px 10px; border-radius: 999px; background: var(--paper); border: 1px solid var(--gold-line); font-size: 13px; color: var(--ink-2); }
+  .d-title { font: 600 15px/1.45 var(--serif); margin: 0 0 8px; }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+  .tags .tag { margin-top: 0; }
+  .gold-btn { font: 600 14px var(--sans); color: var(--navy); background: transparent; border: 1px solid var(--gold); border-radius: 10px; padding: 10px 16px; min-height: 44px; cursor: pointer; }
+  .gold-btn:hover { background: var(--cream-2); }
+  .gold-btn:active { background: var(--gold-line); }
+  .gold-btn[aria-expanded="true"] { background: var(--navy); color: var(--gold-soft); border-color: var(--navy); }
+  .more { margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--gold-line); }
+  .more[hidden] { display: none; }
+  .more p { margin: 0 0 10px; }
+  .more ul { margin: 0; padding-left: 18px; }
+  .more li { margin-bottom: 4px; }
+  .more li.is-open { list-style: none; margin-left: -18px; padding: 4px 10px; border: 1px dashed var(--gold); border-radius: 8px; }
+
+  @media (max-width: 1180px) {
+    .grid, .row-2 { grid-template-columns: minmax(0, 1fr); }
+  }
+  @media (max-width: 820px) {
+    .book { grid-template-columns: minmax(0, 1fr); }
+    .spine { position: static; height: auto; padding: 16px 16px 12px; border-right: 0; border-bottom: 1px solid var(--gold-line); }
+    .crest { padding: 0 0 12px; margin-bottom: 12px; font-size: 19px; }
+    .nav { flex-direction: row; overflow-x: auto; margin: 0 -16px; padding: 0 16px; scrollbar-width: none; }
+    .nav span { flex: none; }
+    .folio { padding: 22px 16px 48px; }
+    h1 { font-size: 32px; }
+    .ribbon { margin-left: 0; }
+    .steps { grid-template-columns: minmax(0, 1fr); }
+    .leaf { padding: 16px; }
+    /* phone: what is stuck comes straight after the title */
+    .folio { display: flex; flex-direction: column; gap: 16px; }
+    .grid, .row-2 { display: contents; }
+    .title-row { order: -3; } .ornament { order: -2; margin: 0; } .side { order: -1; gap: 16px; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="book">
+  <aside class="spine">
+    <div class="crest"><svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true"><path d="M13 1 L16 10 L25 13 L16 16 L13 25 L10 16 L1 13 L10 10 Z" fill="none" stroke="#9A7124" stroke-width="1.5"/><circle cx="13" cy="13" r="2.5" fill="#9A7124"/></svg>Blueprint</div>
+    <nav class="nav" id="nav"></nav>
+  </aside>
+  <main class="folio">
+    <div class="title-row"><h1 id="project-name"></h1><div class="ribbon" id="ribbon"></div></div>
+    <div class="ornament" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M6 0 L12 6 L6 12 L0 6 Z" fill="currentColor"/></svg></div>
+    <div class="grid">
+      <section class="leaf" aria-labelledby="h-overview"><h2 id="h-overview"></h2><ol class="steps" id="steps"></ol></section>
+      <section class="leaf flow" aria-labelledby="h-flow"><h2 id="h-flow"></h2><div class="scroll" id="flow" tabindex="0" role="region"></div><ol class="sr-only" id="flow-text"></ol></section>
+    </div>
+    <div class="row-2">
+      <section class="leaf" aria-labelledby="h-lanes"><h2 id="h-lanes"></h2><div class="scroll" id="lanes" tabindex="0" role="region"></div></section>
+      <div class="side">
+        <section class="leaf" aria-labelledby="h-stuck"><h2 id="h-stuck"></h2><div id="stuck"></div></section>
+        <section class="leaf" id="decision"></section>
+      </div>
+    </div>
+  </main>
+</div>
+<script src="data.js"></script>
+<script src="shared.js"></script>
+<script>
+(function () {
+  const { WORDS, el } = BP;
+  const P = WORDS.pages;
+  const kindColor = { role: "var(--k-role)", screen: "var(--k-screen)", api: "var(--k-api)", system: "var(--k-system)" };
+  const stepByKey = new Map(BP.steps.map((s) => [s.key, s]));
+
+  document.getElementById("project-name").textContent = BP.projectName;
+  document.title = `${BP.projectName} · Blueprint`;
+
+  const n = BP.stuckCount;
+  document.getElementById("ribbon").append(
+    n ? el("span", { class: "seal", "aria-hidden": "true", text: "!" }) : null,
+    el("b", { text: n ? WORDS.stuck(n) : WORDS.ready }),
+    el("span", { class: "pips", "aria-hidden": "true" }, BP.steps.map((s) => el("i", { class: s.stuck ? "is-stuck" : null, title: `${s.number} ${s.title}` }))));
+
+  const nav = document.getElementById("nav");
+  P.forEach((name, i) => nav.append(el("span", { "aria-current": i === 0 ? "page" : null, text: name })));
+
+  document.getElementById("h-overview").textContent = P[0];
+  document.getElementById("h-flow").textContent = P[2];
+  document.getElementById("h-lanes").textContent = P[1];
+  document.getElementById("h-stuck").textContent = P[7];
+
+  // ภาพรวม — a column of medallion rows; last steps wear gold medals.
+  const steps = document.getElementById("steps");
+  const stuckWords = new Map(BP.stuckItems.filter((i) => i.aboutKey).map((i) => [i.aboutKey, i.words]));
+  BP.steps.forEach((s) => steps.append(el("li", { class: [s.ends && "is-end", s.stuck && "is-stuck"].filter(Boolean).join(" ") || null },
+    el("span", { class: "medal", text: s.number }),
+    el("span", { class: "t", text: s.title }),
+    s.stuck ? el("span", { class: "seal", "aria-hidden": "true", text: "!" }) : null,
+    s.stuck ? el("span", { class: "sr-only", text: stuckWords.get(s.key) }) : null)));
+
+  // ผังการทำงาน — medallions joined by gold threads; left to right, or top to bottom on a phone.
+  const L = BP.flowLayout();
+  function drawFlow() {
+    const host = document.getElementById("flow");
+    const R = 32;
+    const wide = { GX: 150, GY: 170, PADX: 70, PADY: 40 };
+    const vertical = host.clientWidth < (L.depth - 1) * wide.GX + 2 * wide.PADX;
+    let place, width, height;
+    if (!vertical) {
+      place = (p) => ({ x: wide.PADX + p.layer * wide.GX, y: wide.PADY + R + ((L.maxRows - 1) / 2 + p.row) * wide.GY });
+      width = (L.depth - 1) * wide.GX + 2 * wide.PADX;
+      height = wide.PADY + 2 * R + (L.maxRows - 1) * wide.GY + 48;
+    } else {
+      const GX = Math.min(170, host.clientWidth / L.maxRows), GY = 128;
+      width = host.clientWidth;
+      place = (p) => ({ x: width / 2 + p.row * GX, y: 20 + R + p.layer * GY });
+      height = 20 + 2 * R + (L.depth - 1) * GY + 40;
+    }
+    const svg = el("svg", { width, height, viewBox: `0 0 ${width} ${height}`, "aria-hidden": "true" });
+    svg.append(el("defs", {}, el("marker", { id: "tip", viewBox: "0 0 10 10", refX: 8, refY: 5, markerWidth: 7, markerHeight: 7, orient: "auto-start-reverse" },
+      el("path", { d: "M0 2 L8 5 L0 8 Z", fill: "#9A7124" }))));
+    const eg = el("g"), lg = el("g"), ng = el("g");
+    L.edges.forEach((e) => {
+      const pts = e.points.map((p) => place(p));
+      const last = pts.length - 1;
+      // leave a medal at its rim, bend through centres, arrive at the next rim
+      const out = (a) => vertical ? { x: a.x, y: a.y + R } : { x: a.x + R, y: a.y };
+      const into = (b) => vertical ? { x: b.x, y: b.y - R - 3 } : { x: b.x - R - 3, y: b.y };
+      const first = out(pts[0]);
+      let d = `M${first.x} ${first.y}`, prev = first;
+      for (let i = 1; i <= last; i++) {
+        const b = i === last ? into(pts[i]) : pts[i];
+        d += vertical
+          ? ` C${prev.x} ${(prev.y + b.y) / 2} ${b.x} ${(prev.y + b.y) / 2} ${b.x} ${b.y}`
+          : ` C${(prev.x + b.x) / 2} ${prev.y} ${(prev.x + b.x) / 2} ${b.y} ${b.x} ${b.y}`;
+        prev = b;
+      }
+      eg.append(el("path", { class: "edge", d, "marker-end": "url(#tip)" }));
+      if (e.label) {
+        const a = pts[0], b = pts[1];
+        if (!vertical) {
+          // on the outgoing side, clear of the title under the medal it leaves
+          const ly = b.y > a.y ? a.y + 30 : (a.y + b.y) / 2 - 8;
+          lg.append(el("text", { class: "edge-label", x: a.x + R + 14, y: ly, "text-anchor": "start", text: e.label }));
+        } else {
+          const goesLeft = b.x < a.x - 1;
+          const ly = a.y + R + (b.y - a.y - R) * (goesLeft ? 0.62 : 0.4);
+          const lx = a.x + (b.x - a.x) * (goesLeft ? 0.75 : 0.5) + (goesLeft ? -8 : 8);
+          lg.append(el("text", { class: "edge-label", x: lx, y: ly, "text-anchor": goesLeft ? "end" : "start", text: e.label }));
+        }
+      }
+    });
+    L.nodes.forEach((nd) => {
+      const { x, y } = place(nd);
+      const s = stepByKey.get(nd.key);
+      const g = el("g", { class: ["node", nd.ends && "is-end", nd.stuck && "is-stuck"].filter(Boolean).join(" ") },
+        el("title", { text: `${s ? s.number + " " : ""}${nd.title}` }),
+        nd.stuck ? el("circle", { class: "halo", cx: x, cy: y, r: R + 7 }) : null,
+        el("circle", { class: "ring", cx: x, cy: y, r: R }),
+        el("text", { class: "num", x, y: y + 7, "text-anchor": "middle", text: s ? s.number : "" }),
+        vertical
+          ? el("text", { class: "name", x: x + R + 12, y: y + 5, "text-anchor": "start", text: nd.title })
+          : el("text", { class: "name", x, y: y + R + 24, "text-anchor": "middle", text: nd.title }));
+      if (nd.stuck) g.append(el("circle", { cx: x + R * 0.8, cy: y - R * 0.8, r: 12, fill: "#8C2F39", stroke: "#E3C27A", "stroke-width": 1.5 }), el("text", { x: x + R * 0.8, y: y - R * 0.8 + 5, "text-anchor": "middle", style: "fill:#fff;font-size:14px;font-weight:700", text: "!" }));
+      if (nd.isBranch) {
+        const bx = vertical ? x : x + R + 1, by = vertical ? y + R + 1 : y;
+        g.append(el("polygon", { points: `${bx},${by - 5} ${bx + 5},${by} ${bx},${by + 5} ${bx - 5},${by}`, fill: "#9A7124" }));
+      }
+      ng.append(g);
+    });
+    svg.append(eg, ng, lg);
+    host.replaceChildren(svg);
+  }
+  drawFlow();
+  let rt; addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(drawFlow, 120); });
+  document.fonts && document.fonts.ready.then(drawFlow);
+  document.getElementById("flow").setAttribute("aria-label", P[2]);
+  document.getElementById("lanes").setAttribute("aria-label", P[1]);
+  BP.arrowLines().forEach((t) => document.getElementById("flow-text").append(el("li", { text: t })));
+
+  // ลำดับงาน — a ledger: steps down, participants across, a gem where they take part.
+  const table = el("table", { class: "ledger" });
+  table.append(el("thead", {}, el("tr", {}, el("th", { scope: "col", style: "width:auto" }),
+    BP.swimlane.lanes.map((l) => el("th", { scope: "col" }, el("i", { style: `background:${kindColor[l.kind]}`, "aria-hidden": "true" }), l.title)))));
+  const tb = el("tbody");
+  BP.swimlane.rows.forEach((r) => {
+    const s = stepByKey.get(r.step.key);
+    tb.append(el("tr", {}, el("th", { scope: "row" }, el("b", { text: s ? s.number : "" }), r.step.title),
+      BP.swimlane.lanes.map((l) => el("td", {}, r.lanes.includes(l.key)
+        ? el("span", { class: "gem", style: `background:${kindColor[l.kind]}`, role: "img", "aria-label": `${l.title} · ${r.step.title}`, title: `${l.title} · ${r.step.title}` })
+        : null))));
+  });
+  table.append(tb);
+  document.getElementById("lanes").append(table);
+
+  // ติดอยู่ตรงไหน
+  const stuck = document.getElementById("stuck");
+  BP.stuckItems.forEach((item) => {
+    const step = item.aboutKey && stepByKey.get(item.aboutKey);
+    stuck.append(el("div", { class: "stuck-card" },
+      el("span", { class: "seal", "aria-hidden": "true", text: "!" }),
+      el("div", {}, el("p", { class: "k", text: item.words }), el("p", { class: "q", text: item.title }),
+        step ? el("span", { class: "tag", text: `${step.number} ${step.title}` }) : null)));
+  });
+
+  // The decision — its title and the steps it covers; the long text behind ดูรายละเอียด.
+  const dec = BP.decision;
+  const box = document.getElementById("decision");
+  box.setAttribute("aria-label", dec.title);
+  const more = el("div", { class: "more", id: "decision-more", hidden: true },
+    el("p", { text: dec.rule }),
+    el("ul", {}, dec.cases.map((c) => el("li", { text: c })), dec.open ? el("li", { class: "is-open", text: dec.open }) : null));
+  const btn = el("button", { class: "gold-btn", type: "button", "aria-expanded": "false", "aria-controls": "decision-more", text: WORDS.showMore,
+    on: { click: () => { const open = more.hidden; more.hidden = !open; btn.setAttribute("aria-expanded", String(open)); } } });
+  box.append(el("p", { class: "d-title", text: dec.title }),
+    el("div", { class: "tags" }, dec.covers.map((k) => stepByKey.get(k)).filter(Boolean).map((s) => el("span", { class: "tag", text: `${s.number} ${s.title}` }))),
+    btn, more);
+})();
+</script>
+</body>
+</html>

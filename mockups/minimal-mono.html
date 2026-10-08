@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Blueprint · minimal mono</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  /* minimal mono — one column, one subject at a time, type does the work; blue only for what needs you. */
+  :root {
+    --paper: #FFFFFF;
+    --ink: #000000;
+    --ink-2: #4D4D4D;
+    --ink-3: #767676;
+    --rule: #E3E3E3;
+    --wash: #F6F6F6;
+    --accent: #0A5BD3;
+    --font: "Anuphan", "Sukhumvit Set", "Thonburi", system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body { background: var(--paper); color: var(--ink); font: 400 17px/1.65 var(--font); }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+  .bar { position: sticky; top: 0; z-index: 2; background: var(--paper); display: flex; align-items: center; gap: 20px; padding: 18px 48px 0; }
+  .brand { font-weight: 600; letter-spacing: -0.01em; }
+  .state { margin-left: auto; display: inline-flex; align-items: center; gap: 8px; font-weight: 500; }
+  .dot { width: 18px; height: 18px; border-radius: 50%; background: var(--accent); color: #fff; display: inline-grid; place-items: center; font-size: 12px; font-weight: 700; line-height: 1; flex: none; }
+  .meter { display: flex; gap: 3px; padding: 14px 48px 0; position: sticky; top: 58px; background: var(--paper); z-index: 2; }
+  .meter span { flex: 1; height: 2px; background: var(--ink); }
+  .meter span.is-stuck { background: var(--accent); height: 4px; margin-top: -1px; }
+
+  .frame { display: grid; grid-template-columns: 200px minmax(0, 760px); gap: 72px; padding: 56px 48px 120px; justify-content: center; }
+  .nav { position: sticky; top: 112px; align-self: start; display: flex; flex-direction: column; gap: 4px; }
+  .nav span { color: var(--ink-3); font-size: 15px; padding: 3px 0; }
+  .nav span[aria-current] { color: var(--ink); font-weight: 600; }
+
+  h1 { font-size: 72px; line-height: 1.05; font-weight: 700; letter-spacing: -0.035em; margin: 0 0 72px; }
+  h2 { font-size: 16px; font-weight: 600; color: var(--ink); margin: 0 0 22px; letter-spacing: 0; }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+  section + section { margin-top: 104px; }
+
+  ol.steps { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--ink); }
+  .steps li { display: grid; grid-template-columns: 88px 1fr; align-items: baseline; gap: 16px; padding: 18px 0; border-bottom: 1px solid var(--rule); }
+  .steps .t .dot { margin-left: 12px; vertical-align: middle; }
+  .steps .n { font-size: 40px; font-weight: 300; line-height: 1; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+  .steps .t { font-size: 24px; font-weight: 500; letter-spacing: -0.01em; }
+  .steps li.is-end .t::after { content: ""; display: inline-block; width: 10px; height: 10px; background: var(--ink); margin-left: 12px; vertical-align: middle; }
+  .steps li.is-stuck .n { color: var(--accent); }
+
+  .scroll { overflow-x: auto; overscroll-behavior-x: contain; }
+  .flow svg { display: block; margin: 0 auto; }
+  .flow .node rect { fill: var(--paper); stroke: var(--ink); stroke-width: 1.25; }
+  .flow .node.is-end rect { fill: var(--ink); }
+  .flow .node.is-end text { fill: var(--paper); }
+  .flow .node.is-stuck rect { stroke: var(--accent); stroke-width: 2.5; }
+  .flow .node text { font: 500 16px var(--font); fill: var(--ink); }
+  .flow .node .num { fill: var(--ink-3); font-weight: 400; }
+  .flow .node.is-end .num { fill: #BDBDBD; }
+  .flow .edge { fill: none; stroke: var(--ink); stroke-width: 1.25; }
+  .flow .edge-label { font: 400 14px var(--font); fill: var(--ink-2); paint-order: stroke; stroke: var(--paper); stroke-width: 6px; stroke-linejoin: round; }
+
+  .decision { margin-top: 40px; padding-top: 22px; border-top: 1px solid var(--rule); }
+  .decision p { margin: 0; }
+  .decision .d-title { font-size: 19px; font-weight: 500; }
+  .text-btn { font: 500 16px var(--font); color: var(--ink); background: none; border: 0; padding: 12px 0; min-height: 44px; cursor: pointer; text-decoration: underline; text-underline-offset: 5px; text-decoration-thickness: 1px; }
+  .text-btn:hover { text-decoration-thickness: 2px; }
+  .text-btn:active { color: var(--ink-2); }
+  .text-btn[aria-expanded="true"] { background: var(--ink); color: var(--paper); text-decoration: none; padding: 10px 16px; }
+  .more { padding: 4px 0 0; max-width: 60ch; }
+  .more[hidden] { display: none; }
+  .more p { margin: 0 0 14px; color: var(--ink-2); }
+  .more ul { margin: 0; padding: 0; list-style: none; }
+  .more li { padding: 8px 0; border-top: 1px solid var(--rule); }
+  .more li.is-open { border-top-style: dashed; }
+  .more li.is-open::before { content: "?"; display: inline-grid; place-items: center; width: 18px; height: 18px; border: 1px solid var(--ink); border-radius: 50%; font-size: 12px; margin-right: 10px; }
+
+  table.matrix { border-collapse: collapse; }
+  .matrix thead th { vertical-align: bottom; padding: 0 3px 10px; width: 64px; min-width: 64px; font-size: 13px; font-weight: 400; line-height: 1.35; color: var(--ink-2); text-align: center; }
+  .matrix thead th span { display: block; }
+  .matrix thead th svg { display: block; margin: 6px auto 0; }
+  .matrix tbody th { text-align: left; font-weight: 500; padding: 11px 16px 11px 0; white-space: nowrap; }
+  .matrix tbody th b { font-weight: 300; color: var(--ink-3); margin-right: 12px; font-variant-numeric: tabular-nums; }
+  .matrix td { text-align: center; border-top: 1px solid var(--rule); padding: 0; }
+  .matrix tbody tr:first-child td, .matrix tbody tr:first-child th { border-top: 1px solid var(--ink); }
+  .matrix tbody th { border-top: 1px solid var(--rule); }
+  .matrix svg { display: inline-block; vertical-align: middle; }
+
+  .stuck-row { display: grid; grid-template-columns: auto 1fr; gap: 14px; padding: 18px 0; border-top: 1px solid var(--ink); border-bottom: 1px solid var(--rule); }
+  .stuck-row p { margin: 0; }
+  .stuck-row .k { font-weight: 600; }
+  .stuck-row .q { font-size: 21px; font-weight: 500; letter-spacing: -0.01em; margin-top: 2px; }
+  .stuck-row .s { color: var(--ink-3); margin-top: 6px; font-size: 15px; }
+
+  @media (max-width: 900px) {
+    .frame { grid-template-columns: minmax(0, 1fr); gap: 0; padding: 24px 16px 80px; }
+    .bar { padding: 14px 16px 0; }
+    .meter { padding: 12px 16px 0; top: 52px; }
+    .nav { position: static; flex-direction: row; overflow-x: auto; gap: 18px; margin: 0 -16px 40px; padding: 0 16px; scrollbar-width: none; }
+    .nav span { flex: none; }
+    h1 { font-size: 44px; margin-bottom: 48px; }
+    section + section { margin-top: 72px; }
+    .steps li { grid-template-columns: 56px 1fr; }
+    .steps .n { font-size: 30px; }
+    .steps .t { font-size: 20px; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<header class="bar"><span class="brand">Blueprint</span><span class="state" id="state"></span></header>
+<div class="meter" id="meter" aria-hidden="true"></div>
+<div class="frame">
+  <nav class="nav" id="nav"></nav>
+  <main>
+    <h1 id="project-name"></h1>
+    <section aria-labelledby="h-stuck"><h2 id="h-stuck"></h2><div id="stuck"></div></section>
+    <section class="flow" aria-labelledby="h-flow"><h2 id="h-flow"></h2><div class="scroll" id="flow" tabindex="0" role="region"></div><ol class="sr-only" id="flow-text"></ol><div class="decision" id="decision"></div></section>
+    <section aria-labelledby="h-overview"><h2 id="h-overview"></h2><ol class="steps" id="steps"></ol></section>
+    <section aria-labelledby="h-lanes"><h2 id="h-lanes"></h2><div class="scroll" id="lanes" tabindex="0" role="region"></div></section>
+  </main>
+</div>
+<script src="data.js"></script>
+<script src="shared.js"></script>
+<script>
+(function () {
+  const { WORDS, el } = BP;
+  const P = WORDS.pages;
+  const stepByKey = new Map(BP.steps.map((s) => [s.key, s]));
+
+  document.getElementById("project-name").textContent = BP.projectName;
+  document.title = `${BP.projectName} · Blueprint`;
+
+  const n = BP.stuckCount;
+  document.getElementById("state").append(n ? el("span", { class: "dot", "aria-hidden": "true", text: "!" }) : null, n ? WORDS.stuck(n) : WORDS.ready);
+  const meter = document.getElementById("meter");
+  BP.steps.forEach((s) => meter.append(el("span", { class: s.stuck ? "is-stuck" : null })));
+
+  const nav = document.getElementById("nav");
+  P.forEach((name, i) => nav.append(el("span", { "aria-current": i === 0 ? "page" : null, text: name })));
+
+  document.getElementById("h-overview").textContent = P[0];
+  document.getElementById("h-flow").textContent = P[2];
+  document.getElementById("h-lanes").textContent = P[1];
+  document.getElementById("h-stuck").textContent = P[7];
+
+  // ภาพรวม — a numbered list, large; a black square marks a last step, blue numbers a stuck one.
+  const steps = document.getElementById("steps");
+  const stuckWords = new Map(BP.stuckItems.filter((i) => i.aboutKey).map((i) => [i.aboutKey, i.words]));
+  BP.steps.forEach((s) => steps.append(el("li", { class: [s.ends && "is-end", s.stuck && "is-stuck"].filter(Boolean).join(" ") || null },
+    el("span", { class: "n", text: s.number }),
+    el("span", { class: "t" }, s.title,
+      s.stuck ? el("span", { class: "dot", "aria-hidden": "true", text: "!" }) : null,
+      s.stuck ? el("span", { class: "sr-only", text: stuckWords.get(s.key) }) : null))));
+
+  // ผังการทำงาน — top to bottom; last steps filled black; branch words sit on the line.
+  const L = BP.flowLayout();
+  function drawFlow() {
+  const host = document.getElementById("flow");
+  // full size when the column allows; on a phone the boxes narrow and the title drops under the number
+  const full = L.maxRows * 210 + (L.maxRows - 1) * 70 + 40;
+  const narrow = host.clientWidth < full;
+  const GX = narrow ? 20 : 70, PAD = narrow ? 10 : 20, GY = 84;
+  const W = narrow ? Math.floor((host.clientWidth - 2 * PAD - (L.maxRows - 1) * GX) / L.maxRows) : 210;
+  const H = narrow ? 62 : 54;
+  const width = L.maxRows * W + (L.maxRows - 1) * GX + PAD * 2;
+  const colX = (row) => width / 2 + row * (W + GX) - W / 2;
+  const rowY = (layer) => PAD + layer * (H + GY);
+  const height = rowY(L.depth - 1) + H + PAD;
+  const svg = el("svg", { width, height, viewBox: `0 0 ${width} ${height}`, "aria-hidden": "true" });
+  svg.append(el("defs", {}, el("marker", { id: "arr", viewBox: "0 0 10 10", refX: 9, refY: 5, markerWidth: 7, markerHeight: 7, orient: "auto-start-reverse" },
+    el("path", { d: "M0 1 L9 5 L0 9", fill: "none", stroke: "#000", "stroke-width": 1.5 }))));
+  const eg = el("g"), lg = el("g"), ng = el("g");
+  L.edges.forEach((e) => {
+    const pts = e.points.map((p, i) => {
+      const cx = colX(p.row) + W / 2;
+      const top = rowY(p.layer), bottom = top + H;
+      return { x: cx, yIn: i === 0 ? bottom : (i === e.points.length - 1 ? top : top + H / 2), yOut: i === 0 ? bottom : top + H / 2 };
+    });
+    let d = `M${pts[0].x} ${pts[0].yOut}`;
+    for (let i = 1; i < pts.length; i++) {
+      const a = pts[i - 1], b = pts[i];
+      const my = (a.yOut + b.yIn) / 2;
+      d += ` C${a.x} ${my} ${b.x} ${my} ${b.x} ${b.yIn - (i === pts.length - 1 ? 2 : 0)}`;
+    }
+    eg.append(el("path", { class: "edge", d, "marker-end": "url(#arr)" }));
+    if (e.label) {
+      const a = pts[0], b = pts[1];
+      // label beside the line, on the outward side, a third of the way down
+      const lx = a.x + (b.x - a.x) * 0.5, ly = a.yOut + (b.yIn - a.yOut) * 0.35;
+      const anchor = b.x < a.x - 1 ? "end" : "start";
+      const dx = b.x < a.x - 1 ? -14 : 14;
+      lg.append(el("text", { class: "edge-label", x: lx + dx, y: ly + 5, "text-anchor": anchor, text: e.label }));
+    }
+  });
+  L.nodes.forEach((nd) => {
+    const x = colX(nd.row), y = rowY(nd.layer);
+    const s = stepByKey.get(nd.key);
+    const g = el("g", { class: ["node", nd.ends && "is-end", nd.stuck && "is-stuck"].filter(Boolean).join(" ") },
+      el("rect", { x, y, width: W, height: H, rx: 3 }),
+      narrow
+        ? el("text", { x: x + 12, y: y + 25, style: "font-size:14px" }, el("tspan", { class: "num", text: s ? s.number : "" }), el("tspan", { x: x + 12, dy: 21, text: nd.title }))
+        : el("text", { x: x + 18, y: y + H / 2 + 6 }, el("tspan", { class: "num", text: s ? s.number + "   " : "" }), el("tspan", { text: nd.title })));
+    if (nd.isBranch) g.append(el("polygon", { points: `${x + W / 2},${y + H - 6} ${x + W / 2 + 6},${y + H} ${x + W / 2},${y + H + 6} ${x + W / 2 - 6},${y + H}`, fill: "#000" }));
+    if (nd.stuck) g.append(el("circle", { cx: x + W, cy: y, r: 10, fill: "var(--accent)" }), el("text", { x: x + W, y: y + 4.5, "text-anchor": "middle", style: "fill:#fff;font-size:12px;font-weight:700", text: "!" }));
+    ng.append(g);
+  });
+  svg.append(eg, ng, lg);
+  host.replaceChildren(svg);
+  }
+  drawFlow();
+  let rt; addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(drawFlow, 120); });
+  document.fonts && document.fonts.ready.then(drawFlow);
+  document.getElementById("flow").setAttribute("aria-label", P[2]);
+  document.getElementById("lanes").setAttribute("aria-label", P[1]);
+  BP.arrowLines().forEach((t) => document.getElementById("flow-text").append(el("li", { text: t })));
+
+  // The decision under the chart: one line, the long text behind ดูรายละเอียด.
+  const dec = BP.decision;
+  const more = el("div", { class: "more", id: "decision-more", hidden: true },
+    el("p", { text: dec.rule }),
+    el("ul", {}, dec.cases.map((c) => el("li", { text: c })), dec.open ? el("li", { class: "is-open", text: dec.open }) : null));
+  const btn = el("button", { class: "text-btn", type: "button", "aria-expanded": "false", "aria-controls": "decision-more", text: WORDS.showMore,
+    on: { click: () => { const open = more.hidden; more.hidden = !open; btn.setAttribute("aria-expanded", String(open)); } } });
+  document.getElementById("decision").append(el("p", { class: "d-title", text: dec.title }), btn, more);
+
+  // ลำดับงาน — a matrix; shape says what kind of participant (no colour): ● ■ ◆ ▲.
+  const shape = (kind, size = 14, fill = "#000") => {
+    const s = size, h = s / 2;
+    const i = BP.laneKinds.indexOf(kind);
+    const body = [
+      el("circle", { cx: h, cy: h, r: h - 1, fill }),
+      el("rect", { x: 1, y: 1, width: s - 2, height: s - 2, fill }),
+      el("polygon", { points: `${h},0 ${s},${h} ${h},${s} 0,${h}`, fill }),
+      el("polygon", { points: `${h},1 ${s - 1},${s - 1} 1,${s - 1}`, fill }),
+    ][i % 4];
+    return el("svg", { width: s, height: s, viewBox: `0 0 ${s} ${s}`, "aria-hidden": "true" }, body);
+  };
+  const table = el("table", { class: "matrix" });
+  table.append(el("thead", {}, el("tr", {}, el("th", { scope: "col", style: "width:auto" }),
+    BP.swimlane.lanes.map((l) => el("th", { scope: "col" }, el("span", { text: l.title }))))));
+  // header shapes sit at the foot of each rotated title
+  table.querySelectorAll("thead th:not(:first-child)").forEach((th, i) => th.append(shape(BP.swimlane.lanes[i].kind, 9, "#767676")));
+  const tb = el("tbody");
+  BP.swimlane.rows.forEach((r) => {
+    const s = stepByKey.get(r.step.key);
+    tb.append(el("tr", {}, el("th", { scope: "row" }, el("b", { text: s ? s.number : "" }), r.step.title),
+      BP.swimlane.lanes.map((l) => el("td", { title: r.lanes.includes(l.key) ? `${l.title} · ${r.step.title}` : null },
+        r.lanes.includes(l.key) ? el("span", { role: "img", "aria-label": `${l.title} · ${r.step.title}` }, shape(l.kind)) : null))));
+  });
+  table.append(tb);
+  document.getElementById("lanes").append(table);
+
+  // ติดอยู่ตรงไหน — each item as one row.
+  const stuck = document.getElementById("stuck");
+  BP.stuckItems.forEach((item) => {
+    const step = item.aboutKey && stepByKey.get(item.aboutKey);
+    stuck.append(el("div", { class: "stuck-row" },
+      el("span", { class: "dot", "aria-hidden": "true", text: "!" }),
+      el("div", {},
+        el("p", { class: "k", text: item.words }),
+        el("p", { class: "q", text: item.title }),
+        step ? el("p", { class: "s", text: `${step.number}  ${step.title}` }) : null)));
+  });
+})();
+</script>
+</body>
+</html>

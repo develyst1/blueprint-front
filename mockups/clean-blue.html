@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Blueprint · clean blue</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  /* clean blue — a picture canvas: the flowchart is the hero, lanes run across, one blue, stuck in orange. */
+  :root {
+    --bg: #F2F5FA;
+    --surface: #FFFFFF;
+    --ink: #15233D;
+    --ink-2: #4B5B76;
+    --line: #DCE3EE;
+    --line-strong: #7F8DA3;
+    --edge: #6E7C93;
+    --blue: #1F6FEB;
+    --blue-ink: #1458C4;
+    --blue-tint: #E7EFFD;
+    --stuck: #A6460A;
+    --stuck-tint: #FFF1E3;
+    --stuck-line: #F2B27A;
+    --band: #F7F9FD;
+    --k-role: #1F6FEB; --k-screen: #0E9F8E; --k-api: #7C4DDB; --k-system: #DB2777;
+    --r-panel: 22px; --r-tile: 14px; --r-chip: 999px;
+    --font: "IBM Plex Sans Thai", "Sukhumvit Set", "Thonburi", system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body { background: var(--bg); color: var(--ink); font: 400 16px/1.6 var(--font); }
+  :focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+
+  .top { display: flex; align-items: center; gap: 24px; padding: 20px 40px; background: var(--surface); border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 600; color: var(--ink-2); }
+  .brand-mark { width: 30px; height: 30px; border-radius: 9px; background: var(--blue); display: grid; place-items: center; }
+  .project { font-size: 26px; font-weight: 700; margin: 0; letter-spacing: -0.01em; }
+  .ready { margin-left: auto; display: flex; align-items: center; gap: 14px; }
+  .ready-label { display: inline-flex; align-items: center; gap: 8px; font-weight: 600; color: var(--stuck); background: var(--stuck-tint); border: 1px solid var(--stuck-line); padding: 6px 14px; border-radius: var(--r-chip); }
+  .ready-label.ok { color: var(--blue-ink); background: var(--blue-tint); border-color: transparent; }
+  .glyph { width: 20px; height: 20px; border-radius: 50%; background: var(--stuck); color: #fff; display: inline-grid; place-items: center; font-size: 13px; font-weight: 700; line-height: 1; flex: none; }
+  .meter { display: flex; align-items: center; gap: 4px; }
+  .meter span { width: 26px; height: 8px; border-radius: 4px; background: var(--blue); }
+  .meter span.is-stuck { height: 18px; width: 18px; border-radius: 50%; background: var(--stuck); color: #fff; font-size: 12px; font-weight: 700; display: grid; place-items: center; line-height: 1; }
+
+  .tabs { display: flex; gap: 6px; padding: 14px 40px; overflow-x: auto; background: var(--surface); border-bottom: 1px solid var(--line); scrollbar-width: none; }
+  .tabs span { flex: none; padding: 8px 16px; border-radius: var(--r-chip); color: var(--ink-2); font-weight: 500; }
+  .tabs span[aria-current] { background: var(--blue-tint); color: var(--blue-ink); font-weight: 600; }
+
+  main { padding: 28px 40px 56px; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 24px; max-width: 1440px; margin: 0 auto; }
+  .panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-panel); padding: 24px 28px; min-width: 0; }
+  .panel h2 { margin: 0 0 16px; font-size: 19px; font-weight: 600; }
+  .hero { grid-column: span 12; padding: 26px 28px 20px; }
+  .hero h2 { font-size: 22px; }
+  .span-12 { grid-column: span 12; } .span-8 { grid-column: span 8; } .span-4 { grid-column: span 4; }
+
+  .steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+  .step { position: relative; border: 1px solid var(--line); border-radius: var(--r-tile); padding: 14px 16px; display: flex; align-items: center; gap: 14px; min-height: 76px; }
+  .step-num { font-size: 28px; font-weight: 700; line-height: 1; color: var(--blue); }
+  .step-title { font-weight: 600; line-height: 1.4; }
+  .step.is-stuck { border-color: var(--stuck-line); background: var(--stuck-tint); }
+  .step.is-stuck .step-num { color: var(--stuck); }
+  .step .glyph { margin-left: auto; }
+  .step.is-end { border-style: dashed; border-color: var(--line-strong); }
+
+  .scroll { overflow-x: auto; overscroll-behavior-x: contain; border-radius: 12px; }
+  .flow svg, .lanes svg { display: block; margin: 0 auto; }
+  .flow .node rect { fill: var(--surface); stroke: var(--line-strong); stroke-width: 1.5; }
+  .flow .node.is-end rect { fill: var(--blue-tint); stroke: var(--blue); }
+  .flow .node.is-stuck rect { fill: var(--stuck-tint); stroke: var(--stuck); stroke-width: 2; }
+  .flow .node text { font: 600 15px var(--font); fill: var(--ink); }
+  .flow .node .num { font-weight: 700; fill: var(--blue); }
+  .flow .node.is-stuck .num { fill: var(--stuck); }
+  .flow .edge { fill: none; stroke: var(--edge); stroke-width: 2; }
+  .flow .edge-label rect { fill: var(--surface); stroke: var(--line-strong); }
+  .flow .edge-label text { font: 500 13px var(--font); fill: var(--ink); }
+  .flow.is-vertical .node text { font-size: 14px; }
+  .flow .branch { fill: var(--blue); }
+
+  .side { display: flex; flex-direction: column; gap: 24px; }
+  .stuck-item { display: flex; gap: 12px; align-items: flex-start; padding: 14px; border-radius: var(--r-tile); background: var(--stuck-tint); border: 1px solid var(--stuck-line); }
+  .stuck-item p { margin: 0; }
+  .stuck-kind { font-weight: 600; color: var(--stuck); }
+  .chip { display: inline-flex; align-items: center; gap: 6px; margin-top: 8px; padding: 2px 10px; border-radius: var(--r-chip); background: var(--surface); border: 1px solid var(--line); font-size: 14px; color: var(--ink-2); }
+  .decision-title { font-weight: 600; margin: 0 0 6px; }
+  .covers { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+  .covers .chip { margin-top: 0; }
+  .more-btn { font: 600 15px var(--font); color: var(--blue-ink); background: var(--blue-tint); border: 1px solid transparent; border-radius: var(--r-chip); padding: 10px 18px; min-height: 44px; cursor: pointer; }
+  .more-btn:hover { background: #D8E6FC; }
+  .more-btn:active { background: #C9DCFB; }
+  .more-btn[aria-expanded="true"] { background: var(--blue); color: #fff; }
+  .more { margin-top: 14px; border-top: 1px solid var(--line); padding-top: 14px; }
+  .more[hidden] { display: none; }
+  .more p { margin: 0 0 10px; max-width: 60ch; }
+  .more ul { margin: 0; padding-left: 20px; }
+  .more li { margin-bottom: 6px; }
+  .more li.is-open { list-style: none; margin-left: -20px; padding: 6px 10px; border: 1px dashed var(--line-strong); border-radius: 10px; }
+
+  .lanes .band-label { font: 500 14px var(--font); fill: var(--ink); }
+  .lanes .col-num { font: 700 15px var(--font); fill: var(--blue); }
+  .lanes .col-title { font: 600 13.5px var(--font); fill: var(--ink-2); }
+  .lanes .thread { stroke: var(--line-strong); stroke-width: 2; }
+  .lanes .mark { stroke: #fff; stroke-width: 2; }
+
+  @media (max-width: 1100px) {
+    .span-8, .span-4 { grid-column: span 12; }
+  }
+  @media (max-width: 640px) {
+    .top, .tabs { padding-left: 16px; padding-right: 16px; }
+    .top { gap: 12px; }
+    .ready { margin-left: 0; width: 100%; }
+    main { padding: 20px 16px 40px; gap: 16px; }
+    .panel, .hero { padding: 18px 16px; border-radius: 18px; }
+    .side { order: -1; gap: 16px; }
+    .steps { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+    .step { min-height: 60px; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand"><span class="brand-mark" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 16 16"><path d="M2 3h12M2 8h8M2 13h12" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg></span>Blueprint</div>
+  <h1 class="project" id="project-name"></h1>
+  <div class="ready" id="ready"></div>
+</header>
+<nav class="tabs" id="tabs"></nav>
+<main>
+  <section class="panel hero flow" id="flow-panel" aria-labelledby="h-flow"><h2 id="h-flow"></h2><div class="scroll" id="flow" tabindex="0" role="region"></div><ol class="sr-only" id="flow-text"></ol></section>
+  <section class="panel span-8" aria-labelledby="h-overview"><h2 id="h-overview"></h2><ol class="steps" id="steps"></ol></section>
+  <div class="span-4 side">
+    <section class="panel" aria-labelledby="h-stuck"><h2 id="h-stuck"></h2><div id="stuck"></div></section>
+    <section class="panel" id="decision"></section>
+  </div>
+  <section class="panel span-12 lanes" aria-labelledby="h-lanes"><h2 id="h-lanes"></h2><div class="scroll" id="lanes" tabindex="0" role="region"></div></section>
+</main>
+<script src="data.js"></script>
+<script src="shared.js"></script>
+<script>
+(function () {
+  const { WORDS, el } = BP;
+  const P = WORDS.pages;
+  const kindColor = { role: "var(--k-role)", screen: "var(--k-screen)", api: "var(--k-api)", system: "var(--k-system)" };
+  const stepByKey = new Map(BP.steps.map((s) => [s.key, s]));
+  const stuckWords = new Map(BP.stuckItems.filter((i) => i.aboutKey).map((i) => [i.aboutKey, i.words]));
+
+  document.getElementById("project-name").textContent = BP.projectName;
+  document.title = `${BP.projectName} · Blueprint`;
+
+  // Readiness: label + one segment per step; a stuck step is a round "!" mark, not only another colour.
+  const n = BP.stuckCount;
+  document.getElementById("ready").append(
+    el("span", { class: n ? "ready-label" : "ready-label ok" },
+      n ? el("span", { class: "glyph", "aria-hidden": "true", text: "!" }) : null,
+      n ? WORDS.stuck(n) : WORDS.ready),
+    el("span", { class: "meter", "aria-hidden": "true" },
+      BP.steps.map((s) => el("span", { class: s.stuck ? "is-stuck" : null, title: `${s.number} ${s.title}`, text: s.stuck ? "!" : null }))),
+  );
+
+  const tabs = document.getElementById("tabs");
+  P.forEach((name, i) => tabs.append(el("span", { "aria-current": i === 0 ? "page" : null, text: name })));
+
+  document.getElementById("h-overview").textContent = P[0];
+  document.getElementById("h-flow").textContent = P[2];
+  document.getElementById("h-lanes").textContent = P[1];
+  document.getElementById("h-stuck").textContent = P[7];
+  document.getElementById("flow").setAttribute("aria-label", P[2]);
+  document.getElementById("lanes").setAttribute("aria-label", P[1]);
+  BP.arrowLines().forEach((t) => document.getElementById("flow-text").append(el("li", { text: t })));
+
+  // ภาพรวม — numbered step tiles.
+  const steps = document.getElementById("steps");
+  BP.steps.forEach((s) => {
+    steps.append(el("li", { class: ["step", s.stuck && "is-stuck", s.ends && "is-end"].filter(Boolean).join(" ") },
+      el("span", { class: "step-num", text: s.number }),
+      el("span", { class: "step-title", text: s.title }),
+      s.stuck ? el("span", { class: "glyph", "aria-hidden": "true", text: "!" }) : null,
+      s.stuck ? el("span", { class: "sr-only", text: stuckWords.get(s.key) }) : null,
+    ));
+  });
+
+  // ผังการทำงาน — the hero. Left to right when it fits, top to bottom when it does not.
+  const L = BP.flowLayout();
+  function drawFlow() {
+    const host = document.getElementById("flow");
+    const avail = host.clientWidth;
+    const H_ = { W: 168, H: 66, GX: 88, GY: 48, PAD: 20 }; // GX = the narrowest gap a branch label fits in
+    const needH = L.depth * H_.W + (L.depth - 1) * H_.GX + 2 * H_.PAD;
+    const vertical = avail < needH;
+    document.getElementById("flow-panel").classList.toggle("is-vertical", vertical);
+    let W, H, place, width, height;
+    if (!vertical) {
+      ({ W, H } = H_);
+      const gx = Math.min(180, (avail - 2 * H_.PAD - L.depth * W) / (L.depth - 1));
+      place = (p) => ({ x: H_.PAD + p.layer * (W + gx), y: H_.PAD + ((L.maxRows - 1) / 2 + p.row) * (H + H_.GY) });
+      width = H_.PAD * 2 + L.depth * W + (L.depth - 1) * gx;
+      height = H_.PAD * 2 + L.maxRows * H + (L.maxRows - 1) * H_.GY;
+    } else {
+      const GX = 16, PAD = 12;
+      W = Math.min(220, (avail - 2 * PAD - (L.maxRows - 1) * GX) / L.maxRows); H = 62;
+      const GY = 74;
+      width = Math.max(avail, 2 * PAD + L.maxRows * W + (L.maxRows - 1) * GX);
+      place = (p) => ({ x: width / 2 + p.row * (W + GX) - W / 2, y: PAD + p.layer * (H + GY) });
+      height = PAD * 2 + L.depth * H + (L.depth - 1) * GY;
+    }
+    const svg = el("svg", { width, height, viewBox: `0 0 ${width} ${height}`, "aria-hidden": "true" });
+    svg.append(el("defs", {}, el("marker", { id: "arrow", viewBox: "0 0 10 10", refX: 9, refY: 5, markerWidth: 8, markerHeight: 8, orient: "auto-start-reverse" },
+      el("path", { d: "M0 0 L10 5 L0 10 z", fill: "#6E7C93" }))));
+    const eg = el("g"), lg = el("g"), ng = el("g");
+    L.edges.forEach((e) => {
+      const last = e.points.length - 1;
+      // anchor points: leave from the right/bottom edge, arrive at the left/top edge, bend through centres
+      const pts = e.points.map((p, i) => {
+        const b = place(p);
+        if (!vertical) return { x: i === 0 ? b.x + W : i === last ? b.x - 2 : b.x + W / 2, y: b.y + H / 2 };
+        return { x: b.x + W / 2, y: i === 0 ? b.y + H : i === last ? b.y - 2 : b.y + H / 2 };
+      });
+      let d = `M${pts[0].x} ${pts[0].y}`;
+      for (let i = 1; i <= last; i++) {
+        const a = pts[i - 1], b = pts[i];
+        d += vertical
+          ? ` C${a.x} ${(a.y + b.y) / 2} ${b.x} ${(a.y + b.y) / 2} ${b.x} ${b.y}`
+          : ` C${(a.x + b.x) / 2} ${a.y} ${(a.x + b.x) / 2} ${b.y} ${b.x} ${b.y}`;
+      }
+      eg.append(el("path", { class: "edge", d, "marker-end": "url(#arrow)" }));
+      if (e.label) {
+        const a = pts[0], b = pts[1];
+        // vertical: two branches leave one point, so stagger them — rightward high, leftward low
+        const frac = b.x > a.x + 1 ? 0.3 : b.x < a.x - 1 ? 0.72 : 0.5;
+        const cx = vertical ? a.x + (b.x - a.x) * 0.55 : (a.x + b.x) / 2;
+        const cy = vertical ? a.y + (b.y - a.y) * frac : (a.y + b.y) / 2;
+        const t = el("text", { x: cx, y: cy + 4.5, "text-anchor": "middle", text: e.label });
+        const g = el("g", { class: "edge-label" }, el("rect", { x: cx - 60, y: cy - 13, width: 120, height: 26, rx: 13 }), t);
+        lg.append(g);
+        requestAnimationFrame(() => { const w = t.getComputedTextLength() + 20; g.firstChild.setAttribute("x", cx - w / 2); g.firstChild.setAttribute("width", w); });
+      }
+    });
+    L.nodes.forEach((nd) => {
+      const { x, y } = place(nd);
+      const s = stepByKey.get(nd.key);
+      const label = vertical
+        ? el("text", { x: x + 14, y: y + 26 }, el("tspan", { class: "num", text: s ? s.number : "" }), el("tspan", { x: x + 14, dy: 20, text: nd.title }))
+        : el("text", { x: x + 18, y: y + H / 2 + 5 }, el("tspan", { class: "num", text: s ? s.number + "  " : "" }), el("tspan", { text: nd.title }));
+      const g = el("g", { class: ["node", nd.ends && "is-end", nd.stuck && "is-stuck"].filter(Boolean).join(" ") },
+        el("title", { text: `${s ? s.number + " " : ""}${nd.title}` }),
+        el("rect", { x, y, width: W, height: H, rx: nd.ends ? H / 2 : 14 }), label);
+      if (nd.isBranch) {
+        const bx = vertical ? x + W / 2 : x + W, by = vertical ? y + H : y + H / 2;
+        g.append(el("polygon", { class: "branch", points: `${bx},${by - 7} ${bx + 7},${by} ${bx},${by + 7} ${bx - 7},${by}` }));
+      }
+      if (nd.stuck) g.append(el("circle", { cx: x + W - 4, cy: y + 4, r: 10, fill: "#A6460A" }), el("text", { x: x + W - 4, y: y + 8.5, "text-anchor": "middle", style: "fill:#fff;font-size:13px;font-weight:700", text: "!" }));
+      ng.append(g);
+    });
+    svg.append(eg, ng, lg);
+    host.replaceChildren(svg);
+  }
+
+  // ลำดับงาน — real lanes: one band per participant, steps across; a thread joins who takes part in a step.
+  function drawLanes() {
+    const host = document.getElementById("lanes");
+    const lanes = BP.swimlane.lanes, rows = BP.swimlane.rows;
+    const LW = 176, HEAD = 64, BH = 40;
+    const CW = Math.max(104, (host.clientWidth - LW) / rows.length);
+    const width = LW + CW * rows.length, height = HEAD + BH * lanes.length + 6;
+    const svg = el("svg", { width, height, viewBox: `0 0 ${width} ${height}` });
+    const laneY = (i) => HEAD + i * BH + BH / 2;
+    lanes.forEach((l, i) => {
+      if (i % 2 === 0) svg.append(el("rect", { x: 0, y: HEAD + i * BH, width, height: BH, fill: "#F7F9FD" }));
+      svg.append(el("circle", { cx: 12, cy: laneY(i), r: 5, fill: kindColor[l.kind] }),
+        el("text", { class: "band-label", x: 26, y: laneY(i) + 5, text: l.title }));
+    });
+    rows.forEach((r, c) => {
+      const cx = LW + c * CW + CW / 2;
+      const s = stepByKey.get(r.step.key);
+      svg.append(el("text", { class: "col-num", x: cx, y: 22, "text-anchor": "middle", text: s ? s.number : "" }),
+        el("text", { class: "col-title", x: cx, y: 44, "text-anchor": "middle", text: r.step.title }));
+      const idx = r.lanes.map((k) => lanes.findIndex((l) => l.key === k)).filter((i) => i >= 0).sort((a, b) => a - b);
+      if (idx.length > 1) svg.append(el("line", { class: "thread", x1: cx, x2: cx, y1: laneY(idx[0]), y2: laneY(idx[idx.length - 1]) }));
+      idx.forEach((i) => {
+        const l = lanes[i];
+        svg.append(el("circle", { class: "mark", cx, cy: laneY(i), r: 8, fill: kindColor[l.kind], role: "img", "aria-label": `${l.title} · ${r.step.title}` },
+          el("title", { text: `${l.title} · ${r.step.title}` })));
+      });
+    });
+    host.replaceChildren(svg);
+  }
+
+  // ติดอยู่ตรงไหน — each item in its words, the part's title, and the step it is about.
+  const stuck = document.getElementById("stuck");
+  BP.stuckItems.forEach((item) => {
+    const step = item.aboutKey && stepByKey.get(item.aboutKey);
+    stuck.append(el("div", { class: "stuck-item" },
+      el("span", { class: "glyph", "aria-hidden": "true", text: "!" }),
+      el("div", {},
+        el("p", { class: "stuck-kind", text: item.words }),
+        el("p", { text: item.title }),
+        step ? el("span", { class: "chip", text: `${step.number} ${step.title}` }) : null)));
+  });
+
+  // The decision: one line visible, the long text behind ดูรายละเอียด.
+  const dec = BP.decision;
+  const box = document.getElementById("decision");
+  box.setAttribute("aria-label", dec.title);
+  const more = el("div", { class: "more", id: "decision-more", hidden: true },
+    el("p", { text: dec.rule }),
+    el("ul", {}, dec.cases.map((c) => el("li", { text: c })), dec.open ? el("li", { class: "is-open", text: dec.open }) : null));
+  const btn = el("button", { class: "more-btn", type: "button", "aria-expanded": "false", "aria-controls": "decision-more", text: WORDS.showMore,
+    on: { click: () => { const open = more.hidden; more.hidden = !open; btn.setAttribute("aria-expanded", String(open)); } } });
+  box.append(
+    el("p", { class: "decision-title", text: dec.title }),
+    el("div", { class: "covers" }, dec.covers.map((k) => stepByKey.get(k)).filter(Boolean).map((s) => el("span", { class: "chip", text: `${s.number} ${s.title}` }))),
+    btn, more);
+
+  const draw = () => { drawFlow(); drawLanes(); };
+  draw();
+  let t; addEventListener("resize", () => { clearTimeout(t); t = setTimeout(draw, 120); });
+  document.fonts && document.fonts.ready.then(draw);
+})();
+</script>
+</body>
+</html>
