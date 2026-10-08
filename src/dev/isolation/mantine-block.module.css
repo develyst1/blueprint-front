@@ -1,0 +1,20 @@
+/* Mantine's baseline.css, kept to the Mantine subtree. The original targets :root, *, body and bare
+   input/button — the whole page — so it is not imported; these are its rules with the block as the root. */
+.root {
+  color-scheme: var(--mantine-color-scheme);
+  font-family: var(--mantine-font-family);
+  font-size: var(--mantine-font-size-md);
+  line-height: var(--mantine-line-height);
+  background-color: var(--mantine-color-body);
+  color: var(--mantine-color-text);
+  -webkit-font-smoothing: var(--mantine-webkit-font-smoothing);
+  -moz-osx-font-smoothing: var(--mantine-moz-font-smoothing);
+}
+
+.root :where(input, button, textarea, select) {
+  font: inherit;
+}
+
+.root :where(button, select) {
+  text-transform: none;
+}

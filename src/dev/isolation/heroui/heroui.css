@@ -1,0 +1,54 @@
+/*
+ * HeroUI theme CSS — the only file in the app that uses Tailwind.
+ * Same layers as @heroui/styles' own entry, minus Tailwind's preflight and HeroUI's base.css:
+ * both style the whole document. Rules aimed at :root / :host / html / body / * are moved onto
+ * [data-theme-root="heroui"] by scope-to-theme-root.cjs (wired in postcss.config.mjs).
+ */
+@layer theme, base, components, utilities;
+
+@import "tailwindcss/preflight.css";
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities) source("./");
+@import "tw-animate-css";
+
+@import "@heroui/styles/components/index.css" layer(components);
+@import "@heroui/styles/themes/default" layer(theme);
+@import "@heroui/styles/utilities";
+@import "@heroui/styles/variants";
+
+/* HeroUI's base.css, kept to its subtree: border colour inheritance. */
+@layer base {
+  [data-theme-root="heroui"],
+  [data-theme-root="heroui"] *,
+  [data-theme-root="heroui"] ::after,
+  [data-theme-root="heroui"] ::before {
+    border-color: var(--border, currentColor);
+  }
+
+  /* What a body would give HeroUI content: its font, colour and background tokens. */
+  [data-theme-root="heroui"] {
+    font-family: var(--font-sans);
+    color: var(--foreground);
+    background-color: var(--background);
+    line-height: 1.5;
+  }
+
+  /* The parts of Tailwind's preflight HeroUI's components lean on, inside this subtree only
+     (zero specificity, so every component style still wins). */
+  [data-theme-root="heroui"] :where(*, ::before, ::after) {
+    box-sizing: border-box;
+    border: 0 solid;
+    margin: 0;
+    padding: 0;
+  }
+  [data-theme-root="heroui"] :where(button, input, select, optgroup, textarea) {
+    font: inherit;
+    letter-spacing: inherit;
+    color: inherit;
+    background-color: transparent;
+    border-radius: 0;
+  }
+  [data-theme-root="heroui"] :where(h1, h2, h3, h4, h5, h6) { font-size: inherit; font-weight: inherit; }
+  [data-theme-root="heroui"] :where(ol, ul, menu) { list-style: none; }
+  [data-theme-root="heroui"] :where(table) { border-collapse: collapse; border-color: inherit; text-indent: 0; }
+}

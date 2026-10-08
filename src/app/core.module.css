@@ -1,0 +1,34 @@
+/* Core styles — the only CSS the app shell loads. No library CSS here. */
+.body {
+  margin: 0;
+  font-family: "Sukhumvit Set", "Thonburi", "Noto Sans Thai", system-ui, sans-serif;
+  line-height: 1.5;
+  color: #1b1f24;
+  background: #ffffff;
+}
+
+.body,
+.body *,
+.body *::before,
+.body *::after {
+  box-sizing: border-box;
+}
+
+/* The core sample block on the dev isolation routes. */
+.core {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid #c9ced6;
+  border-radius: 8px;
+}
+
+.core h1 { font-size: 24px; font-weight: 700; margin: 0; }
+.core p { margin: 0; }
+.core a { color: #1458c4; }
+.core button { font: inherit; padding: 6px 14px; border: 1px solid #8a93a0; border-radius: 6px; background: #f3f4f6; color: inherit; }
+.core input { font: inherit; padding: 6px 10px; border: 1px solid #8a93a0; border-radius: 6px; }
+.core ul { margin: 0; padding-left: 20px; }
+.core table { border-collapse: collapse; }
+.core th,
+.core td { border: 1px solid #c9ced6; padding: 4px 10px; text-align: left; }
