@@ -1,0 +1,213 @@
+/* ลำดับงาน in minimal mono (TASK-A-019). Marks are outline shapes (solid on the stuck step's row); handoffs are
+   thin numbered arcs drawn above each row's marks. Group starts get a 1 px rule so the four kinds read as blocks. */
+
+.heading {
+  font-size: 20px;
+  line-height: 1.4;
+  font-weight: 700;
+  margin: 0;
+}
+
+.legend {
+  row-gap: 8px;
+}
+
+.wrap {
+  position: relative;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #5c5c5c #e0e0e0;
+  overscroll-behavior-x: contain;
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: var(--mantine-radius-lg);
+}
+
+.table {
+  min-width: 760px;
+  border-collapse: separate;
+  border-spacing: 0;
+  color: #000000;
+}
+
+.sticky {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  background: #ffffff;
+  box-shadow: inset -1px 0 0 #e0e0e0;
+}
+
+.stepHead {
+  min-width: 200px;
+}
+
+/* on a phone the sticky step column must leave room for the lanes */
+@media (max-width: 47.99em) {
+  /* more lanes than fit: the box fades at its right edge as the cue that it scrolls */
+  .wrap {
+    mask-image: linear-gradient(to right, #000 calc(100% - 32px), transparent);
+  }
+
+  .wrap:focus-within {
+    mask-image: none;
+  }
+
+  .stepHead {
+    min-width: 150px;
+  }
+
+  .stepCell {
+    padding: 10px 10px;
+  }
+}
+
+.groupHead {
+  padding: 12px 8px 6px;
+  font-size: 14px;
+  font-weight: 700;
+  text-align: center;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.laneHead {
+  padding: 8px 6px 12px;
+  vertical-align: bottom;
+  min-width: 72px;
+  border-bottom: 1.5px solid #000000;
+}
+
+.laneTitle {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.4;
+  text-align: center;
+}
+
+.groupStart {
+  box-shadow: inset 1px 0 0 #e0e0e0;
+}
+
+.stepCell {
+  padding: 12px 16px;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.stepNumber {
+  font-weight: 800;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.stepTitle {
+  font-weight: 500;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.rowStuck .stepTitle {
+  font-weight: 800;
+}
+
+/* marks sit low in the row; the row's handoff arcs bow above them */
+.markCell {
+  height: 84px;
+  padding: 0 0 15px;
+  vertical-align: bottom;
+  text-align: center;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.mark {
+  display: inline-flex;
+}
+
+.moreButton {
+  background: #ffffff;
+  color: #000000;
+  border: 1.5px solid #000000;
+  font-weight: 600;
+}
+
+.moreButton:hover {
+  background: #f2f2f2;
+}
+
+.chevronOpen {
+  transform: rotate(180deg);
+}
+
+.detailsCell {
+  padding: 12px 16px 16px;
+  background: #f2f2f2;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.handoffList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  position: sticky;
+  left: 16px;
+  max-width: min(720px, calc(100vw - 64px));
+}
+
+.handoffList li {
+  display: grid;
+  grid-template-columns: 28px minmax(0, max-content) minmax(0, 1fr);
+  gap: 12px;
+  align-items: baseline;
+}
+
+.handoffOrder {
+  font-weight: 800;
+}
+
+.handoffWho {
+  font-weight: 700;
+}
+
+/* ---- the arc layer ---- */
+.arcs {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.arc {
+  fill: none;
+  stroke: #5c5c5c;
+  stroke-width: 1.25;
+}
+
+.badge {
+  fill: #ffffff;
+  stroke: #000000;
+  stroke-width: 1.25;
+}
+
+.badgeText {
+  font-size: 14px;
+  font-weight: 700;
+  fill: #000000;
+  font-family: var(--mantine-font-family);
+}
+
+.missingEnd {
+  fill: #ffffff;
+  stroke: #5c5c5c;
+  stroke-width: 1.25;
+  stroke-dasharray: 3 3;
+}

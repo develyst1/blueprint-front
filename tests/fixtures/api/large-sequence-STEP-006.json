@@ -1,0 +1,47 @@
+{
+  "participants": [
+    {
+      "key": "ROLE-002",
+      "kind": "role",
+      "title": "ผู้ตรวจสอบ"
+    },
+    {
+      "key": "SCR-001",
+      "kind": "screen",
+      "title": "หน้าคำขอ"
+    },
+    {
+      "key": "API-002",
+      "kind": "api",
+      "title": "ดึงรายการ"
+    },
+    {
+      "key": "SYS-003",
+      "kind": "system",
+      "title": "ระบบบัญชี"
+    }
+  ],
+  "messages": [
+    {
+      "key": "INT-012",
+      "from": "ROLE-002",
+      "to": "SCR-001",
+      "text": "กรอกข้อมูลขั้น 6",
+      "reply": null
+    },
+    {
+      "key": "INT-013",
+      "from": "SCR-001",
+      "to": "API-002",
+      "text": "ส่งข้อมูลขั้น 6",
+      "reply": null
+    },
+    {
+      "key": "INT-014",
+      "from": "API-002",
+      "to": "SYS-003",
+      "text": "บันทึกลงระบบขั้น 6",
+      "reply": null
+    }
+  ]
+}

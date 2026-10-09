@@ -1,0 +1,291 @@
+{
+  "lanes": [
+    {
+      "key": "ROLE-002",
+      "kind": "role",
+      "title": "ผู้ตรวจสอบ"
+    },
+    {
+      "key": "SCR-002",
+      "kind": "screen",
+      "title": "หน้ารายการ"
+    },
+    {
+      "key": "API-002",
+      "kind": "api",
+      "title": "ดึงรายการ"
+    },
+    {
+      "key": "ROLE-003",
+      "kind": "role",
+      "title": "ผู้อนุมัติ"
+    },
+    {
+      "key": "SCR-003",
+      "kind": "screen",
+      "title": "หน้าตรวจสอบ"
+    },
+    {
+      "key": "API-003",
+      "kind": "api",
+      "title": "บันทึกผลตรวจ"
+    },
+    {
+      "key": "ROLE-004",
+      "kind": "role",
+      "title": "ผู้ดูแลระบบ"
+    },
+    {
+      "key": "SCR-004",
+      "kind": "screen",
+      "title": "หน้าอนุมัติ"
+    },
+    {
+      "key": "API-004",
+      "kind": "api",
+      "title": "บันทึกการอนุมัติ"
+    },
+    {
+      "key": "SYS-002",
+      "kind": "system",
+      "title": "ระบบอีเมล"
+    },
+    {
+      "key": "ROLE-005",
+      "kind": "role",
+      "title": "ผู้ประสานงาน"
+    },
+    {
+      "key": "SCR-005",
+      "kind": "screen",
+      "title": "หน้าสรุป"
+    },
+    {
+      "key": "API-005",
+      "kind": "api",
+      "title": "ส่งการแจ้งเตือน"
+    },
+    {
+      "key": "ROLE-001",
+      "kind": "role",
+      "title": "ผู้ร้องขอ"
+    },
+    {
+      "key": "SCR-006",
+      "kind": "screen",
+      "title": "หน้าแจ้งผล"
+    },
+    {
+      "key": "API-001",
+      "kind": "api",
+      "title": "ส่งคำขอ"
+    },
+    {
+      "key": "SCR-001",
+      "kind": "screen",
+      "title": "หน้าคำขอ"
+    },
+    {
+      "key": "SYS-003",
+      "kind": "system",
+      "title": "ระบบบัญชี"
+    },
+    {
+      "key": "SYS-004",
+      "kind": "system",
+      "title": "ระบบรายงาน"
+    },
+    {
+      "key": "SYS-001",
+      "kind": "system",
+      "title": "ระบบเอกสาร"
+    }
+  ],
+  "rows": [
+    {
+      "step": {
+        "key": "STEP-001",
+        "title": "ขั้นที่ 1",
+        "position": 1
+      },
+      "lanes": [
+        "ROLE-002",
+        "SCR-002",
+        "API-002"
+      ]
+    },
+    {
+      "step": {
+        "key": "STEP-002",
+        "title": "ขั้นที่ 2",
+        "position": 2
+      },
+      "lanes": [
+        "ROLE-003",
+        "SCR-003",
+        "API-003"
+      ]
+    },
+    {
+      "step": {
+        "key": "STEP-003",
+        "title": "ขั้นที่ 3",
+        "position": 3
+      },
+      "lanes": [
+        "ROLE-004",
+        "SCR-004",
+        "API-004",
+        "SYS-002"
+      ]
+    },
+    {
+      "step": {
+        "key": "STEP-004",
+        "title": "ขั้นที่ 4",
+        "position": 4
+      },
+      "lanes": [
+        "ROLE-005",
+        "SCR-005",
+        "API-005"
+      ]
+    },
+    {
+      "step": {
+        "key": "STEP-005",
+        "title": "ขั้นที่ 5",
+        "position": 5
+      },
+      "lanes": [
+        "ROLE-001",
+        "SCR-006",
+        "API-001"
+      ]
+    },
+    {
+      "step": {
+        "key": "STEP-006",
+        "title": "ขั้นที่ 6",
+        "position": 6
+      },
+      "lanes": [
+        "ROLE-002",
+        "SCR-001",
+        "API-002",
+        "SYS-003"
+      ]
+    },
+    {
+      "step": {
+        "key": "STEP-007",
+        "title": "ขั้นที่ 7",
+        "position": 7
+      },
+      "lanes": [
+        "ROLE-003",
+        "SCR-002",
+        "API-003"
+      ]
+    },
+    {
+      "step": {
+        "key": "STEP-008",
+        "title": "ขั้นที่ 8",
+        "position": 8
+      },
+      "lanes": [
+        "ROLE-004",
+        "SCR-003",
+        "API-004"
+      ]
+    },
+    {
+      "step": {
+        "key": "STEP-009",
+        "title": "ขั้นที่ 9",
+        "position": 9
+      },
+      "lanes": [
+        "ROLE-005",
+        "SCR-004",
+        "API-005",
+        "SYS-004"
+      ]
+    },
+    {
+      "step": {
+        "key": "STEP-010",
+        "title": "ขั้นที่ 10",
+        "position": 10
+      },
+      "lanes": [
+        "ROLE-001",
+        "SCR-005",
+        "API-001"
+      ]
+    },
+    {
+      "step": {
+        "key": "STEP-011",
+        "title": "ขั้นที่ 11",
+        "position": 11
+      },
+      "lanes": [
+        "ROLE-002",
+        "SCR-006",
+        "API-002"
+      ]
+    },
+    {
+      "step": {
+        "key": "STEP-012",
+        "title": "ขั้นที่ 12",
+        "position": 12
+      },
+      "lanes": [
+        "ROLE-003",
+        "SCR-001",
+        "API-003",
+        "SYS-001"
+      ]
+    },
+    {
+      "step": {
+        "key": "STEP-013",
+        "title": "ขั้นที่ 13",
+        "position": 13
+      },
+      "lanes": [
+        "ROLE-004",
+        "SCR-002",
+        "API-004"
+      ]
+    },
+    {
+      "step": {
+        "key": "STEP-014",
+        "title": "ขั้นที่ 14",
+        "position": 14
+      },
+      "lanes": [
+        "ROLE-005",
+        "SCR-003",
+        "API-005"
+      ]
+    },
+    {
+      "step": {
+        "key": "STEP-015",
+        "title": "ขั้นที่ 15",
+        "position": 15
+      },
+      "lanes": [
+        "ROLE-001",
+        "SCR-004",
+        "API-001",
+        "SYS-002"
+      ]
+    }
+  ]
+}

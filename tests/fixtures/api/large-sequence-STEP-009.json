@@ -1,0 +1,47 @@
+{
+  "participants": [
+    {
+      "key": "ROLE-005",
+      "kind": "role",
+      "title": "ผู้ประสานงาน"
+    },
+    {
+      "key": "SCR-004",
+      "kind": "screen",
+      "title": "หน้าอนุมัติ"
+    },
+    {
+      "key": "API-005",
+      "kind": "api",
+      "title": "ส่งการแจ้งเตือน"
+    },
+    {
+      "key": "SYS-004",
+      "kind": "system",
+      "title": "ระบบรายงาน"
+    }
+  ],
+  "messages": [
+    {
+      "key": "INT-019",
+      "from": "ROLE-005",
+      "to": "SCR-004",
+      "text": "กรอกข้อมูลขั้น 9",
+      "reply": null
+    },
+    {
+      "key": "INT-020",
+      "from": "SCR-004",
+      "to": "API-005",
+      "text": "ส่งข้อมูลขั้น 9",
+      "reply": null
+    },
+    {
+      "key": "INT-021",
+      "from": "API-005",
+      "to": "SYS-004",
+      "text": "บันทึกลงระบบขั้น 9",
+      "reply": null
+    }
+  ]
+}

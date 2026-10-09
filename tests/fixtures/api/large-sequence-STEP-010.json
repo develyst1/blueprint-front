@@ -1,0 +1,35 @@
+{
+  "participants": [
+    {
+      "key": "ROLE-001",
+      "kind": "role",
+      "title": "ผู้ร้องขอ"
+    },
+    {
+      "key": "SCR-005",
+      "kind": "screen",
+      "title": "หน้าสรุป"
+    },
+    {
+      "key": "API-001",
+      "kind": "api",
+      "title": "ส่งคำขอ"
+    }
+  ],
+  "messages": [
+    {
+      "key": "INT-022",
+      "from": "ROLE-001",
+      "to": "SCR-005",
+      "text": "กรอกข้อมูลขั้น 10",
+      "reply": null
+    },
+    {
+      "key": "INT-023",
+      "from": "SCR-005",
+      "to": "API-001",
+      "text": "ส่งข้อมูลขั้น 10",
+      "reply": null
+    }
+  ]
+}

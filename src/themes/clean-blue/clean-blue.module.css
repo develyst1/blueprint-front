@@ -1,0 +1,107 @@
+/* clean-blue — root, shell and page dock. Colours are the --cb-* variables Root.tsx sets from tokens.ts. */
+
+.root {
+  color: var(--cb-ink);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+.root :where(h1, h2, h3, h4, p, ul, ol, dl, dd) { margin: 0; }
+.root :where(ul[class], ol[class]) { padding: 0; list-style: none; }
+.root :where(a) { color: var(--cb-blue); }
+.root :where(a:focus-visible, button:focus-visible, [tabindex]:focus-visible) {
+  outline: 2px solid var(--cb-blue);
+  outline-offset: 2px;
+}
+
+/* the page canvas — the shell's own background, so a card on the home keeps the home's */
+.page {
+  background: var(--cb-canvas);
+  min-width: 0;
+}
+
+.skip {
+  position: absolute;
+  left: 16px;
+  top: -64px;
+  z-index: 10;
+  padding: 10px 16px;
+  border-radius: var(--cb-r-tile);
+  background: var(--cb-blue);
+  color: var(--cb-paper) !important;
+  font-weight: 600;
+  text-decoration: none;
+}
+.skip:focus { top: 12px; }
+
+/* ---------- top bar ---------- */
+.bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 20px;
+  padding: 20px clamp(16px, 4vw, 40px) 16px;
+  background: var(--cb-paper);
+}
+.project { display: grid; gap: 2px; min-width: 0; flex: 1 1 260px; }
+.project h1 { font-size: 28px; line-height: 1.3; font-weight: 700; overflow-wrap: anywhere; }
+.created { color: var(--cb-ink2); font-size: 14px; }
+.barEnd { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+
+.readiness {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 6px 16px 6px 12px;
+  border-radius: 999px;
+  font-weight: 600;
+  background: var(--cb-blueSoft);
+  color: var(--cb-blue);
+}
+.readinessStuck { background: var(--cb-stuckSoft); color: var(--cb-stuck); }
+.readinessEmpty { background: var(--cb-neutralSoft); color: var(--cb-ink2); }
+.readinessDot { display: inline-grid; place-items: center; font-size: 22px; line-height: 1; }
+
+/* ---------- page dock: one tile + label per page ---------- */
+.dock {
+  display: flex;
+  gap: 4px;
+  padding: 0 clamp(16px, 4vw, 40px) 12px;
+  background: var(--cb-paper);
+  border-bottom: 1px solid var(--cb-line);
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+.dockItem {
+  flex: 0 0 auto;
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  min-width: 84px;
+  min-height: 44px;
+  padding: 8px 10px;
+  border-radius: var(--cb-r-tile);
+  color: var(--cb-ink2) !important;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+}
+.dockItem:hover { background: var(--cb-canvas); color: var(--cb-ink) !important; }
+.dockItem[aria-current="page"] { background: var(--cb-blueSoft); color: var(--cb-blue) !important; font-weight: 600; }
+
+/* ---------- content ---------- */
+.main {
+  padding: 28px clamp(16px, 4vw, 40px) 48px;
+  max-width: 1360px;
+}
+/* the core's <main id="content"> is the one child; the page's blocks sit in it */
+.main > * { display: grid; gap: 24px; min-width: 0; }
+.main > *:focus { outline: none; }
+
+@media (max-width: 640px) {
+  .project h1 { font-size: 22px; }
+  .dockItem { min-width: 72px; padding: 8px 6px; }
+  .main { padding-top: 20px; }
+  .main > * { gap: 20px; }
+}

@@ -1,0 +1,35 @@
+{
+  "participants": [
+    {
+      "key": "ROLE-003",
+      "kind": "role",
+      "title": "ผู้อนุมัติ"
+    },
+    {
+      "key": "SCR-002",
+      "kind": "screen",
+      "title": "หน้ารายการ"
+    },
+    {
+      "key": "API-003",
+      "kind": "api",
+      "title": "บันทึกผลตรวจ"
+    }
+  ],
+  "messages": [
+    {
+      "key": "INT-015",
+      "from": "ROLE-003",
+      "to": "SCR-002",
+      "text": "กรอกข้อมูลขั้น 7",
+      "reply": null
+    },
+    {
+      "key": "INT-016",
+      "from": "SCR-002",
+      "to": "API-003",
+      "text": "ส่งข้อมูลขั้น 7",
+      "reply": null
+    }
+  ]
+}

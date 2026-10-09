@@ -1,0 +1,21 @@
+/* Page states: a white panel with the strong outline for what needs the reader (API down, not found); a quiet
+   panel with the cards' 1.5 px grey line for an empty project — empty must never look like an error or like loading. */
+.panel {
+  background: #ffffff;
+  color: #000000;
+  border: 2px solid #000000;
+  max-width: 560px;
+}
+
+.quiet {
+  background: #ffffff;
+  border: 1.5px solid #8a8a8a;
+  max-width: 560px;
+}
+
+.back {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  text-underline-offset: 4px;
+}

@@ -1,0 +1,451 @@
+/* แชต in minimal mono (TASK-A-040). The mono palette only: canvas #F2F2F2 (the root's), white panels, ink #000, ink-2
+   #5C5C5C, line #8A8A8A (3.45:1, for outlines that carry meaning), #E0E0E0 decoration only. Weight is the hierarchy:
+   the chat box and the main actions wear the strong 2 px ink outline; nothing here is solid black — the shell's stuck
+   strip stays the page's only solid block. Nothing under 14 px; 44 px targets; the root's focus ring. */
+
+.page {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+  max-width: 1120px;
+  accent-color: #000000;
+}
+
+.page > * {
+  min-width: 0;
+}
+
+@media (min-width: 64em) {
+  .page {
+    grid-template-columns: minmax(0, 1fr) 280px;
+    column-gap: 32px;
+    align-items: start;
+  }
+
+  .page > * {
+    grid-column: 1;
+  }
+
+  .page > .edge {
+    grid-column: 2;
+    grid-row: 1 / span 12;
+  }
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ---------- buttons: outlines in two weights ---------- */
+.strong,
+.outline {
+  background: #ffffff;
+  color: #000000;
+  font-weight: 700;
+}
+
+.strong {
+  border: 2px solid #000000;
+}
+
+.outline {
+  border: 1.5px solid #8a8a8a;
+  font-weight: 600;
+}
+
+.strong:hover,
+.outline:hover {
+  background: #f2f2f2;
+}
+
+.textButton {
+  min-height: 44px;
+  padding: 0 4px;
+  border: none;
+  background: none;
+  color: #000000;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  cursor: pointer;
+}
+
+/* an open ดูรายละเอียด: the underline becomes a 2 px bar — visible, and still not a solid block */
+.textButton[aria-expanded="true"] {
+  text-decoration: none;
+  box-shadow: inset 0 -2px 0 #000000;
+}
+
+.textButton:disabled {
+  color: #5c5c5c;
+  cursor: default;
+}
+
+/* ---------- the chat box: the one focus ---------- */
+.composer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.box {
+  width: 100%;
+  min-height: 132px;
+  box-sizing: border-box;
+  padding: 18px 20px;
+  border: 2px solid #000000;
+  border-radius: var(--mantine-radius-lg);
+  background: #ffffff;
+  color: #000000;
+  font: inherit;
+  font-size: 18px;
+  line-height: 1.6;
+  resize: vertical;
+}
+
+/* a file over the box: the drop target shows itself (dashed, still ink) */
+.boxDrop {
+  border-style: dashed;
+  background: #f2f2f2;
+}
+
+.box::placeholder {
+  color: #5c5c5c;
+}
+
+.composerRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.hint {
+  font-size: 14px;
+  color: #5c5c5c;
+}
+
+/* ---------- states ---------- */
+.status:empty {
+  display: none;
+}
+
+.thinking {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.panelStrong {
+  background: #ffffff;
+  color: #000000;
+  border: 2px solid #000000;
+}
+
+.panelStrong p {
+  margin: 0 0 10px;
+}
+
+.panelStrong p:last-child {
+  margin-bottom: 0;
+}
+
+.alertWord,
+.originAsk {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.originFile {
+  font-size: 14px;
+  color: #5c5c5c;
+  overflow-wrap: anywhere;
+}
+
+/* ---------- the question pack ---------- */
+.pack {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.packBox {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  max-height: min(60vh, 560px);
+  overflow-y: auto;
+  /* 6 px of room for the focus ring, taken back from the sides so the cards line up with the box */
+  padding: 6px;
+  margin-inline: -6px;
+  width: calc(100% + 12px);
+  box-sizing: border-box;
+}
+
+@media (max-width: 47.99em) {
+  .packBox {
+    max-height: 45vh;
+  }
+}
+
+.card {
+  padding: 16px 18px;
+  border: 1.5px solid #8a8a8a;
+  border-radius: var(--mantine-radius-lg);
+  background: #ffffff;
+  color: #000000;
+}
+
+.question {
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.55;
+}
+
+.answer {
+  margin-top: 8px;
+  font-size: 16px;
+  line-height: 1.55;
+}
+
+.label {
+  display: block;
+  font-size: 14px;
+  font-weight: 700;
+  color: #5c5c5c;
+}
+
+.cases {
+  margin: 8px 0 0;
+  padding-left: 20px;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.clamp {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+
+/* the bot's suggestion: dashed — a suggestion, not a fact */
+.suggestion {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+  margin-top: 10px;
+  padding: 10px 12px;
+  border: 1.5px dashed #5c5c5c;
+  border-radius: var(--mantine-radius-md);
+  font-size: 16px;
+  line-height: 1.55;
+}
+
+.suggestion > :first-child {
+  flex: 1 1 200px;
+  min-width: 0;
+}
+
+/* a question with no proposed answer */
+.own {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.ownRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.input {
+  flex: 1 1 200px;
+  min-width: 0;
+  min-height: 44px;
+  box-sizing: border-box;
+  padding: 0 12px;
+  border: 1.5px solid #8a8a8a;
+  border-radius: var(--mantine-radius-md);
+  background: #ffffff;
+  color: #000000;
+  font: inherit;
+  font-size: 16px;
+}
+
+.input::placeholder {
+  color: #5c5c5c;
+}
+
+/* the optional reason: lighter than the answer box, so answering reads as the main way */
+.inputQuiet {
+  border-style: dashed;
+}
+
+/* ---------- what changed ---------- */
+.change {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+/* ---------- the edge: quiet ---------- */
+.edge {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  font-size: 15px;
+}
+
+.spec {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  min-height: 44px;
+  font-weight: 700;
+  color: #000000;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.sources {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sources li {
+  display: flex;
+  flex-direction: column;
+}
+
+.sourceName {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.sourceState {
+  font-size: 14px;
+  color: #5c5c5c;
+}
+
+.sourceFailed .sourceState {
+  color: #000000;
+  font-weight: 700;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.fieldLabel {
+  font-size: 15px;
+  font-weight: 700;
+  color: #000000;
+}
+
+.select {
+  min-height: 44px;
+  border: 1.5px solid #8a8a8a;
+  font-size: 15px;
+}
+
+.option {
+  min-height: 44px;
+}
+
+.option svg {
+  opacity: 1;
+  color: #000000;
+}
+
+.range {
+  flex: 1;
+  min-height: 44px;
+}
+
+.value {
+  font-size: 15px;
+  font-weight: 700;
+  min-width: 2.5em;
+  text-align: right;
+}
+
+/* ---------- the conversation, newest first ---------- */
+.messages {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.messages li {
+  max-width: 44em;
+  padding: 12px 14px;
+  border-radius: var(--mantine-radius-lg);
+  font-size: 16px;
+  line-height: 1.55;
+}
+
+/* the person: on the right, a light fill (decoration — never black, which is the stuck strip's) */
+.user {
+  align-self: flex-end;
+  background: #e0e0e0;
+  color: #000000;
+}
+
+.bot {
+  align-self: flex-start;
+  background: #ffffff;
+  color: #000000;
+  border: 1.5px solid #8a8a8a;
+}
+
+.caw {
+  align-self: flex-start;
+  background: #ffffff;
+  color: #000000;
+  border: 1.5px dashed #000000;
+}
+
+.at {
+  display: block;
+  margin-top: 4px;
+  font-size: 14px;
+  color: #5c5c5c;
+}

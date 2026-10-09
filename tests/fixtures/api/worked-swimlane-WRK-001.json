@@ -1,0 +1,124 @@
+{
+  "lanes": [
+    {
+      "key": "ROLE-001",
+      "kind": "role",
+      "title": "พนักงาน"
+    },
+    {
+      "key": "SCR-001",
+      "kind": "screen",
+      "title": "หน้าค้นหาห้อง"
+    },
+    {
+      "key": "API-001",
+      "kind": "api",
+      "title": "ค้นหาห้องว่าง"
+    },
+    {
+      "key": "SYS-001",
+      "kind": "system",
+      "title": "ระบบปฏิทิน"
+    },
+    {
+      "key": "SCR-002",
+      "kind": "screen",
+      "title": "หน้ายืนยันการจอง"
+    },
+    {
+      "key": "API-002",
+      "kind": "api",
+      "title": "สร้างการจอง"
+    },
+    {
+      "key": "ROLE-002",
+      "kind": "role",
+      "title": "ผู้ดูแลห้อง"
+    },
+    {
+      "key": "SCR-003",
+      "kind": "screen",
+      "title": "หน้าอนุมัติคำขอ"
+    },
+    {
+      "key": "API-003",
+      "kind": "api",
+      "title": "อนุมัติการจอง"
+    }
+  ],
+  "rows": [
+    {
+      "step": {
+        "key": "STEP-001",
+        "title": "ค้นหาห้องว่าง",
+        "position": 1
+      },
+      "lanes": [
+        "ROLE-001",
+        "SCR-001",
+        "API-001",
+        "SYS-001"
+      ]
+    },
+    {
+      "step": {
+        "key": "STEP-002",
+        "title": "เลือกห้องและเวลา",
+        "position": 2
+      },
+      "lanes": [
+        "ROLE-001",
+        "SCR-001",
+        "SCR-002"
+      ]
+    },
+    {
+      "step": {
+        "key": "STEP-003",
+        "title": "ส่งคำขอจอง",
+        "position": 3
+      },
+      "lanes": [
+        "ROLE-001",
+        "SCR-002",
+        "API-002",
+        "SYS-001"
+      ]
+    },
+    {
+      "step": {
+        "key": "STEP-004",
+        "title": "ผู้ดูแลพิจารณา",
+        "position": 4
+      },
+      "lanes": [
+        "ROLE-002",
+        "SCR-003",
+        "API-003",
+        "SYS-001"
+      ]
+    },
+    {
+      "step": {
+        "key": "STEP-005",
+        "title": "ได้รับการยืนยัน",
+        "position": 5
+      },
+      "lanes": [
+        "SCR-002",
+        "ROLE-001"
+      ]
+    },
+    {
+      "step": {
+        "key": "STEP-006",
+        "title": "แจ้งว่าถูกปฏิเสธ",
+        "position": 6
+      },
+      "lanes": [
+        "SCR-002",
+        "ROLE-001"
+      ]
+    }
+  ]
+}

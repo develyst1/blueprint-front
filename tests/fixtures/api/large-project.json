@@ -1,0 +1,2584 @@
+{
+  "project": {
+    "id": "ab42a952-5107-4520-91c9-96aa5863f347",
+    "organisationId": "00000000-0000-0000-0000-000000000001",
+    "name": "งานทดลองขนาดใหญ่",
+    "createdAt": "2026-10-08T20:02:34.354Z",
+    "theme": "clean-blue",
+    "model": "tier:medium",
+    "creativity": 0.5
+  },
+  "parts": [
+    {
+      "key": "API-001",
+      "kind": "api",
+      "title": "ส่งคำขอ",
+      "body": {
+        "path": "/test/1",
+        "method": "POST",
+        "responses": []
+      },
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "createdIn": "9cc3a0f8-7abb-490f-8004-5958ef521601"
+    },
+    {
+      "key": "API-002",
+      "kind": "api",
+      "title": "ดึงรายการ",
+      "body": {
+        "path": "/test/2",
+        "method": "GET",
+        "responses": []
+      },
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "createdIn": "9cc3a0f8-7abb-490f-8004-5958ef521601"
+    },
+    {
+      "key": "API-003",
+      "kind": "api",
+      "title": "บันทึกผลตรวจ",
+      "body": {
+        "path": "/test/3",
+        "method": "POST",
+        "responses": []
+      },
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "createdIn": "9cc3a0f8-7abb-490f-8004-5958ef521601"
+    },
+    {
+      "key": "API-004",
+      "kind": "api",
+      "title": "บันทึกการอนุมัติ",
+      "body": {
+        "path": "/test/4",
+        "method": "GET",
+        "responses": []
+      },
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "createdIn": "9cc3a0f8-7abb-490f-8004-5958ef521601"
+    },
+    {
+      "key": "API-005",
+      "kind": "api",
+      "title": "ส่งการแจ้งเตือน",
+      "body": {
+        "path": "/test/5",
+        "method": "POST",
+        "responses": []
+      },
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "createdIn": "9cc3a0f8-7abb-490f-8004-5958ef521601"
+    },
+    {
+      "key": "INT-001",
+      "kind": "interaction",
+      "title": "กรอกข้อมูลขั้น 1",
+      "body": {
+        "text": "กรอกข้อมูลขั้น 1"
+      },
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "createdIn": "9cc3a0f8-7abb-490f-8004-5958ef521601"
+    },
+    {
+      "key": "INT-002",
+      "kind": "interaction",
+      "title": "ส่งข้อมูลขั้น 1",
+      "body": {
+        "text": "ส่งข้อมูลขั้น 1"
+      },
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "createdIn": "9cc3a0f8-7abb-490f-8004-5958ef521601"
+    },
+    {
+      "key": "INT-003",
+      "kind": "interaction",
+      "title": "กรอกข้อมูลขั้น 2",
+      "body": {
+        "text": "กรอกข้อมูลขั้น 2"
+      },
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "createdIn": "9cc3a0f8-7abb-490f-8004-5958ef521601"
+    },
+    {
+      "key": "INT-004",
+      "kind": "interaction",
+      "title": "ส่งข้อมูลขั้น 2",
+      "body": {
+        "text": "ส่งข้อมูลขั้น 2"
+      },
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "createdIn": "9cc3a0f8-7abb-490f-8004-5958ef521601"
+    },
+    {
+      "key": "INT-005",
+      "kind": "interaction",
+      "title": "กรอกข้อมูลขั้น 3",
+      "body": {
+        "text": "กรอกข้อมูลขั้น 3"
+      },
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "createdIn": "9cc3a0f8-7abb-490f-8004-5958ef521601"
+    },
+    {
+      "key": "INT-006",
+      "kind": "interaction",
+      "title": "ส่งข้อมูลขั้น 3",
+      "body": {
+        "text": "ส่งข้อมูลขั้น 3"
+      },
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "createdIn": "9cc3a0f8-7abb-490f-8004-5958ef521601"
+    },
+    {
+      "key": "INT-007",
+      "kind": "interaction",
+      "title": "บันทึกลงระบบขั้น 3",
+      "body": {
+        "text": "บันทึกลงระบบขั้น 3"
+      },
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "createdIn": "9cc3a0f8-7abb-490f-8004-5958ef521601"
+    },
+    {
+      "key": "INT-008",
+      "kind": "interaction",
+      "title": "กรอกข้อมูลขั้น 4",
+      "body": {
+        "text": "กรอกข้อมูลขั้น 4"
+      },
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "createdIn": "9cc3a0f8-7abb-490f-8004-5958ef521601"
+    },
+    {
+      "key": "INT-009",
+      "kind": "interaction",
+      "title": "ส่งข้อมูลขั้น 4",
+      "body": {
+        "text": "ส่งข้อมูลขั้น 4"
+      },
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "createdIn": "9cc3a0f8-7abb-490f-8004-5958ef521601"
+    },
+    {
+      "key": "INT-010",
+      "kind": "interaction",
+      "title": "กรอกข้อมูลขั้น 5",
+      "body": {
+        "text": "กรอกข้อมูลขั้น 5"
+      },
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "createdIn": "9cc3a0f8-7abb-490f-8004-5958ef521601"
+    },
+    {
+      "key": "INT-011",
+      "kind": "interaction",
+      "title": "ส่งข้อมูลขั้น 5",
+      "body": {
+        "text": "ส่งข้อมูลขั้น 5"
+      },
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "createdIn": "9cc3a0f8-7abb-490f-8004-5958ef521601"
+    },
+    {
+      "key": "INT-012",
+      "kind": "interaction",
+      "title": "กรอกข้อมูลขั้น 6",
+      "body": {
+        "text": "กรอกข้อมูลขั้น 6"
+      },
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "createdIn": "9cc3a0f8-7abb-490f-8004-5958ef521601"
+    },
+    {
+      "key": "INT-013",
+      "kind": "interaction",
+      "title": "ส่งข้อมูลขั้น 6",
+      "body": {
+        "text": "ส่งข้อมูลขั้น 6"
+      },
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "createdIn": "9cc3a0f8-7abb-490f-8004-5958ef521601"
+    },
+    {
+      "key": "INT-014",
+      "kind": "interaction",
+      "title": "บันทึกลงระบบขั้น 6",
+      "body": {
+        "text": "บันทึกลงระบบขั้น 6"
+      },
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "createdIn": "9cc3a0f8-7abb-490f-8004-5958ef521601"
+    },
+    {
+      "key": "INT-015",
+      "kind": "interaction",
+      "title": "กรอกข้อมูลขั้น 7",
+      "body": {
+        "text": "กรอกข้อมูลขั้น 7"
+      },
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "createdIn": "9cc3a0f8-7abb-490f-8004-5958ef521601"
+    },
+    {
+      "key": "INT-016",
+      "kind": "interaction",
+      "title": "ส่งข้อมูลขั้น 7",
+      "body": {
+        "text": "ส่งข้อมูลขั้น 7"
+      },
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "createdIn": "9cc3a0f8-7abb-490f-8004-5958ef521601"
+    },
+    {
+      "key": "INT-017",
+      "kind": "interaction",
+      "title": "กรอกข้อมูลขั้น 8",
+      "body": {
+        "text": "กรอกข้อมูลขั้น 8"
+      },
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "createdIn": "9cc3a0f8-7abb-490f-8004-5958ef521601"
+    },
+    {
+      "key": "INT-018",
+      "kind": "interaction",
+      "title": "ส่งข้อมูลขั้น 8",
+      "body": {
+        "text": "ส่งข้อมูลขั้น 8"
+      },
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "createdIn": "9cc3a0f8-7abb-490f-8004-5958ef521601"
+    },
+    {
+      "key": "INT-019",
+      "kind": "interaction",
+      "title": "กรอกข้อมูลขั้น 9",
+      "body": {
+        "text": "กรอกข้อมูลขั้น 9"
+      },
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "createdIn": "9cc3a0f8-7abb-490f-8004-5958ef521601"
+    },
+    {
+      "key": "INT-020",
+      "kind": "interaction",
+      "title": "ส่งข้อมูลขั้น 9",
+      "body": {
+        "text": "ส่งข้อมูลขั้น 9"
+      },
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "createdIn": "9cc3a0f8-7abb-490f-8004-5958ef521601"
+    },
+    {
+      "key": "INT-021",
+      "kind": "interaction",
+      "title": "บันทึกลงระบบขั้น 9",
+      "body": {
+        "text": "บันทึกลงระบบขั้น 9"
+      },
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "createdIn": "9cc3a0f8-7abb-490f-8004-5958ef521601"
+    },
+    {
+      "key": "INT-022",
+      "kind": "interaction",
+      "title": "กรอกข้อมูลขั้น 10",
+      "body": {
+        "text": "กรอกข้อมูลขั้น 10"
+      },
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "createdIn": "9cc3a0f8-7abb-490f-8004-5958ef521601"
+    },
+    {
+      "key": "INT-023",
+      "kind": "interaction",
+      "title": "ส่งข้อมูลขั้น 10",
+      "body": {
+        "text": "ส่งข้อมูลขั้น 10"
+      },
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "createdIn": "9cc3a0f8-7abb-490f-8004-5958ef521601"
+    },
+    {
+      "key": "INT-024",
+      "kind": "interaction",
+      "title": "กรอกข้อมูลขั้น 11",
+      "body": {
+        "text": "กรอกข้อมูลขั้น 11"
+      },
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "createdIn": "9cc3a0f8-7abb-490f-8004-5958ef521601"
+    },
+    {
+      "key": "INT-025",
+      "kind": "interaction",
+      "title": "ส่งข้อมูลขั้น 11",
+      "body": {
+        "text": "ส่งข้อมูลขั้น 11"
+      },
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "createdIn": "9cc3a0f8-7abb-490f-8004-5958ef521601"
+    },
+    {
+      "key": "INT-026",
+      "kind": "interaction",
+      "title": "กรอกข้อมูลขั้น 12",
+      "body": {
+        "text": "กรอกข้อมูลขั้น 12"
+      },
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "createdIn": "9cc3a0f8-7abb-490f-8004-5958ef521601"
+    },
+    {
+      "key": "INT-027",
+      "kind": "interaction",
+      "title": "ส่งข้อมูลขั้น 12",
+      "body": {
+        "text": "ส่งข้อมูลขั้น 12"
+      },
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "createdIn": "9cc3a0f8-7abb-490f-8004-5958ef521601"
+    },
+    {
+      "key": "INT-028",
+      "kind": "interaction",
+      "title": "บันทึกลงระบบขั้น 12",
+      "body": {
+        "text": "บันทึกลงระบบขั้น 12"
+      },
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "createdIn": "9cc3a0f8-7abb-490f-8004-5958ef521601"
+    },
+    {
+      "key": "INT-029",
+      "kind": "interaction",
+      "title": "กรอกข้อมูลขั้น 13",
+      "body": {
+        "text": "กรอกข้อมูลขั้น 13"
+      },
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "createdIn": "9cc3a0f8-7abb-490f-8004-5958ef521601"
+    },
+    {
+      "key": "INT-030",
+      "kind": "interaction",
+      "title": "ส่งข้อมูลขั้น 13",
+      "body": {
+        "text": "ส่งข้อมูลขั้น 13"
+      },
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "createdIn": "9cc3a0f8-7abb-490f-8004-5958ef521601"
+    },
+    {
+      "key": "INT-031",
+      "kind": "interaction",
+      "title": "กรอกข้อมูลขั้น 14",
+      "body": {
+        "text": "กรอกข้อมูลขั้น 14"
+      },
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "createdIn": "9cc3a0f8-7abb-490f-8004-5958ef521601"
+    },
+    {
+      "key": "INT-032",
+      "kind": "interaction",
+      "title": "ส่งข้อมูลขั้น 14",
+      "body": {
+        "text": "ส่งข้อมูลขั้น 14"
+      },
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "createdIn": "9cc3a0f8-7abb-490f-8004-5958ef521601"
+    },
+    {
+      "key": "INT-033",
+      "kind": "interaction",
+      "title": "กรอกข้อมูลขั้น 15",
+      "body": {
+        "text": "กรอกข้อมูลขั้น 15"
+      },
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "createdIn": "9cc3a0f8-7abb-490f-8004-5958ef521601"
+    },
+    {
+      "key": "INT-034",
+      "kind": "interaction",
+      "title": "ส่งข้อมูลขั้น 15",
+      "body": {
+        "text": "ส่งข้อมูลขั้น 15"
+      },
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "createdIn": "9cc3a0f8-7abb-490f-8004-5958ef521601"
+    },
+    {
+      "key": "INT-035",
+      "kind": "interaction",
+      "title": "บันทึกลงระบบขั้น 15",
+      "body": {
+        "text": "บันทึกลงระบบขั้น 15"
+      },
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "createdIn": "9cc3a0f8-7abb-490f-8004-5958ef521601"
+    },
+    {
+      "key": "ROLE-001",
+      "kind": "role",
+      "title": "ผู้ร้องขอ",
+      "body": {},
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "createdIn": "9cc3a0f8-7abb-490f-8004-5958ef521601"
+    },
+    {
+      "key": "ROLE-002",
+      "kind": "role",
+      "title": "ผู้ตรวจสอบ",
+      "body": {},
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "createdIn": "9cc3a0f8-7abb-490f-8004-5958ef521601"
+    },
+    {
+      "key": "ROLE-003",
+      "kind": "role",
+      "title": "ผู้อนุมัติ",
+      "body": {},
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "createdIn": "9cc3a0f8-7abb-490f-8004-5958ef521601"
+    },
+    {
+      "key": "ROLE-004",
+      "kind": "role",
+      "title": "ผู้ดูแลระบบ",
+      "body": {},
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "createdIn": "9cc3a0f8-7abb-490f-8004-5958ef521601"
+    },
+    {
+      "key": "ROLE-005",
+      "kind": "role",
+      "title": "ผู้ประสานงาน",
+      "body": {},
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "createdIn": "9cc3a0f8-7abb-490f-8004-5958ef521601"
+    },
+    {
+      "key": "SCR-001",
+      "kind": "screen",
+      "title": "หน้าคำขอ",
+      "body": {
+        "fields": [],
+        "states": [],
+        "actions": []
+      },
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "createdIn": "9cc3a0f8-7abb-490f-8004-5958ef521601"
+    },
+    {
+      "key": "SCR-002",
+      "kind": "screen",
+      "title": "หน้ารายการ",
+      "body": {
+        "fields": [],
+        "states": [],
+        "actions": []
+      },
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "createdIn": "9cc3a0f8-7abb-490f-8004-5958ef521601"
+    },
+    {
+      "key": "SCR-003",
+      "kind": "screen",
+      "title": "หน้าตรวจสอบ",
+      "body": {
+        "fields": [],
+        "states": [],
+        "actions": []
+      },
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "createdIn": "9cc3a0f8-7abb-490f-8004-5958ef521601"
+    },
+    {
+      "key": "SCR-004",
+      "kind": "screen",
+      "title": "หน้าอนุมัติ",
+      "body": {
+        "fields": [],
+        "states": [],
+        "actions": []
+      },
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "createdIn": "9cc3a0f8-7abb-490f-8004-5958ef521601"
+    },
+    {
+      "key": "SCR-005",
+      "kind": "screen",
+      "title": "หน้าสรุป",
+      "body": {
+        "fields": [],
+        "states": [],
+        "actions": []
+      },
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "createdIn": "9cc3a0f8-7abb-490f-8004-5958ef521601"
+    },
+    {
+      "key": "SCR-006",
+      "kind": "screen",
+      "title": "หน้าแจ้งผล",
+      "body": {
+        "fields": [],
+        "states": [],
+        "actions": []
+      },
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "createdIn": "9cc3a0f8-7abb-490f-8004-5958ef521601"
+    },
+    {
+      "key": "STEP-001",
+      "kind": "step",
+      "title": "ขั้นที่ 1",
+      "body": {
+        "ends": false
+      },
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "createdIn": "9cc3a0f8-7abb-490f-8004-5958ef521601"
+    },
+    {
+      "key": "STEP-002",
+      "kind": "step",
+      "title": "ขั้นที่ 2",
+      "body": {
+        "ends": false
+      },
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "createdIn": "9cc3a0f8-7abb-490f-8004-5958ef521601"
+    },
+    {
+      "key": "STEP-003",
+      "kind": "step",
+      "title": "ขั้นที่ 3",
+      "body": {
+        "ends": false
+      },
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "createdIn": "9cc3a0f8-7abb-490f-8004-5958ef521601"
+    },
+    {
+      "key": "STEP-004",
+      "kind": "step",
+      "title": "ขั้นที่ 4",
+      "body": {
+        "ends": false
+      },
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "createdIn": "9cc3a0f8-7abb-490f-8004-5958ef521601"
+    },
+    {
+      "key": "STEP-005",
+      "kind": "step",
+      "title": "ขั้นที่ 5",
+      "body": {
+        "ends": false
+      },
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "createdIn": "9cc3a0f8-7abb-490f-8004-5958ef521601"
+    },
+    {
+      "key": "STEP-006",
+      "kind": "step",
+      "title": "ขั้นที่ 6",
+      "body": {
+        "ends": false
+      },
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "createdIn": "9cc3a0f8-7abb-490f-8004-5958ef521601"
+    },
+    {
+      "key": "STEP-007",
+      "kind": "step",
+      "title": "ขั้นที่ 7",
+      "body": {
+        "ends": false
+      },
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "createdIn": "9cc3a0f8-7abb-490f-8004-5958ef521601"
+    },
+    {
+      "key": "STEP-008",
+      "kind": "step",
+      "title": "ขั้นที่ 8",
+      "body": {
+        "ends": false
+      },
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "createdIn": "9cc3a0f8-7abb-490f-8004-5958ef521601"
+    },
+    {
+      "key": "STEP-009",
+      "kind": "step",
+      "title": "ขั้นที่ 9",
+      "body": {
+        "ends": false
+      },
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "createdIn": "9cc3a0f8-7abb-490f-8004-5958ef521601"
+    },
+    {
+      "key": "STEP-010",
+      "kind": "step",
+      "title": "ขั้นที่ 10",
+      "body": {
+        "ends": false
+      },
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "createdIn": "9cc3a0f8-7abb-490f-8004-5958ef521601"
+    },
+    {
+      "key": "STEP-011",
+      "kind": "step",
+      "title": "ขั้นที่ 11",
+      "body": {
+        "ends": false
+      },
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "createdIn": "9cc3a0f8-7abb-490f-8004-5958ef521601"
+    },
+    {
+      "key": "STEP-012",
+      "kind": "step",
+      "title": "ขั้นที่ 12",
+      "body": {
+        "ends": false
+      },
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "createdIn": "9cc3a0f8-7abb-490f-8004-5958ef521601"
+    },
+    {
+      "key": "STEP-013",
+      "kind": "step",
+      "title": "ขั้นที่ 13",
+      "body": {
+        "ends": false
+      },
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "createdIn": "9cc3a0f8-7abb-490f-8004-5958ef521601"
+    },
+    {
+      "key": "STEP-014",
+      "kind": "step",
+      "title": "ขั้นที่ 14",
+      "body": {
+        "ends": false
+      },
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "createdIn": "9cc3a0f8-7abb-490f-8004-5958ef521601"
+    },
+    {
+      "key": "STEP-015",
+      "kind": "step",
+      "title": "ขั้นที่ 15",
+      "body": {
+        "ends": true
+      },
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "createdIn": "9cc3a0f8-7abb-490f-8004-5958ef521601"
+    },
+    {
+      "key": "SYS-001",
+      "kind": "system",
+      "title": "ระบบเอกสาร",
+      "body": {},
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "createdIn": "9cc3a0f8-7abb-490f-8004-5958ef521601"
+    },
+    {
+      "key": "SYS-002",
+      "kind": "system",
+      "title": "ระบบอีเมล",
+      "body": {},
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "createdIn": "9cc3a0f8-7abb-490f-8004-5958ef521601"
+    },
+    {
+      "key": "SYS-003",
+      "kind": "system",
+      "title": "ระบบบัญชี",
+      "body": {},
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "createdIn": "9cc3a0f8-7abb-490f-8004-5958ef521601"
+    },
+    {
+      "key": "SYS-004",
+      "kind": "system",
+      "title": "ระบบรายงาน",
+      "body": {},
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "createdIn": "9cc3a0f8-7abb-490f-8004-5958ef521601"
+    },
+    {
+      "key": "WRK-001",
+      "kind": "work",
+      "title": "งานทดลองขนาดใหญ่",
+      "body": {},
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "createdIn": "9cc3a0f8-7abb-490f-8004-5958ef521601"
+    }
+  ],
+  "links": [
+    {
+      "id": "ca64e55f-b1bf-4244-ae35-1419c2bd15a1",
+      "kind": "from",
+      "fromKey": "INT-001",
+      "toKey": "ROLE-002",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "a785f342-2277-446d-b721-3f8c8a5e6846",
+      "kind": "to",
+      "fromKey": "INT-001",
+      "toKey": "SCR-002",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "b0897656-bacb-41f0-b9ac-efaaf9c65bd4",
+      "kind": "from",
+      "fromKey": "INT-002",
+      "toKey": "SCR-002",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "75338007-e5a6-40f4-b669-9786e51a620c",
+      "kind": "to",
+      "fromKey": "INT-002",
+      "toKey": "API-002",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "b5f0fa4c-e1df-43c0-8dba-c952aa51f272",
+      "kind": "from",
+      "fromKey": "INT-003",
+      "toKey": "ROLE-003",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "17d2751f-0d27-4be7-83f6-996818045e78",
+      "kind": "to",
+      "fromKey": "INT-003",
+      "toKey": "SCR-003",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "59cacf3b-b99e-490b-a0ad-166baaab7643",
+      "kind": "from",
+      "fromKey": "INT-004",
+      "toKey": "SCR-003",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "1444cfef-fcd8-4b5a-a7a9-b23c0967a87a",
+      "kind": "to",
+      "fromKey": "INT-004",
+      "toKey": "API-003",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "d6a7ccfc-624c-4160-a6dc-7aeac7ff1835",
+      "kind": "from",
+      "fromKey": "INT-005",
+      "toKey": "ROLE-004",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "73fdfc4e-eb0f-4952-8800-c3f293ec6bcb",
+      "kind": "to",
+      "fromKey": "INT-005",
+      "toKey": "SCR-004",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "208f48d2-2c8c-49d1-9ce7-8ac182702f84",
+      "kind": "from",
+      "fromKey": "INT-006",
+      "toKey": "SCR-004",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "bfda85a6-8100-49fb-9af1-e4d058228d36",
+      "kind": "to",
+      "fromKey": "INT-006",
+      "toKey": "API-004",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "c38689bf-83fc-44dd-bd0a-494a7d9f5c5b",
+      "kind": "from",
+      "fromKey": "INT-007",
+      "toKey": "API-004",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "b2e6a571-d0df-4efb-ac5d-c049ed4f0b5b",
+      "kind": "to",
+      "fromKey": "INT-007",
+      "toKey": "SYS-002",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "3f2ca383-ce0a-4110-a01e-8e13725b4584",
+      "kind": "from",
+      "fromKey": "INT-008",
+      "toKey": "ROLE-005",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "d81adc8f-feb6-43ac-ba11-3a8f8364cbe3",
+      "kind": "to",
+      "fromKey": "INT-008",
+      "toKey": "SCR-005",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "922777fc-2484-496a-95cd-ac18517312c5",
+      "kind": "from",
+      "fromKey": "INT-009",
+      "toKey": "SCR-005",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "a293de6b-b351-46e2-805e-6c28c6063275",
+      "kind": "to",
+      "fromKey": "INT-009",
+      "toKey": "API-005",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "f7f00b7b-8983-4a35-8ba4-9d358c100a2b",
+      "kind": "from",
+      "fromKey": "INT-010",
+      "toKey": "ROLE-001",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "10282700-33ee-43ba-bc6a-5e1485694db8",
+      "kind": "to",
+      "fromKey": "INT-010",
+      "toKey": "SCR-006",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "c6cc0096-81a8-4d2e-b507-d226f1be304d",
+      "kind": "from",
+      "fromKey": "INT-011",
+      "toKey": "SCR-006",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "e3f8bb89-cb23-4990-8e9a-ad4458e19bfd",
+      "kind": "to",
+      "fromKey": "INT-011",
+      "toKey": "API-001",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "b6e66a2e-9e96-4bf0-8d6e-67693c251ced",
+      "kind": "from",
+      "fromKey": "INT-012",
+      "toKey": "ROLE-002",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "98637705-d15a-4714-a22d-1776f56cccdc",
+      "kind": "to",
+      "fromKey": "INT-012",
+      "toKey": "SCR-001",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "643b935d-3c66-4214-aaf3-5f317f8b86b4",
+      "kind": "from",
+      "fromKey": "INT-013",
+      "toKey": "SCR-001",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "aaab36f6-44dd-4f6e-abff-af0330ebdaae",
+      "kind": "to",
+      "fromKey": "INT-013",
+      "toKey": "API-002",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "c0c6aedd-c60f-4471-8413-6e5d95937882",
+      "kind": "from",
+      "fromKey": "INT-014",
+      "toKey": "API-002",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "424131c8-07e9-45d1-aea9-18172aaa0400",
+      "kind": "to",
+      "fromKey": "INT-014",
+      "toKey": "SYS-003",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "32821683-d184-4f6c-9edd-1beae85a876d",
+      "kind": "from",
+      "fromKey": "INT-015",
+      "toKey": "ROLE-003",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "ab5ebe95-e994-4a33-9651-1b8431a29956",
+      "kind": "to",
+      "fromKey": "INT-015",
+      "toKey": "SCR-002",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "d71d26ea-12fa-454b-b695-46d4200fe955",
+      "kind": "from",
+      "fromKey": "INT-016",
+      "toKey": "SCR-002",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "ff257461-26d4-4b7d-81d7-9243d9b6a43c",
+      "kind": "to",
+      "fromKey": "INT-016",
+      "toKey": "API-003",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "0ca7eaaa-3a65-4f2c-aaf7-f8160100f8df",
+      "kind": "from",
+      "fromKey": "INT-017",
+      "toKey": "ROLE-004",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "9b156510-b9de-48a9-a05c-f26ca201ed6b",
+      "kind": "to",
+      "fromKey": "INT-017",
+      "toKey": "SCR-003",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "1f4d6cb7-1012-4d1e-87bf-ad0921739769",
+      "kind": "from",
+      "fromKey": "INT-018",
+      "toKey": "SCR-003",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "07a8e07e-72ef-4b08-af1f-c1ceeb931b32",
+      "kind": "to",
+      "fromKey": "INT-018",
+      "toKey": "API-004",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "4a97a1ce-b129-4b76-8a84-982dba130744",
+      "kind": "from",
+      "fromKey": "INT-019",
+      "toKey": "ROLE-005",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "6f7e38e3-06a2-4c74-8b50-2b0a858dc317",
+      "kind": "to",
+      "fromKey": "INT-019",
+      "toKey": "SCR-004",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "b39e73bf-cd98-4049-99c7-bd1bc2284493",
+      "kind": "from",
+      "fromKey": "INT-020",
+      "toKey": "SCR-004",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "70be8257-4273-478c-b2c4-61c8c2a6e805",
+      "kind": "to",
+      "fromKey": "INT-020",
+      "toKey": "API-005",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "fd9d1cc5-e0c5-474a-819b-09f91360c806",
+      "kind": "from",
+      "fromKey": "INT-021",
+      "toKey": "API-005",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "81feb55e-ad02-49a0-a1d9-0f80564d3dca",
+      "kind": "to",
+      "fromKey": "INT-021",
+      "toKey": "SYS-004",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "ff5bea99-800f-4ad8-bf93-5d9d3ff91524",
+      "kind": "from",
+      "fromKey": "INT-022",
+      "toKey": "ROLE-001",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "ca8d9a18-7593-4788-9c58-2856c708ae75",
+      "kind": "to",
+      "fromKey": "INT-022",
+      "toKey": "SCR-005",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "7bd1fd6f-81ae-4b8d-8f4c-60b07e6b661b",
+      "kind": "from",
+      "fromKey": "INT-023",
+      "toKey": "SCR-005",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "8260028f-52fc-4569-a5b1-06e692266b1c",
+      "kind": "to",
+      "fromKey": "INT-023",
+      "toKey": "API-001",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "042df739-e499-49f0-9678-f736fefab4af",
+      "kind": "from",
+      "fromKey": "INT-024",
+      "toKey": "ROLE-002",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "d6451326-52c1-4181-ba7f-6c1a0d2a1742",
+      "kind": "to",
+      "fromKey": "INT-024",
+      "toKey": "SCR-006",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "4701fb33-5591-4db3-ba70-5c8d2f82e5f4",
+      "kind": "from",
+      "fromKey": "INT-025",
+      "toKey": "SCR-006",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "dd251a19-1e22-423c-9d57-42060a83320c",
+      "kind": "to",
+      "fromKey": "INT-025",
+      "toKey": "API-002",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "b879f68f-e1ad-4727-bad1-7e8fb0db7187",
+      "kind": "from",
+      "fromKey": "INT-026",
+      "toKey": "ROLE-003",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "3c2e9b57-d5bc-4d0a-b054-f90480348510",
+      "kind": "to",
+      "fromKey": "INT-026",
+      "toKey": "SCR-001",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "9557c758-2cb1-484d-b0a7-4e4f382f34fa",
+      "kind": "from",
+      "fromKey": "INT-027",
+      "toKey": "SCR-001",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "2d01f3a8-fc69-4a3b-a961-5f0911ccd92e",
+      "kind": "to",
+      "fromKey": "INT-027",
+      "toKey": "API-003",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "055c7767-98af-4005-b40f-9fde4c34dcb5",
+      "kind": "from",
+      "fromKey": "INT-028",
+      "toKey": "API-003",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "f1554e09-6622-4da1-8a01-497129dd0b61",
+      "kind": "to",
+      "fromKey": "INT-028",
+      "toKey": "SYS-001",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "ca16eada-651d-468a-bd32-6c69aae97c20",
+      "kind": "from",
+      "fromKey": "INT-029",
+      "toKey": "ROLE-004",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "b99dbbc5-ea0a-49d2-a45b-ceacba4119ba",
+      "kind": "to",
+      "fromKey": "INT-029",
+      "toKey": "SCR-002",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "c3ef0bf1-e540-4aa5-be08-34bb2d9ed87d",
+      "kind": "from",
+      "fromKey": "INT-030",
+      "toKey": "SCR-002",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "5212425b-e29f-4079-a2b2-4cad39215412",
+      "kind": "to",
+      "fromKey": "INT-030",
+      "toKey": "API-004",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "62382781-b0c6-4dc3-ae3e-07f751797e13",
+      "kind": "from",
+      "fromKey": "INT-031",
+      "toKey": "ROLE-005",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "6d1d224c-9aba-4f90-b0f6-cf288510e26f",
+      "kind": "to",
+      "fromKey": "INT-031",
+      "toKey": "SCR-003",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "b16d2dec-03d7-442e-83bd-ffe54ed45685",
+      "kind": "from",
+      "fromKey": "INT-032",
+      "toKey": "SCR-003",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "f2157a56-bdba-4f38-a23e-3504773c8b48",
+      "kind": "to",
+      "fromKey": "INT-032",
+      "toKey": "API-005",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "0459efad-4f4d-4401-9fec-d08af2ac9bc0",
+      "kind": "from",
+      "fromKey": "INT-033",
+      "toKey": "ROLE-001",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "75fd39e2-c493-40a3-b89b-e2812877f007",
+      "kind": "to",
+      "fromKey": "INT-033",
+      "toKey": "SCR-004",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "50105018-ec80-4711-85b9-81f5d8753171",
+      "kind": "from",
+      "fromKey": "INT-034",
+      "toKey": "SCR-004",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "1f1d4fee-0d40-46cf-afcd-2b339e01451c",
+      "kind": "to",
+      "fromKey": "INT-034",
+      "toKey": "API-001",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "26eb1c81-1e6e-43b3-bf9e-c62eb3357a69",
+      "kind": "from",
+      "fromKey": "INT-035",
+      "toKey": "API-001",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "5ed30090-5cf4-4f3b-beb4-f1fe8bc37df8",
+      "kind": "to",
+      "fromKey": "INT-035",
+      "toKey": "SYS-002",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "580077f6-0136-4f2a-b769-b748ec672c56",
+      "kind": "has_interaction",
+      "fromKey": "STEP-001",
+      "toKey": "INT-001",
+      "position": 1,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "2b34f69f-eeb5-44f3-bc28-bb39ea8bbcec",
+      "kind": "has_interaction",
+      "fromKey": "STEP-001",
+      "toKey": "INT-002",
+      "position": 2,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "ee363815-7f72-439e-b2f7-a6046747c4f6",
+      "kind": "next",
+      "fromKey": "STEP-001",
+      "toKey": "STEP-002",
+      "position": 1,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "40dda7aa-95f1-4fe3-bd5a-8183a95e7662",
+      "kind": "has_interaction",
+      "fromKey": "STEP-002",
+      "toKey": "INT-003",
+      "position": 1,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "45fd2996-b3a0-401a-abbc-df2bc16e2aa1",
+      "kind": "has_interaction",
+      "fromKey": "STEP-002",
+      "toKey": "INT-004",
+      "position": 2,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "bea02c34-5658-4ca8-8bec-14ed53e52d56",
+      "kind": "next",
+      "fromKey": "STEP-002",
+      "toKey": "STEP-003",
+      "position": 2,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "2d500c28-4dc2-4fa8-b76f-90a5cb7fca8b",
+      "kind": "has_interaction",
+      "fromKey": "STEP-003",
+      "toKey": "INT-005",
+      "position": 1,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "63b587ba-9739-46ba-9f6d-1eca5647a60a",
+      "kind": "has_interaction",
+      "fromKey": "STEP-003",
+      "toKey": "INT-006",
+      "position": 2,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "27e2d1ed-a79a-4c85-a170-0d7f200e77be",
+      "kind": "has_interaction",
+      "fromKey": "STEP-003",
+      "toKey": "INT-007",
+      "position": 3,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "ba8a3e60-9f14-4861-b600-7ac7199e334a",
+      "kind": "next",
+      "fromKey": "STEP-003",
+      "toKey": "STEP-004",
+      "position": 3,
+      "label": "เส้นทางปกติ",
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "c00afa62-2f79-43ba-b763-e2e6038a42d3",
+      "kind": "next",
+      "fromKey": "STEP-003",
+      "toKey": "STEP-006",
+      "position": 4,
+      "label": "ข้ามการเตรียม",
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "8081f057-3324-4e11-95df-ec801cd66a58",
+      "kind": "has_interaction",
+      "fromKey": "STEP-004",
+      "toKey": "INT-008",
+      "position": 1,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "33067b08-6a0f-4f52-88bd-bed5ef332700",
+      "kind": "has_interaction",
+      "fromKey": "STEP-004",
+      "toKey": "INT-009",
+      "position": 2,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "d688b55d-867e-4b16-a6d1-f594e5f9ff20",
+      "kind": "next",
+      "fromKey": "STEP-004",
+      "toKey": "STEP-005",
+      "position": 5,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "74148f49-b4a5-4cbe-91ce-36d1ee887143",
+      "kind": "has_interaction",
+      "fromKey": "STEP-005",
+      "toKey": "INT-010",
+      "position": 1,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "9a20a401-25ea-4968-8e6d-40c22540d165",
+      "kind": "has_interaction",
+      "fromKey": "STEP-005",
+      "toKey": "INT-011",
+      "position": 2,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "f8e31c9c-b4a0-4e50-aa04-f90dbd1f3bd7",
+      "kind": "next",
+      "fromKey": "STEP-005",
+      "toKey": "STEP-006",
+      "position": 6,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "94eb0e0d-5c0c-472b-ab53-94b1cddaea55",
+      "kind": "has_interaction",
+      "fromKey": "STEP-006",
+      "toKey": "INT-012",
+      "position": 1,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "7656f860-cc00-4106-abdb-eb74d82a4f2c",
+      "kind": "has_interaction",
+      "fromKey": "STEP-006",
+      "toKey": "INT-013",
+      "position": 2,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "f211de46-1f6d-4572-93b0-56d225e4b234",
+      "kind": "has_interaction",
+      "fromKey": "STEP-006",
+      "toKey": "INT-014",
+      "position": 3,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "04d65e94-76c1-4864-b9a5-8a0e0734bdf8",
+      "kind": "next",
+      "fromKey": "STEP-006",
+      "toKey": "STEP-007",
+      "position": 7,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "f5b78725-c415-48c0-b2f0-9f5a1c946eb8",
+      "kind": "has_interaction",
+      "fromKey": "STEP-007",
+      "toKey": "INT-015",
+      "position": 1,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "5b597b03-7ed2-4432-b158-58313574f1b2",
+      "kind": "has_interaction",
+      "fromKey": "STEP-007",
+      "toKey": "INT-016",
+      "position": 2,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "12f8d80f-d3ab-4607-9de3-c658c1b431f7",
+      "kind": "next",
+      "fromKey": "STEP-007",
+      "toKey": "STEP-008",
+      "position": 8,
+      "label": "ผ่านการตรวจ",
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "0536c9d5-5f93-4fad-bb86-93e2683083cf",
+      "kind": "next",
+      "fromKey": "STEP-007",
+      "toKey": "STEP-010",
+      "position": 9,
+      "label": "ไม่ผ่านการตรวจ",
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "5bae4e53-4a36-4f7e-a66d-9b79cca23b46",
+      "kind": "has_interaction",
+      "fromKey": "STEP-008",
+      "toKey": "INT-017",
+      "position": 1,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "30a49b88-6a53-4e38-b7d2-6547c8f6c51d",
+      "kind": "has_interaction",
+      "fromKey": "STEP-008",
+      "toKey": "INT-018",
+      "position": 2,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "2747bc30-0c7b-4e63-95c0-ba77ea71e49f",
+      "kind": "next",
+      "fromKey": "STEP-008",
+      "toKey": "STEP-009",
+      "position": 10,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "f97d1af9-efa5-44b4-a036-e132b2a72591",
+      "kind": "has_interaction",
+      "fromKey": "STEP-009",
+      "toKey": "INT-019",
+      "position": 1,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "8d8eaa48-3eed-484d-b2ac-bf11b885296c",
+      "kind": "has_interaction",
+      "fromKey": "STEP-009",
+      "toKey": "INT-020",
+      "position": 2,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "eb37cef0-bcf5-4d75-a8d5-55f2d140109b",
+      "kind": "has_interaction",
+      "fromKey": "STEP-009",
+      "toKey": "INT-021",
+      "position": 3,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "2610b8b9-c3b5-452d-b874-9fea96172fc3",
+      "kind": "next",
+      "fromKey": "STEP-009",
+      "toKey": "STEP-010",
+      "position": 11,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "cef62ff9-7a2f-43d8-b3ef-701889ceec2b",
+      "kind": "has_interaction",
+      "fromKey": "STEP-010",
+      "toKey": "INT-022",
+      "position": 1,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "b2c7556b-ac29-4685-b286-36298b691ae1",
+      "kind": "has_interaction",
+      "fromKey": "STEP-010",
+      "toKey": "INT-023",
+      "position": 2,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "bfb6576c-80bb-4f67-9ad5-4760e33a0e34",
+      "kind": "next",
+      "fromKey": "STEP-010",
+      "toKey": "STEP-011",
+      "position": 12,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "1e5735bb-2de0-4499-8f4b-0983b468f86c",
+      "kind": "has_interaction",
+      "fromKey": "STEP-011",
+      "toKey": "INT-024",
+      "position": 1,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "3018963b-2a68-433c-b19c-458f9692c033",
+      "kind": "has_interaction",
+      "fromKey": "STEP-011",
+      "toKey": "INT-025",
+      "position": 2,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "3c470cb5-3a7c-428f-8da2-3fbf64433775",
+      "kind": "next",
+      "fromKey": "STEP-011",
+      "toKey": "STEP-012",
+      "position": 13,
+      "label": "ต้องแก้ไข",
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "311d975b-3e27-4b5c-a07c-c3dc82c1397f",
+      "kind": "next",
+      "fromKey": "STEP-011",
+      "toKey": "STEP-014",
+      "position": 14,
+      "label": "ไม่ต้องแก้ไข",
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "f4940a98-0caa-45b1-872f-0cb193b138ee",
+      "kind": "has_interaction",
+      "fromKey": "STEP-012",
+      "toKey": "INT-026",
+      "position": 1,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "e2ad4c41-c25a-4085-a8e7-cb69f4df5257",
+      "kind": "has_interaction",
+      "fromKey": "STEP-012",
+      "toKey": "INT-027",
+      "position": 2,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "51f817f3-0bb5-4032-b1d5-b0202ae47bf1",
+      "kind": "has_interaction",
+      "fromKey": "STEP-012",
+      "toKey": "INT-028",
+      "position": 3,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "2203a3b2-23bf-4404-b1ad-e033cd58bedb",
+      "kind": "next",
+      "fromKey": "STEP-012",
+      "toKey": "STEP-013",
+      "position": 15,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "4f88ef93-a99d-4183-ac31-4fee0464daeb",
+      "kind": "has_interaction",
+      "fromKey": "STEP-013",
+      "toKey": "INT-029",
+      "position": 1,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "75f85916-2512-4842-8abc-60477703c362",
+      "kind": "has_interaction",
+      "fromKey": "STEP-013",
+      "toKey": "INT-030",
+      "position": 2,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "5c451231-a8a9-47d6-8418-feae0b7ce4cd",
+      "kind": "next",
+      "fromKey": "STEP-013",
+      "toKey": "STEP-014",
+      "position": 16,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "5426609b-ea55-4595-8a32-2af51bceeba4",
+      "kind": "has_interaction",
+      "fromKey": "STEP-014",
+      "toKey": "INT-031",
+      "position": 1,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "5e3eba5d-64e6-4b4e-bec5-f0eb71a7a570",
+      "kind": "has_interaction",
+      "fromKey": "STEP-014",
+      "toKey": "INT-032",
+      "position": 2,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "4602f725-a3b4-44ec-ab07-d5b710d424de",
+      "kind": "next",
+      "fromKey": "STEP-014",
+      "toKey": "STEP-015",
+      "position": 17,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "706cdca5-9deb-45ed-8fad-27b34dff5471",
+      "kind": "has_interaction",
+      "fromKey": "STEP-015",
+      "toKey": "INT-033",
+      "position": 1,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "6af15809-318a-466f-acaa-6eb0222ffb98",
+      "kind": "has_interaction",
+      "fromKey": "STEP-015",
+      "toKey": "INT-034",
+      "position": 2,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "7ac1d4bd-3934-48b6-bc1c-afd1ca19ae14",
+      "kind": "has_interaction",
+      "fromKey": "STEP-015",
+      "toKey": "INT-035",
+      "position": 3,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "87ff4550-f4c9-4802-97ee-d2fa7611ec5f",
+      "kind": "has_step",
+      "fromKey": "WRK-001",
+      "toKey": "STEP-001",
+      "position": 1,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "615ad156-5638-40eb-a4cd-7f5becf9b57a",
+      "kind": "has_step",
+      "fromKey": "WRK-001",
+      "toKey": "STEP-002",
+      "position": 2,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "395bfca4-7774-4ead-83f6-60d639b70def",
+      "kind": "has_step",
+      "fromKey": "WRK-001",
+      "toKey": "STEP-003",
+      "position": 3,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "5c68503e-c89f-4b80-ae0f-7eec9f04568e",
+      "kind": "has_step",
+      "fromKey": "WRK-001",
+      "toKey": "STEP-004",
+      "position": 4,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "ec934c7c-aaf1-4288-a456-9978294bf0e1",
+      "kind": "has_step",
+      "fromKey": "WRK-001",
+      "toKey": "STEP-005",
+      "position": 5,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "21ad8fca-ebda-47e3-8091-53f37b6d30a7",
+      "kind": "has_step",
+      "fromKey": "WRK-001",
+      "toKey": "STEP-006",
+      "position": 6,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "a2c22f55-dbb1-4c3a-9d94-73e6a55dd2f8",
+      "kind": "has_step",
+      "fromKey": "WRK-001",
+      "toKey": "STEP-007",
+      "position": 7,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "8df769ea-66e4-458f-8f65-b25f4fe42830",
+      "kind": "has_step",
+      "fromKey": "WRK-001",
+      "toKey": "STEP-008",
+      "position": 8,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "e16f76ad-6214-48e3-8d57-20f85708420b",
+      "kind": "has_step",
+      "fromKey": "WRK-001",
+      "toKey": "STEP-009",
+      "position": 9,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "84f1518f-dbc1-4f98-afd1-5fdb05280a3c",
+      "kind": "has_step",
+      "fromKey": "WRK-001",
+      "toKey": "STEP-010",
+      "position": 10,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "2a25b9ae-d714-49f8-a6ed-19c0d8a580d8",
+      "kind": "has_step",
+      "fromKey": "WRK-001",
+      "toKey": "STEP-011",
+      "position": 11,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "04d02a96-9103-4fcc-8b2f-22e353c02f7c",
+      "kind": "has_step",
+      "fromKey": "WRK-001",
+      "toKey": "STEP-012",
+      "position": 12,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "f6a73a65-0c23-4d4d-b6d7-37c371becb16",
+      "kind": "has_step",
+      "fromKey": "WRK-001",
+      "toKey": "STEP-013",
+      "position": 13,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "f49f5116-f185-4edc-8c02-14d65f1b084e",
+      "kind": "has_step",
+      "fromKey": "WRK-001",
+      "toKey": "STEP-014",
+      "position": 14,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "8d5e33ba-5810-49d5-9f8e-76234c58b952",
+      "kind": "has_step",
+      "fromKey": "WRK-001",
+      "toKey": "STEP-015",
+      "position": 15,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    }
+  ]
+}

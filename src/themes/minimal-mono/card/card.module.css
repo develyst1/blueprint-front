@@ -1,0 +1,22 @@
+.card {
+  display: block;
+  background: #ffffff;
+  color: #000000;
+  border: 1.5px solid #8a8a8a;
+  min-width: 0;
+}
+
+.link {
+  text-decoration: none;
+}
+
+/* hover: the strong outline (2 px ink) without moving the layout — the extra 0.5 px is drawn inside */
+.link:hover {
+  border-color: #000000;
+  box-shadow: inset 0 0 0 0.5px #000000;
+}
+
+/* the readiness strip keeps its natural width inside the card */
+.strip {
+  display: flex;
+}

@@ -1,0 +1,296 @@
+/* minimal mono card pages — หน้าจอ · API · ประวัติ (TASK-A-022). Same two outline tokens as pages.module.css:
+   strong = 2 px ink · meaning = 1.5 px #8A8A8A. Nothing under 14 px. The stuck card is outlined in ink; the solid
+   block stays the stuck mark alone. */
+
+.card {
+  background: #ffffff;
+  color: #000000;
+  border: 1.5px solid #8a8a8a;
+  min-width: 0;
+}
+
+.cardStuck {
+  border: 2px solid #000000;
+}
+
+.mark {
+  display: inline-flex;
+  flex: none;
+  padding-top: 5px;
+}
+
+.title {
+  font-size: 18px;
+  line-height: 1.45;
+  font-weight: 700;
+  margin: 0;
+  min-width: 0;
+  flex: 1;
+  overflow-wrap: anywhere;
+}
+
+.stuckWords {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.groupHead {
+  font-size: 14px;
+  line-height: 1.4;
+  font-weight: 700;
+  color: #5c5c5c;
+  margin: 0;
+}
+
+.lines {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.lines li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 10px;
+  font-size: 15px;
+  line-height: 1.5;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.lineMain {
+  font-weight: 500;
+}
+
+.lineSub {
+  color: #5c5c5c;
+  font-size: 14px;
+}
+
+.links {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.links li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+/* a data link: ink, underlined, a 44 px hit area */
+.link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-size: 15px;
+  font-weight: 500;
+  color: #000000;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+
+.link:hover {
+  text-decoration-thickness: 2px;
+}
+
+.more {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mantine-spacing-md);
+  padding-top: var(--mantine-spacing-md);
+}
+
+/* ---------- api ---------- */
+.method {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 0 10px;
+  border: 1.5px solid #000000;
+  border-radius: var(--mantine-radius-md);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.path {
+  font-family: var(--mantine-font-family-monospace);
+  font-size: 14px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.status {
+  font-family: var(--mantine-font-family-monospace);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.json {
+  margin: 0;
+  padding: 12px;
+  background: #f2f2f2;
+  border-radius: var(--mantine-radius-md);
+  font-family: var(--mantine-font-family-monospace);
+  font-size: 14px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.bodyBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* ---------- history ---------- */
+.partList ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.partLink {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 6px 12px;
+  border-radius: var(--mantine-radius-md);
+  border: 1.5px solid transparent;
+  font-size: 15px;
+  font-weight: 500;
+  color: #000000;
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+
+.partLink:hover {
+  border-color: #8a8a8a;
+}
+
+.partLink[aria-current="page"] {
+  border-color: #000000;
+  background: #ffffff;
+  font-weight: 700;
+}
+
+/* with a part chosen, the list is a bounded box that scrolls inside itself at every width (REVIEW-C-002 row 21);
+   8 px of padding leaves room for the 4 px focus ring, which a scroller would otherwise clip */
+.partListBounded {
+  max-height: min(70vh, 640px);
+  overflow-y: auto;
+  border: 1.5px solid #8a8a8a;
+  border-radius: var(--mantine-radius-lg);
+  background: #ffffff;
+  padding: 8px;
+}
+
+/* a phone: a shorter box, so the chosen part's history (above it) keeps the screen */
+@media (max-width: 47.99em) {
+  .partListBounded {
+    max-height: 264px;
+  }
+}
+
+.timeline {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--mantine-spacing-lg);
+}
+
+.timeline li {
+  display: grid;
+  grid-template-columns: 12px minmax(0, 1fr);
+  gap: 14px;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  margin-top: 9px;
+  border-radius: 50%;
+  border: 2px solid #000000;
+  background: #ffffff;
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 16px;
+  margin-top: 4px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #5c5c5c;
+}
+
+.what {
+  color: #000000;
+  font-weight: 500;
+}
+
+/* ---------- legend (screens) ---------- */
+.legend {
+  row-gap: 8px;
+}
+
+.legendWord {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* an entry with no summary (v1.8): its when · by what · what is the line itself, in ink */
+.metaOnly {
+  margin-top: 0;
+  font-size: 15px;
+  color: #000000;
+  font-weight: 500;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* a list page with nothing in it (D-015): the sentence, quiet */
+.emptyWord {
+  font-size: 16px;
+  color: #5c5c5c;
+}

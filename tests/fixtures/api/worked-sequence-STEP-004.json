@@ -1,0 +1,47 @@
+{
+  "participants": [
+    {
+      "key": "ROLE-002",
+      "kind": "role",
+      "title": "ผู้ดูแลห้อง"
+    },
+    {
+      "key": "SCR-003",
+      "kind": "screen",
+      "title": "หน้าอนุมัติคำขอ"
+    },
+    {
+      "key": "API-003",
+      "kind": "api",
+      "title": "อนุมัติการจอง"
+    },
+    {
+      "key": "SYS-001",
+      "kind": "system",
+      "title": "ระบบปฏิทิน"
+    }
+  ],
+  "messages": [
+    {
+      "key": "INT-010",
+      "from": "ROLE-002",
+      "to": "SCR-003",
+      "text": "เปิดคำขอแล้วกดอนุมัติหรือปฏิเสธ",
+      "reply": null
+    },
+    {
+      "key": "INT-011",
+      "from": "SCR-003",
+      "to": "API-003",
+      "text": "ส่งผลการพิจารณา",
+      "reply": null
+    },
+    {
+      "key": "INT-012",
+      "from": "API-003",
+      "to": "SYS-001",
+      "text": "อัปเดตสถานะการจอง",
+      "reply": null
+    }
+  ]
+}

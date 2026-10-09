@@ -1,0 +1,388 @@
+{
+  "project": {
+    "id": "cb589f41-7dab-45ff-91ea-5a68060ddfcc",
+    "organisationId": "00000000-0000-0000-0000-000000000001",
+    "name": "งานทดลองที่ติดทุกแบบ",
+    "createdAt": "2026-10-08T20:02:34.353Z",
+    "theme": "clean-blue",
+    "model": "tier:medium",
+    "creativity": 0.5
+  },
+  "parts": [
+    {
+      "key": "DATA-001",
+      "kind": "data",
+      "title": "ข้อมูลทดลอง",
+      "body": {
+        "fields": []
+      },
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "createdIn": "d3e9f322-55ee-425f-a641-58a9e54ea61e"
+    },
+    {
+      "key": "DATA-002",
+      "kind": "data",
+      "title": "ข้อมูลที่ไม่มีใครใช้ (แก้ครั้งที่ 2)",
+      "body": {
+        "fields": []
+      },
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "createdIn": "d3e9f322-55ee-425f-a641-58a9e54ea61e"
+    },
+    {
+      "key": "INT-001",
+      "kind": "interaction",
+      "title": "เปิดหน้าทดลอง",
+      "body": {
+        "text": "เปิดหน้าทดลอง"
+      },
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "createdIn": "d3e9f322-55ee-425f-a641-58a9e54ea61e"
+    },
+    {
+      "key": "INT-002",
+      "kind": "interaction",
+      "title": "ส่งข้อมูลโดยยังไม่รู้ผู้รับ",
+      "body": {
+        "text": "ส่งข้อมูลโดยยังไม่รู้ผู้รับ"
+      },
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "createdIn": "d3e9f322-55ee-425f-a641-58a9e54ea61e"
+    },
+    {
+      "key": "INT-003",
+      "kind": "interaction",
+      "title": "ดูหน้าทดลอง",
+      "body": {
+        "text": "ดูหน้าทดลอง"
+      },
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "createdIn": "d3e9f322-55ee-425f-a641-58a9e54ea61e"
+    },
+    {
+      "key": "Q-001",
+      "kind": "question",
+      "title": "คำถามที่ยังเปิดอยู่",
+      "body": {
+        "text": "คำถามที่ยังเปิดอยู่",
+        "cases": [],
+        "status": "open",
+        "proposedAnswer": "คำตอบทดลอง"
+      },
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "createdIn": "d3e9f322-55ee-425f-a641-58a9e54ea61e"
+    },
+    {
+      "key": "ROLE-001",
+      "kind": "role",
+      "title": "ผู้ใช้ทดลอง",
+      "body": {},
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "createdIn": "d3e9f322-55ee-425f-a641-58a9e54ea61e"
+    },
+    {
+      "key": "ROLE-002",
+      "kind": "role",
+      "title": "ผู้ใช้ที่บอทเดา",
+      "body": {},
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "team-proposed"
+      },
+      "createdIn": "d3e9f322-55ee-425f-a641-58a9e54ea61e"
+    },
+    {
+      "key": "SCR-001",
+      "kind": "screen",
+      "title": "หน้าทดลอง",
+      "body": {
+        "fields": [],
+        "states": [],
+        "actions": []
+      },
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "createdIn": "d3e9f322-55ee-425f-a641-58a9e54ea61e"
+    },
+    {
+      "key": "STEP-001",
+      "kind": "step",
+      "title": "ขั้นแรก",
+      "body": {
+        "ends": false
+      },
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "createdIn": "d3e9f322-55ee-425f-a641-58a9e54ea61e"
+    },
+    {
+      "key": "STEP-002",
+      "kind": "step",
+      "title": "ขั้นที่ไม่ไปต่อ",
+      "body": {
+        "ends": false
+      },
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "createdIn": "d3e9f322-55ee-425f-a641-58a9e54ea61e"
+    },
+    {
+      "key": "STEP-003",
+      "kind": "step",
+      "title": "ขั้นที่ข้อมูลไม่ครบ",
+      "body": {
+        "ends": true
+      },
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "createdIn": "d3e9f322-55ee-425f-a641-58a9e54ea61e"
+    },
+    {
+      "key": "STEP-004",
+      "kind": "step",
+      "title": "ขั้นที่ไปไม่ถึง",
+      "body": {
+        "ends": true
+      },
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "createdIn": "d3e9f322-55ee-425f-a641-58a9e54ea61e"
+    },
+    {
+      "key": "WRK-001",
+      "kind": "work",
+      "title": "งานทดลองที่ติดทุกแบบ",
+      "body": {},
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "createdIn": "d3e9f322-55ee-425f-a641-58a9e54ea61e"
+    }
+  ],
+  "links": [
+    {
+      "id": "59a89755-f412-4597-9383-7b7173f79453",
+      "kind": "from",
+      "fromKey": "INT-001",
+      "toKey": "ROLE-001",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "0a318019-b93a-48dc-b9a6-32dd8b709721",
+      "kind": "to",
+      "fromKey": "INT-001",
+      "toKey": "SCR-001",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "1e569753-a6b3-484a-89d6-d8a2f4ca6315",
+      "kind": "from",
+      "fromKey": "INT-002",
+      "toKey": "ROLE-001",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "44e464f9-acd4-4dc6-b48b-73d350fd8248",
+      "kind": "from",
+      "fromKey": "INT-003",
+      "toKey": "ROLE-002",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "df3c653e-c4be-4241-85f2-1c6b8d42ae86",
+      "kind": "to",
+      "fromKey": "INT-003",
+      "toKey": "SCR-001",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "a4844094-11ab-44e3-9cd4-e91988aeefb3",
+      "kind": "about",
+      "fromKey": "Q-001",
+      "toKey": "STEP-002",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "f2591040-c2e2-4b13-8f01-dad2e09640ac",
+      "kind": "shows",
+      "fromKey": "SCR-001",
+      "toKey": "DATA-001",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "team-proposed"
+      }
+    },
+    {
+      "id": "584989b3-69c2-439c-85e9-b133643e8b07",
+      "kind": "has_interaction",
+      "fromKey": "STEP-001",
+      "toKey": "INT-001",
+      "position": 1,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "3d0ac8bf-e99f-4d77-9224-db8ea34e56bd",
+      "kind": "next",
+      "fromKey": "STEP-001",
+      "toKey": "STEP-002",
+      "position": 1,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "daf5f923-18c9-4fff-aa5c-713f4829a08b",
+      "kind": "next",
+      "fromKey": "STEP-001",
+      "toKey": "STEP-003",
+      "position": 2,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "337c333f-fdd1-4e9f-be82-fd4f8ee5e64c",
+      "kind": "has_interaction",
+      "fromKey": "STEP-003",
+      "toKey": "INT-002",
+      "position": 1,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "278f9754-cd8d-4ed0-86ec-719309bbca5b",
+      "kind": "has_interaction",
+      "fromKey": "STEP-004",
+      "toKey": "INT-003",
+      "position": 1,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "ff9c5012-a470-4e22-9b7e-f705b865e2b0",
+      "kind": "has_step",
+      "fromKey": "WRK-001",
+      "toKey": "STEP-001",
+      "position": 1,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "1a3ce752-0492-4632-8b87-d7958dc13027",
+      "kind": "has_step",
+      "fromKey": "WRK-001",
+      "toKey": "STEP-002",
+      "position": 2,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "d231d5c9-2be8-49bd-9b83-98b7a4a3235e",
+      "kind": "has_step",
+      "fromKey": "WRK-001",
+      "toKey": "STEP-003",
+      "position": 3,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "a0ea79ab-87c4-45bb-89d4-5bd485a0cbde",
+      "kind": "has_step",
+      "fromKey": "WRK-001",
+      "toKey": "STEP-004",
+      "position": 4,
+      "label": null,
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      }
+    }
+  ]
+}

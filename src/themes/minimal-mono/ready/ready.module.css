@@ -1,0 +1,440 @@
+/* พร้อมสร้างหรือยัง in minimal mono (TASK-A-044). The mono palette only: canvas #F2F2F2 (the root's), white panels,
+   ink #000, ink-2 #5C5C5C, line #8A8A8A (3.45:1 — outlines that carry meaning), #E0E0E0 decoration only. Weight is
+   the hierarchy: ยืนยัน 100% and the main actions are ink outlines; solid black is only the stuck step / the shell's
+   stuck strip. Nothing under 14 px; 44 px targets; the root's focus ring. */
+
+.page {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 20px;
+  max-width: 1120px;
+  accent-color: #000000;
+}
+
+.page > * {
+  min-width: 0;
+}
+
+/* from 64em the gate sits beside the picture and the quiz */
+@media (min-width: 64em) {
+  .page {
+    grid-template-columns: minmax(0, 1fr) 300px;
+    column-gap: 32px;
+    align-items: start;
+  }
+
+  .page > * {
+    grid-column: 1;
+  }
+
+  .page > .gate {
+    grid-column: 2;
+    grid-row: 2 / span 3;
+    position: sticky;
+    top: 16px;
+  }
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1.35;
+}
+
+.h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1.4;
+}
+
+/* ---------- buttons: outlines in two weights ---------- */
+.strong,
+.outline,
+.confirm {
+  background: #ffffff;
+  color: #000000;
+}
+
+.strong {
+  border: 2px solid #000000;
+  font-weight: 700;
+}
+
+.outline {
+  border: 1.5px solid #8a8a8a;
+  font-weight: 600;
+}
+
+/* the page's answer: the heaviest outline, still not a fill */
+.confirm {
+  width: 100%;
+  border: 3px solid #000000;
+  font-size: 17px;
+  font-weight: 800;
+}
+
+.strong:hover,
+.outline:hover,
+.confirm:hover {
+  background: #f2f2f2;
+}
+
+.confirm:disabled,
+.outline:disabled,
+.strong:disabled {
+  background: #ffffff;
+  color: #5c5c5c;
+  border-color: #8a8a8a;
+  border-style: dashed;
+}
+
+.textButton {
+  min-height: 44px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: #000000;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  cursor: pointer;
+}
+
+.textButton[aria-expanded="true"] {
+  text-decoration: none;
+  box-shadow: inset 0 -2px 0 #000000;
+}
+
+.input {
+  flex: 1 1 200px;
+  min-width: 0;
+  min-height: 44px;
+  box-sizing: border-box;
+  padding: 0 12px;
+  border: 1.5px solid #8a8a8a;
+  border-radius: var(--mantine-radius-md);
+  background: #ffffff;
+  color: #000000;
+  font: inherit;
+  font-size: 16px;
+}
+
+.input::placeholder {
+  color: #5c5c5c;
+}
+
+/* dashed means "off" on this page — a disabled box looks it (critique: it read as live) */
+.input:disabled {
+  border-style: dashed;
+  color: #5c5c5c;
+}
+
+.clamp {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+
+/* ---------- the work as a picture ---------- */
+.summary {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.steps {
+  list-style: none;
+  margin: 0;
+  padding: 2px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 10px;
+}
+
+/* a phone: the steps as one row that scrolls sideways (a 15-step work was ~1,000 px of grid before the gate) */
+@media (max-width: 47.99em) {
+  .steps {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    padding: 4px;
+    mask-image: linear-gradient(to right, #000 calc(100% - 32px), transparent);
+  }
+
+  .steps:focus-visible,
+  .steps:focus-within {
+    mask-image: none;
+  }
+
+  .steps > li {
+    flex: 0 0 132px;
+  }
+}
+
+.counts {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 32px;
+}
+
+.counts li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.countN {
+  font-size: 36px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.countWord {
+  font-size: 15px;
+  font-weight: 600;
+  color: #5c5c5c;
+}
+
+.stuckLink {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: 8px;
+  min-height: 44px;
+  font-size: 16px;
+  font-weight: 700;
+  color: #000000;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+/* ---------- the gate ---------- */
+.gate {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  background: #ffffff;
+  color: #000000;
+  border: 1.5px solid #8a8a8a;
+}
+
+.reasons {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.reason {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #000000;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.version {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.changed {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: #5c5c5c;
+}
+
+.build {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  padding-top: 12px;
+  border-top: 1px solid #e0e0e0;
+}
+
+/* the only reason the build is off (REQ-007): as strong as the version lines */
+.buildReason {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: #5c5c5c;
+}
+
+/* ---------- the quiz ---------- */
+.quiz {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.hint {
+  margin: 0;
+  font-size: 15px;
+  color: #5c5c5c;
+}
+
+.score {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.askRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.askForm {
+  display: flex;
+  flex: 1 1 300px;
+  gap: 8px;
+  min-width: 0;
+}
+
+.items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px 18px;
+  border: 1.5px solid #8a8a8a;
+  border-radius: var(--mantine-radius-lg);
+  background: #ffffff;
+}
+
+/* a failed answer: dashed — it never counts */
+.item[data-status="failed"] {
+  border-style: dashed;
+}
+
+.question {
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.55;
+}
+
+.answer {
+  font-size: 16px;
+  line-height: 1.55;
+}
+
+.failed {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+}
+
+.failedWord,
+.notInSpec {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: #5c5c5c;
+}
+
+.parts {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.label {
+  font-size: 14px;
+  font-weight: 700;
+  color: #5c5c5c;
+}
+
+.partLinks {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 16px;
+}
+
+.partLinks a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-size: 15px;
+  font-weight: 500;
+  color: #000000;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.markRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.wrongGroup {
+  display: flex;
+  flex: 1 1 260px;
+  gap: 8px;
+  min-width: 0;
+}
+
+.markedRight,
+.markedWrong {
+  margin: 0;
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 8px;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.markedWrong {
+  color: #000000;
+}
+
+.note {
+  font-weight: 500;
+  color: #5c5c5c;
+}

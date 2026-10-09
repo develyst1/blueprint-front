@@ -1,0 +1,18 @@
+{
+  "participants": [
+    {
+      "key": "ROLE-001",
+      "kind": "role",
+      "title": "ผู้ใช้ทดลอง"
+    }
+  ],
+  "messages": [
+    {
+      "key": "INT-002",
+      "from": "ROLE-001",
+      "to": null,
+      "text": "ส่งข้อมูลโดยยังไม่รู้ผู้รับ",
+      "reply": null
+    }
+  ]
+}

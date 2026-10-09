@@ -1,0 +1,60 @@
+{
+  "items": [
+    {
+      "kind": "open_question",
+      "key": "Q-001",
+      "title": "คำถามที่ยังเปิดอยู่"
+    },
+    {
+      "kind": "unlinked_part",
+      "key": "DATA-002",
+      "title": "ข้อมูลที่ไม่มีใครใช้ (แก้ครั้งที่ 2)"
+    },
+    {
+      "kind": "flow_break",
+      "reason": "unlabelled_branch",
+      "key": "STEP-001",
+      "title": "ขั้นแรก"
+    },
+    {
+      "kind": "flow_break",
+      "reason": "dead_end",
+      "key": "STEP-002",
+      "title": "ขั้นที่ไม่ไปต่อ"
+    },
+    {
+      "kind": "flow_break",
+      "reason": "no_interactions",
+      "key": "STEP-002",
+      "title": "ขั้นที่ไม่ไปต่อ"
+    },
+    {
+      "kind": "flow_break",
+      "reason": "incomplete_interaction",
+      "key": "STEP-003",
+      "title": "ขั้นที่ข้อมูลไม่ครบ"
+    },
+    {
+      "kind": "flow_break",
+      "reason": "unreachable",
+      "key": "STEP-004",
+      "title": "ขั้นที่ไปไม่ถึง"
+    },
+    {
+      "kind": "unconfirmed_guess",
+      "key": "ROLE-002",
+      "title": "ผู้ใช้ที่บอทเดา"
+    },
+    {
+      "kind": "unconfirmed_guess",
+      "key": "SCR-001",
+      "title": "หน้าทดลอง",
+      "linkId": "f2591040-c2e2-4b13-8f01-dad2e09640ac"
+    },
+    {
+      "kind": "screen_without_api",
+      "key": "SCR-001",
+      "title": "หน้าทดลอง"
+    }
+  ]
+}

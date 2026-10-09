@@ -1,0 +1,209 @@
+/* minimal mono's page frame. The canvas is the theme root's (mono.module.css); header and navbar are white
+   panels on it, separated by a 1 px decorative edge — no shadows. */
+
+.shell {
+  min-height: 100vh;
+}
+
+/* skip link: off-screen until focused, then a solid strip at the top-left — instant, no animation */
+.skip {
+  position: absolute;
+  left: 8px;
+  top: 8px;
+  z-index: 300;
+  padding: 10px 16px;
+  min-height: 44px;
+  border-radius: var(--mantine-radius-md);
+  background: #000000;
+  color: #ffffff;
+  font-weight: 700;
+  text-decoration: none;
+  transform: translateY(-200%);
+}
+
+.skip:focus-visible {
+  transform: none;
+}
+
+.header {
+  background: #ffffff;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.wordmark {
+  flex: none;
+  letter-spacing: -0.01em;
+}
+
+.project {
+  min-width: 0;
+}
+
+/* the readiness strip as a link to ติดอยู่ตรงไหน (Shell.tsx) */
+.stripHome {
+  display: inline-flex;
+  flex: none;
+  border-radius: var(--mantine-radius-lg);
+  text-decoration: none;
+}
+
+.stripHome:hover > * {
+  box-shadow: inset 0 0 0 2px #ffffff;
+}
+
+/* the header row: wordmark + project name (takes the room), readiness strip, then the core's tools */
+.headerRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 100%;
+  padding: 0 var(--mantine-spacing-xl);
+}
+
+.headerStart {
+  flex: 1 1 auto;
+}
+
+/* the readiness strip and the tools never shrink; only the name gives way (it truncates) */
+.headerRow > :not(.headerStart) {
+  flex: none;
+}
+
+/* the core's controls (today ส่งออก PDF — a plain button, unstyled by its owner): a quiet outlined button, ink on
+   white; the theme root's focus ring applies. Busy = still ink, wait cursor; off = dashed (dashed means "off" here). */
+.tools button {
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid #000000;
+  border-radius: var(--mantine-radius-md);
+  background: #ffffff;
+  color: #000000;
+  font: inherit;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.tools button:hover:not(:disabled) {
+  background: #f2f2f2;
+}
+
+.tools button:disabled {
+  border-style: dashed;
+  color: #5c5c5c;
+  cursor: wait;
+}
+
+.navbar {
+  background: #ffffff;
+  border-right: 1px solid #e0e0e0;
+}
+
+.navList {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.navLink {
+  min-height: 44px;
+  border-radius: var(--mantine-radius-md);
+  font-weight: 500;
+}
+
+.navLink:not([data-active]) {
+  color: #000000;
+}
+
+.navLink:not([data-active]):hover {
+  background: #f2f2f2;
+}
+
+.main {
+  min-width: 0;
+}
+
+.content {
+  padding: var(--mantine-spacing-xl);
+}
+
+/* The small-screen strip — hidden where the navbar shows (≥ 48em, Mantine's "sm"). A native scroller, its
+   scrollbar always drawn (thin, ink on light grey) as the cue that there is more to the right. */
+.strip {
+  display: none;
+  background: #ffffff;
+  border-bottom: 1px solid #e0e0e0;
+  overflow-x: scroll;
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
+  scrollbar-color: #5c5c5c #e0e0e0;
+  /* macOS overlay scrollbars draw nothing until scrolled, so the row also fades out at its right edge:
+     a cut-off name under a fade reads as "more this way", not as a broken word. */
+  mask-image: linear-gradient(to right, #000 calc(100% - 40px), transparent);
+}
+
+/* once scrolled to the end, nothing is left to hint at */
+.strip:focus-within {
+  mask-image: none;
+}
+
+.stripRow {
+  display: flex;
+  gap: 4px;
+  /* 48 px after the last link: room to scroll it clear of the 40 px edge fade (StripScroll) */
+  padding: 8px 48px 4px 16px;
+  width: max-content;
+}
+
+.stripLink {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 14px;
+  border-radius: var(--mantine-radius-md);
+  white-space: nowrap;
+  color: #000000;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.stripLink:hover {
+  background: #f2f2f2;
+}
+
+.stripLink[aria-current="page"] {
+  background: #000000;
+  color: #ffffff;
+}
+
+@media (max-width: 47.99em) {
+  .strip {
+    display: block;
+  }
+
+  /* collapsed AppShell only translates the navbar off-screen; remove it so its links leave the tab order */
+  .navbar {
+    display: none;
+  }
+
+  /* the row may wrap: whatever does not fit beside the name (strip, tools) moves to a second row, so the name
+     keeps its own width — it truncates only when it alone is wider than the row (A-048 R1) */
+  .shell .header {
+    height: auto;
+  }
+
+  .headerRow {
+    flex-wrap: wrap;
+    row-gap: 8px;
+    padding: 10px var(--mantine-spacing-md);
+  }
+
+  /* the project name needs the width more than the wordmark does */
+  .wordmark {
+    display: none;
+  }
+
+  .content {
+    padding: var(--mantine-spacing-md);
+  }
+}

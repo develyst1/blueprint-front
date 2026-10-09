@@ -1,0 +1,103 @@
+/* The default theme — no component library, system Thai font, styles only its own subtree. Plain and readable:
+   it is the fallback for every theme and the reference the required-content check runs first. */
+.root {
+  font-family: "Sukhumvit Set", "Thonburi", system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #1b1f24;
+  background: #ffffff;
+}
+
+.root a { color: #1458c4; }
+.root a:focus-visible,
+.root button:focus-visible,
+.root summary:focus-visible,
+.root input:focus-visible,
+.root [tabindex]:focus-visible { outline: 3px solid #1458c4; outline-offset: 2px; }
+
+/* ---------- shell ---------- */
+.skip {
+  position: absolute;
+  left: 8px;
+  top: -48px;
+  padding: 8px 14px;
+  background: #1b1f24;
+  color: #ffffff !important;
+  border-radius: 6px;
+  z-index: 10;
+}
+.skip:focus { top: 8px; }
+
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px 16px;
+  padding: 16px;
+  border-bottom: 1px solid #d5dae1;
+}
+.header h1 { font-size: 22px; margin: 0; }
+.readiness { padding: 2px 10px; border: 1px solid #8a93a0; border-radius: 999px; }
+.readinessStuck { border-color: #a6460a; color: #a6460a; }
+.tools { margin-left: auto; } /* v1.11: the core's controls (ส่งออก PDF) at the header's end */
+
+.nav { display: flex; gap: 4px 12px; flex-wrap: wrap; padding: 8px 16px; border-bottom: 1px solid #d5dae1; }
+.nav a { padding: 6px 4px; min-height: 44px; display: inline-flex; align-items: center; }
+.nav a[aria-current="page"] { font-weight: 700; color: #1b1f24; text-decoration: none; }
+
+.main { padding: 16px; max-width: 1200px; }
+.main:focus { outline: none; }
+.main h2 { font-size: 18px; margin: 16px 0 8px; }
+
+/* ---------- lists and tables ---------- */
+.list { padding-left: 20px; margin: 0; }
+.list li { margin: 4px 0; }
+.muted { color: #5b6573; }
+.stuckNote { color: #a6460a; }
+.table { border-collapse: collapse; font-size: 14px; }
+.table th, .table td { border: 1px solid #d5dae1; padding: 6px 8px; text-align: left; vertical-align: top; }
+.table td.on { text-align: center; }
+.scroll { overflow: auto; max-width: 100%; border: 1px solid #d5dae1; border-radius: 6px; }
+.scroll svg { display: block; }
+.pills { display: flex; flex-wrap: wrap; gap: 4px 12px; padding: 0; margin: 0 0 8px; list-style: none; }
+.card {
+  display: grid;
+  gap: 4px;
+  padding: 12px 16px;
+  border: 1px solid #d5dae1;
+  border-radius: 8px;
+  min-width: 0;
+  color: inherit;
+  text-decoration: none;
+  justify-items: start;
+}
+.card:hover { border-color: #8a93a0; }
+.card:hover h2 { text-decoration: underline; }
+.card h2, .card h3 { margin: 0; font-size: 17px; } /* h2 = a home card (under the page's h1) · h3 = the dialog's preview */
+.detail { border: 1px solid #d5dae1; border-radius: 6px; padding: 8px 12px; margin: 8px 0; }
+
+/* ---------- states ---------- */
+.state {
+  display: grid;
+  gap: 12px;
+  justify-items: start;
+  padding: 24px;
+  border: 1px solid #c9ced6;
+  border-radius: 8px;
+  margin: 16px;
+}
+.state p { margin: 0; }
+.state button {
+  font: inherit;
+  min-height: 44px;
+  padding: 8px 16px;
+  border: 1px solid #5f6b7a;
+  border-radius: 6px;
+  background: #f3f4f6;
+  color: inherit;
+  cursor: pointer;
+}
+.state button:hover { background: #e5e7eb; }
+.state button:active { background: #d1d5db; }
+.state button:disabled { opacity: 0.6; cursor: progress; }
+.state a { min-height: 44px; display: inline-flex; align-items: center; }

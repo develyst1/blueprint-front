@@ -1,0 +1,217 @@
+/* minimal mono diagrams (TASK-A-019). Weight is the hierarchy: a white box with a 1.5 px ink outline is a step;
+   the stuck step is the only solid block; arrows are quieter (1.5 px #5C5C5C) than the boxes they join.
+   Labels sit on white plaques, 14 px; step titles 15 px. Nothing under 14 px. */
+
+.scroll {
+  position: relative;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: var(--mantine-radius-lg);
+  padding: 16px;
+}
+
+.flow {
+  display: block;
+  font-family: var(--mantine-font-family);
+}
+
+.edge {
+  fill: none;
+  stroke: #5c5c5c;
+  stroke-width: 1.5;
+}
+
+.nodeBox {
+  fill: #ffffff;
+  stroke: #000000;
+  stroke-width: 1.5;
+}
+
+.nodeNumber {
+  font-size: 15px;
+  font-weight: 800;
+  fill: #000000;
+}
+
+.nodeEnds {
+  font-size: 14px;
+  font-weight: 500;
+  fill: #5c5c5c;
+}
+
+.nodeTitle {
+  font-size: 15px;
+  font-weight: 700;
+  fill: #000000;
+}
+
+.nodeStuck .nodeBox {
+  fill: #000000;
+}
+
+.nodeStuck .nodeNumber,
+.nodeStuck .nodeTitle {
+  fill: #ffffff;
+}
+
+.fork {
+  fill: #ffffff;
+  stroke: #000000;
+  stroke-width: 1.5;
+}
+
+.nodeLink {
+  cursor: pointer;
+  outline: none;
+}
+
+.nodeLink:hover .nodeBox {
+  stroke-width: 2.5;
+}
+
+/* box-shadow does not draw inside SVG, so an SVG link's ring is an outline: 2 px ink, offset clear of the box */
+.nodeLink:focus-visible {
+  outline: 2px solid #000000;
+  outline-offset: 3px;
+}
+
+.fit {
+  max-width: none;
+}
+
+.leader {
+  stroke: #8a8a8a;
+  stroke-width: 1;
+}
+
+.leaderDot {
+  fill: #8a8a8a;
+}
+
+/* ---- sequence (TASK-A-021) ---- */
+.lifeline {
+  stroke: #8a8a8a;
+  stroke-width: 1.5;
+  stroke-dasharray: none;
+}
+
+.headTitle {
+  font-size: 15px;
+  font-weight: 700;
+  fill: #000000;
+}
+
+.message {
+  stroke: #000000;
+  stroke-width: 1.5;
+}
+
+.reply {
+  stroke: #5c5c5c;
+  stroke-width: 1.5;
+  stroke-dasharray: 5 4;
+}
+
+.replyText {
+  font-size: 14px;
+  fill: #5c5c5c;
+}
+
+.order {
+  font-size: 14px;
+  font-weight: 800;
+  fill: #000000;
+}
+
+.missingEnd {
+  fill: #ffffff;
+  stroke: #5c5c5c;
+  stroke-width: 1.25;
+  stroke-dasharray: 3 3;
+}
+
+/* ---- node web (TASK-A-021) ---- */
+/* the web is larger than its window at every width: its right and bottom edges fade, so a label at the window's
+   edge reads as "the web continues" rather than as a cut word (TASK-A-021 R1) */
+.webScroll {
+  max-height: 640px;
+  overflow: auto;
+  mask-image: linear-gradient(to right, #000 calc(100% - 40px), transparent), linear-gradient(to bottom, #000 calc(100% - 40px), transparent);
+  mask-composite: intersect;
+}
+
+.webScroll:focus-within,
+.webScroll:focus {
+  mask-image: none;
+}
+
+/* a 44 px hit circle under every node, invisible */
+.hit {
+  fill: transparent;
+}
+
+/* on a phone: a right-edge fade says the diagram continues; the web box leaves room for the panel below */
+@media (max-width: 47.99em) {
+  .scroll {
+    mask-image: linear-gradient(to right, #000 calc(100% - 32px), transparent);
+  }
+
+  .scroll:focus-within,
+  .scroll:focus {
+    mask-image: none;
+  }
+
+  .webScroll {
+    max-height: 60vh;
+  }
+}
+
+/* edges carry meaning: #8A8A8A on white = 3.45:1 (REVIEW-C-002 row 16); the selected part's own edges ink, heavier */
+.webEdge {
+  stroke: #8a8a8a;
+  stroke-width: 1;
+}
+
+.webEdgeSelected {
+  stroke: #000000;
+  stroke-width: 2;
+}
+
+.webLabel {
+  font-size: 14px;
+  font-weight: 500;
+  fill: #000000;
+  paint-order: stroke;
+  stroke: #ffffff;
+  stroke-width: 4px;
+  stroke-linejoin: round;
+}
+
+.webLabelStuck {
+  font-size: 14px;
+  font-weight: 800;
+  fill: #000000;
+  paint-order: stroke;
+  stroke: #ffffff;
+  stroke-width: 4px;
+  stroke-linejoin: round;
+}
+
+.selectedRing {
+  fill: none;
+  stroke: #000000;
+  stroke-width: 3;
+}
+
+.plaque rect {
+  fill: #ffffff;
+  stroke: #8a8a8a;
+  stroke-width: 1;
+}
+
+.plaque text {
+  fill: #000000;
+  font-weight: 500;
+}

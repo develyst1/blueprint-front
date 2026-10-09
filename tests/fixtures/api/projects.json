@@ -1,0 +1,42 @@
+[
+  {
+    "id": "76a20a50-3834-40f2-aaa5-b5f52821ac63",
+    "organisationId": "00000000-0000-0000-0000-000000000001",
+    "name": "โปรเจกต์ว่าง",
+    "createdAt": "2026-10-08T20:02:34.354Z",
+    "theme": "clean-blue",
+    "model": "tier:medium",
+    "creativity": 0.5,
+    "stuckCount": 0
+  },
+  {
+    "id": "ab42a952-5107-4520-91c9-96aa5863f347",
+    "organisationId": "00000000-0000-0000-0000-000000000001",
+    "name": "งานทดลองขนาดใหญ่",
+    "createdAt": "2026-10-08T20:02:34.354Z",
+    "theme": "clean-blue",
+    "model": "tier:medium",
+    "creativity": 0.5,
+    "stuckCount": 0
+  },
+  {
+    "id": "cb589f41-7dab-45ff-91ea-5a68060ddfcc",
+    "organisationId": "00000000-0000-0000-0000-000000000001",
+    "name": "งานทดลองที่ติดทุกแบบ",
+    "createdAt": "2026-10-08T20:02:34.353Z",
+    "theme": "clean-blue",
+    "model": "tier:medium",
+    "creativity": 0.5,
+    "stuckCount": 10
+  },
+  {
+    "id": "ad7e243c-8d22-4236-9a2b-e3a004b82de9",
+    "organisationId": "00000000-0000-0000-0000-000000000001",
+    "name": "จองห้องประชุม",
+    "createdAt": "2026-10-08T20:02:34.351Z",
+    "theme": "clean-blue",
+    "model": "tier:medium",
+    "creativity": 0.5,
+    "stuckCount": 1
+  }
+]

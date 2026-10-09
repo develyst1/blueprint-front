@@ -1,0 +1,196 @@
+{
+  "nodes": [
+    {
+      "key": "STEP-001",
+      "title": "ขั้นที่ 1",
+      "position": 1,
+      "ends": false,
+      "isBranch": false
+    },
+    {
+      "key": "STEP-002",
+      "title": "ขั้นที่ 2",
+      "position": 2,
+      "ends": false,
+      "isBranch": false
+    },
+    {
+      "key": "STEP-003",
+      "title": "ขั้นที่ 3",
+      "position": 3,
+      "ends": false,
+      "isBranch": true
+    },
+    {
+      "key": "STEP-004",
+      "title": "ขั้นที่ 4",
+      "position": 4,
+      "ends": false,
+      "isBranch": false
+    },
+    {
+      "key": "STEP-005",
+      "title": "ขั้นที่ 5",
+      "position": 5,
+      "ends": false,
+      "isBranch": false
+    },
+    {
+      "key": "STEP-006",
+      "title": "ขั้นที่ 6",
+      "position": 6,
+      "ends": false,
+      "isBranch": false
+    },
+    {
+      "key": "STEP-007",
+      "title": "ขั้นที่ 7",
+      "position": 7,
+      "ends": false,
+      "isBranch": true
+    },
+    {
+      "key": "STEP-008",
+      "title": "ขั้นที่ 8",
+      "position": 8,
+      "ends": false,
+      "isBranch": false
+    },
+    {
+      "key": "STEP-009",
+      "title": "ขั้นที่ 9",
+      "position": 9,
+      "ends": false,
+      "isBranch": false
+    },
+    {
+      "key": "STEP-010",
+      "title": "ขั้นที่ 10",
+      "position": 10,
+      "ends": false,
+      "isBranch": false
+    },
+    {
+      "key": "STEP-011",
+      "title": "ขั้นที่ 11",
+      "position": 11,
+      "ends": false,
+      "isBranch": true
+    },
+    {
+      "key": "STEP-012",
+      "title": "ขั้นที่ 12",
+      "position": 12,
+      "ends": false,
+      "isBranch": false
+    },
+    {
+      "key": "STEP-013",
+      "title": "ขั้นที่ 13",
+      "position": 13,
+      "ends": false,
+      "isBranch": false
+    },
+    {
+      "key": "STEP-014",
+      "title": "ขั้นที่ 14",
+      "position": 14,
+      "ends": false,
+      "isBranch": false
+    },
+    {
+      "key": "STEP-015",
+      "title": "ขั้นที่ 15",
+      "position": 15,
+      "ends": true,
+      "isBranch": false
+    }
+  ],
+  "arrows": [
+    {
+      "from": "STEP-001",
+      "to": "STEP-002",
+      "label": null
+    },
+    {
+      "from": "STEP-002",
+      "to": "STEP-003",
+      "label": null
+    },
+    {
+      "from": "STEP-003",
+      "to": "STEP-004",
+      "label": "เส้นทางปกติ"
+    },
+    {
+      "from": "STEP-003",
+      "to": "STEP-006",
+      "label": "ข้ามการเตรียม"
+    },
+    {
+      "from": "STEP-004",
+      "to": "STEP-005",
+      "label": null
+    },
+    {
+      "from": "STEP-005",
+      "to": "STEP-006",
+      "label": null
+    },
+    {
+      "from": "STEP-006",
+      "to": "STEP-007",
+      "label": null
+    },
+    {
+      "from": "STEP-007",
+      "to": "STEP-008",
+      "label": "ผ่านการตรวจ"
+    },
+    {
+      "from": "STEP-007",
+      "to": "STEP-010",
+      "label": "ไม่ผ่านการตรวจ"
+    },
+    {
+      "from": "STEP-008",
+      "to": "STEP-009",
+      "label": null
+    },
+    {
+      "from": "STEP-009",
+      "to": "STEP-010",
+      "label": null
+    },
+    {
+      "from": "STEP-010",
+      "to": "STEP-011",
+      "label": null
+    },
+    {
+      "from": "STEP-011",
+      "to": "STEP-012",
+      "label": "ต้องแก้ไข"
+    },
+    {
+      "from": "STEP-011",
+      "to": "STEP-014",
+      "label": "ไม่ต้องแก้ไข"
+    },
+    {
+      "from": "STEP-012",
+      "to": "STEP-013",
+      "label": null
+    },
+    {
+      "from": "STEP-013",
+      "to": "STEP-014",
+      "label": null
+    },
+    {
+      "from": "STEP-014",
+      "to": "STEP-015",
+      "label": null
+    }
+  ]
+}

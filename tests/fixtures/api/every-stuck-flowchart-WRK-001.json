@@ -1,0 +1,44 @@
+{
+  "nodes": [
+    {
+      "key": "STEP-001",
+      "title": "ขั้นแรก",
+      "position": 1,
+      "ends": false,
+      "isBranch": true
+    },
+    {
+      "key": "STEP-002",
+      "title": "ขั้นที่ไม่ไปต่อ",
+      "position": 2,
+      "ends": false,
+      "isBranch": false
+    },
+    {
+      "key": "STEP-003",
+      "title": "ขั้นที่ข้อมูลไม่ครบ",
+      "position": 3,
+      "ends": true,
+      "isBranch": false
+    },
+    {
+      "key": "STEP-004",
+      "title": "ขั้นที่ไปไม่ถึง",
+      "position": 4,
+      "ends": true,
+      "isBranch": false
+    }
+  ],
+  "arrows": [
+    {
+      "from": "STEP-001",
+      "to": "STEP-002",
+      "label": null
+    },
+    {
+      "from": "STEP-001",
+      "to": "STEP-003",
+      "label": null
+    }
+  ]
+}

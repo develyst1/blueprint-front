@@ -1,7 +1,7 @@
 /* Core styles — the only CSS the app shell loads. No library CSS here. */
 .body {
   margin: 0;
-  font-family: "Sukhumvit Set", "Thonburi", "Noto Sans Thai", system-ui, sans-serif;
+  font-family: "Sukhumvit Set", "Thonburi", system-ui, sans-serif;
   line-height: 1.5;
   color: #1b1f24;
   background: #ffffff;

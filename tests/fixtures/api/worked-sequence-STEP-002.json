@@ -1,0 +1,35 @@
+{
+  "participants": [
+    {
+      "key": "ROLE-001",
+      "kind": "role",
+      "title": "พนักงาน"
+    },
+    {
+      "key": "SCR-001",
+      "kind": "screen",
+      "title": "หน้าค้นหาห้อง"
+    },
+    {
+      "key": "SCR-002",
+      "kind": "screen",
+      "title": "หน้ายืนยันการจอง"
+    }
+  ],
+  "messages": [
+    {
+      "key": "INT-004",
+      "from": "ROLE-001",
+      "to": "SCR-001",
+      "text": "เลือกห้องและช่วงเวลา",
+      "reply": null
+    },
+    {
+      "key": "INT-005",
+      "from": "SCR-001",
+      "to": "SCR-002",
+      "text": "เปิดหน้ายืนยันพร้อมห้องที่เลือก",
+      "reply": null
+    }
+  ]
+}

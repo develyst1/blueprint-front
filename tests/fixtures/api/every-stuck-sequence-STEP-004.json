@@ -1,0 +1,23 @@
+{
+  "participants": [
+    {
+      "key": "ROLE-002",
+      "kind": "role",
+      "title": "ผู้ใช้ที่บอทเดา"
+    },
+    {
+      "key": "SCR-001",
+      "kind": "screen",
+      "title": "หน้าทดลอง"
+    }
+  ],
+  "messages": [
+    {
+      "key": "INT-003",
+      "from": "ROLE-002",
+      "to": "SCR-001",
+      "text": "ดูหน้าทดลอง",
+      "reply": null
+    }
+  ]
+}

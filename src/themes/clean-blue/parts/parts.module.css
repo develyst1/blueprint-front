@@ -1,0 +1,67 @@
+/* clean-blue small parts: tiles, page heads, choosers. Colours from the --cb-* variables on the root. */
+
+.tile {
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border-radius: var(--cb-r-tile);
+}
+.sm { width: 28px; height: 28px; font-size: 14px; border-radius: 8px; }
+.md { width: 36px; height: 36px; font-size: 18px; }
+.lg { width: 44px; height: 44px; font-size: 22px; }
+
+.journey { background: var(--cb-journey-soft); color: var(--cb-journey); }
+.interaction { background: var(--cb-interaction-soft); color: var(--cb-interaction); }
+.participant { background: var(--cb-participant-soft); color: var(--cb-participant); }
+.knowledge { background: var(--cb-knowledge-soft); color: var(--cb-knowledge); }
+.question { background: var(--cb-question-soft); color: var(--cb-question); }
+
+.page_plain { background: var(--cb-canvas); color: var(--cb-ink2); }
+.page_current { background: var(--cb-blue); color: var(--cb-paper); }
+.page_stuck { background: var(--cb-stuckSoft); color: var(--cb-stuck); }
+
+.pageHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 24px;
+}
+.pageTitle {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 24px;
+  line-height: 1.3;
+  font-weight: 700;
+}
+
+.choose {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 2px;
+  max-width: 100%;
+  scrollbar-width: thin;
+}
+.pill {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 6px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--cb-line);
+  background: var(--cb-paper);
+  color: var(--cb-ink) !important;
+  font-size: 15px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.pill:hover { border-color: var(--cb-lineStrong); }
+.pill[aria-current="page"] { background: var(--cb-blue); border-color: var(--cb-blue); color: var(--cb-paper) !important; font-weight: 600; }
+
+@media (max-width: 640px) {
+  .pageTitle { font-size: 20px; gap: 12px; }
+}

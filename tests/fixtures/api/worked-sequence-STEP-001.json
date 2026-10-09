@@ -1,0 +1,47 @@
+{
+  "participants": [
+    {
+      "key": "ROLE-001",
+      "kind": "role",
+      "title": "พนักงาน"
+    },
+    {
+      "key": "SCR-001",
+      "kind": "screen",
+      "title": "หน้าค้นหาห้อง"
+    },
+    {
+      "key": "API-001",
+      "kind": "api",
+      "title": "ค้นหาห้องว่าง"
+    },
+    {
+      "key": "SYS-001",
+      "kind": "system",
+      "title": "ระบบปฏิทิน"
+    }
+  ],
+  "messages": [
+    {
+      "key": "INT-001",
+      "from": "ROLE-001",
+      "to": "SCR-001",
+      "text": "เลือกวันที่",
+      "reply": null
+    },
+    {
+      "key": "INT-002",
+      "from": "SCR-001",
+      "to": "API-001",
+      "text": "ขอรายการห้องว่าง",
+      "reply": null
+    },
+    {
+      "key": "INT-003",
+      "from": "API-001",
+      "to": "SYS-001",
+      "text": "อ่านห้องว่างจากปฏิทิน",
+      "reply": null
+    }
+  ]
+}

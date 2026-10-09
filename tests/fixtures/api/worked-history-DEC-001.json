@@ -1,0 +1,74 @@
+[
+  {
+    "changeSetId": "c0a6a1a6-f5eb-4ff6-8705-6e8d0c4fb3eb",
+    "at": "2026-10-08T20:02:34.387Z",
+    "cause": {
+      "kind": "operator"
+    },
+    "entity": "part:DEC-001",
+    "op": "add",
+    "before": null,
+    "after": {
+      "key": "DEC-001",
+      "body": {
+        "open": "ห้องพอดี 10 คน",
+        "rule": "ห้องที่จุเกิน 10 คนต้องให้ผู้ดูแลอนุมัติ",
+        "cases": [
+          "ห้องใหญ่ → ผู้ดูแลอนุมัติ",
+          "ห้องเล็ก → ยืนยันทันที"
+        ]
+      },
+      "kind": "decision",
+      "title": "ห้องที่จุเกิน 10 คนต้องให้ผู้ดูแลอนุมัติ",
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      },
+      "removed": false
+    }
+  },
+  {
+    "changeSetId": "c0a6a1a6-f5eb-4ff6-8705-6e8d0c4fb3eb",
+    "at": "2026-10-08T20:02:34.387Z",
+    "cause": {
+      "kind": "operator"
+    },
+    "entity": "link:44545709-c17f-474a-9e5e-6166cfe37055",
+    "op": "link_add",
+    "before": null,
+    "after": {
+      "id": "44545709-c17f-474a-9e5e-6166cfe37055",
+      "kind": "covers",
+      "label": null,
+      "toKey": "STEP-003",
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      },
+      "fromKey": "DEC-001",
+      "position": null
+    }
+  },
+  {
+    "changeSetId": "c0a6a1a6-f5eb-4ff6-8705-6e8d0c4fb3eb",
+    "at": "2026-10-08T20:02:34.387Z",
+    "cause": {
+      "kind": "operator"
+    },
+    "entity": "link:e0151fb8-456d-49df-b7ae-21a66208b347",
+    "op": "link_add",
+    "before": null,
+    "after": {
+      "id": "e0151fb8-456d-49df-b7ae-21a66208b347",
+      "kind": "covers",
+      "label": null,
+      "toKey": "STEP-004",
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      },
+      "fromKey": "DEC-001",
+      "position": null
+    }
+  }
+]

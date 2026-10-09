@@ -1,0 +1,61 @@
+{
+  "lanes": [
+    {
+      "key": "ROLE-001",
+      "kind": "role",
+      "title": "ผู้ใช้ทดลอง"
+    },
+    {
+      "key": "SCR-001",
+      "kind": "screen",
+      "title": "หน้าทดลอง"
+    },
+    {
+      "key": "ROLE-002",
+      "kind": "role",
+      "title": "ผู้ใช้ที่บอทเดา"
+    }
+  ],
+  "rows": [
+    {
+      "step": {
+        "key": "STEP-001",
+        "title": "ขั้นแรก",
+        "position": 1
+      },
+      "lanes": [
+        "ROLE-001",
+        "SCR-001"
+      ]
+    },
+    {
+      "step": {
+        "key": "STEP-002",
+        "title": "ขั้นที่ไม่ไปต่อ",
+        "position": 2
+      },
+      "lanes": []
+    },
+    {
+      "step": {
+        "key": "STEP-003",
+        "title": "ขั้นที่ข้อมูลไม่ครบ",
+        "position": 3
+      },
+      "lanes": [
+        "ROLE-001"
+      ]
+    },
+    {
+      "step": {
+        "key": "STEP-004",
+        "title": "ขั้นที่ไปไม่ถึง",
+        "position": 4
+      },
+      "lanes": [
+        "ROLE-002",
+        "SCR-001"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,132 @@
+[
+  {
+    "changeSetId": "7bc496d2-840e-4ea1-bcb4-716c277093d9",
+    "at": "2026-10-08T23:12:09.452Z",
+    "cause": {
+      "kind": "operator"
+    },
+    "entity": "part:Q-001",
+    "op": "add",
+    "before": null,
+    "after": {
+      "key": "Q-001",
+      "body": {
+        "text": "ผู้ดูแลไม่ตอบใน 24 ชม. ทำอย่างไร",
+        "cases": [],
+        "status": "open",
+        "proposedAnswer": "ยกเลิกอัตโนมัติและแจ้งพนักงาน"
+      },
+      "kind": "question",
+      "title": "ผู้ดูแลไม่ตอบใน 24 ชม. ทำอย่างไร",
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      },
+      "removed": false
+    }
+  },
+  {
+    "changeSetId": "7bc496d2-840e-4ea1-bcb4-716c277093d9",
+    "at": "2026-10-08T23:12:09.452Z",
+    "cause": {
+      "kind": "operator"
+    },
+    "entity": "link:3f9906ad-0ffd-49d1-babd-5f4c42481fe3",
+    "op": "link_add",
+    "before": null,
+    "after": {
+      "id": "3f9906ad-0ffd-49d1-babd-5f4c42481fe3",
+      "kind": "about",
+      "label": null,
+      "toKey": "STEP-004",
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      },
+      "fromKey": "Q-001",
+      "position": null
+    }
+  },
+  {
+    "changeSetId": "03fe1416-f820-4890-90ee-9a6ba6446ae0",
+    "at": "2026-10-08T23:12:09.487Z",
+    "cause": {
+      "kind": "operator"
+    },
+    "entity": "part:Q-001",
+    "op": "update",
+    "before": {
+      "key": "Q-001",
+      "body": {
+        "text": "ผู้ดูแลไม่ตอบใน 24 ชม. ทำอย่างไร",
+        "cases": [],
+        "status": "open",
+        "proposedAnswer": "ยกเลิกอัตโนมัติและแจ้งพนักงาน"
+      },
+      "kind": "question",
+      "title": "ผู้ดูแลไม่ตอบใน 24 ชม. ทำอย่างไร",
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      },
+      "removed": false
+    },
+    "after": {
+      "key": "Q-001",
+      "body": {
+        "text": "ผู้ดูแลไม่ตอบใน 24 ชม. ทำอย่างไร",
+        "cases": [],
+        "status": "open",
+        "proposedAnswer": "ยกเลิกอัตโนมัติและแจ้งพนักงาน (แก้ครั้งที่ 1)"
+      },
+      "kind": "question",
+      "title": "ผู้ดูแลไม่ตอบใน 24 ชม. ทำอย่างไร",
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      },
+      "removed": false
+    }
+  },
+  {
+    "changeSetId": "638fd861-dc5b-44c5-a2df-bf6009d2f480",
+    "at": "2026-10-08T23:12:09.489Z",
+    "cause": {
+      "kind": "operator"
+    },
+    "entity": "part:Q-001",
+    "op": "update",
+    "before": {
+      "key": "Q-001",
+      "body": {
+        "text": "ผู้ดูแลไม่ตอบใน 24 ชม. ทำอย่างไร",
+        "cases": [],
+        "status": "open",
+        "proposedAnswer": "ยกเลิกอัตโนมัติและแจ้งพนักงาน (แก้ครั้งที่ 1)"
+      },
+      "kind": "question",
+      "title": "ผู้ดูแลไม่ตอบใน 24 ชม. ทำอย่างไร",
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      },
+      "removed": false
+    },
+    "after": {
+      "key": "Q-001",
+      "body": {
+        "text": "ผู้ดูแลไม่ตอบใน 24 ชม. ทำอย่างไร",
+        "cases": [],
+        "status": "open",
+        "proposedAnswer": "ยกเลิกอัตโนมัติและแจ้งพนักงาน (แก้ครั้งที่ 2)"
+      },
+      "kind": "question",
+      "title": "ผู้ดูแลไม่ตอบใน 24 ชม. ทำอย่างไร",
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      },
+      "removed": false
+    }
+  }
+]

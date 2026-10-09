@@ -1,0 +1,54 @@
+{
+  "participants": [
+    {
+      "key": "ROLE-001",
+      "kind": "role",
+      "title": "พนักงาน"
+    },
+    {
+      "key": "SCR-002",
+      "kind": "screen",
+      "title": "หน้ายืนยันการจอง"
+    },
+    {
+      "key": "API-002",
+      "kind": "api",
+      "title": "สร้างการจอง"
+    },
+    {
+      "key": "SYS-001",
+      "kind": "system",
+      "title": "ระบบปฏิทิน"
+    }
+  ],
+  "messages": [
+    {
+      "key": "INT-006",
+      "from": "ROLE-001",
+      "to": "SCR-002",
+      "text": "กดยืนยันการจอง",
+      "reply": null
+    },
+    {
+      "key": "INT-007",
+      "from": "SCR-002",
+      "to": "API-002",
+      "text": "ส่ง Booking",
+      "reply": null
+    },
+    {
+      "key": "INT-008",
+      "from": "API-002",
+      "to": "SYS-001",
+      "text": "ตรวจเวลาว่างและบันทึก",
+      "reply": null
+    },
+    {
+      "key": "INT-009",
+      "from": "API-002",
+      "to": "SCR-002",
+      "text": "201 · status pending | confirmed",
+      "reply": null
+    }
+  ]
+}

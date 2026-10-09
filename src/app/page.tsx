@@ -1,7 +1,7 @@
-export default function Home() {
-  return (
-    <main>
-      <h1>Blueprint</h1>
-    </main>
-  );
+import { Home } from "@/core/home/Home";
+
+export const dynamic = "force-dynamic";
+
+export default function Page() {
+  return <Home />;
 }

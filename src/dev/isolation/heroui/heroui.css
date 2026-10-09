@@ -2,7 +2,7 @@
  * HeroUI theme CSS — the only file in the app that uses Tailwind.
  * Same layers as @heroui/styles' own entry, minus Tailwind's preflight and HeroUI's base.css:
  * both style the whole document. Rules aimed at :root / :host / html / body / * are moved onto
- * [data-theme-root="heroui"] by scope-to-theme-root.cjs (wired in postcss.config.mjs).
+ * [data-theme-root="heroui"] by src/core/postcss/scope-to-theme-root.cjs (wired in postcss.config.mjs).
  */
 @layer theme, base, components, utilities;
 

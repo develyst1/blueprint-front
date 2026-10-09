@@ -1,0 +1,95 @@
+[
+  {
+    "changeSetId": "d3e9f322-55ee-425f-a641-58a9e54ea61e",
+    "at": "2026-10-08T20:02:34.357Z",
+    "cause": {
+      "kind": "operator"
+    },
+    "entity": "part:DATA-002",
+    "op": "add",
+    "before": null,
+    "after": {
+      "key": "DATA-002",
+      "body": {
+        "fields": []
+      },
+      "kind": "data",
+      "title": "ข้อมูลที่ไม่มีใครใช้",
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "removed": false
+    }
+  },
+  {
+    "changeSetId": "20d2c677-199d-442c-9f26-b47bc4be8014",
+    "at": "2026-10-08T20:02:34.547Z",
+    "cause": {
+      "kind": "operator"
+    },
+    "entity": "part:DATA-002",
+    "op": "update",
+    "before": {
+      "key": "DATA-002",
+      "body": {
+        "fields": []
+      },
+      "kind": "data",
+      "title": "ข้อมูลที่ไม่มีใครใช้",
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "removed": false
+    },
+    "after": {
+      "key": "DATA-002",
+      "body": {
+        "fields": []
+      },
+      "kind": "data",
+      "title": "ข้อมูลที่ไม่มีใครใช้ (แก้ครั้งที่ 1)",
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "removed": false
+    }
+  },
+  {
+    "changeSetId": "7861243c-365e-47b7-aaae-4df7d969d954",
+    "at": "2026-10-08T20:02:34.551Z",
+    "cause": {
+      "kind": "operator"
+    },
+    "entity": "part:DATA-002",
+    "op": "update",
+    "before": {
+      "key": "DATA-002",
+      "body": {
+        "fields": []
+      },
+      "kind": "data",
+      "title": "ข้อมูลที่ไม่มีใครใช้ (แก้ครั้งที่ 1)",
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "removed": false
+    },
+    "after": {
+      "key": "DATA-002",
+      "body": {
+        "fields": []
+      },
+      "kind": "data",
+      "title": "ข้อมูลที่ไม่มีใครใช้ (แก้ครั้งที่ 2)",
+      "origin": {
+        "date": "2026-10-09",
+        "stamp": "operator"
+      },
+      "removed": false
+    }
+  }
+]

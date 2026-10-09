@@ -1,0 +1,82 @@
+"use client";
+
+// ลำดับงาน — the swimlane as an Ant Table (ref 2): steps are rows, participants are columns headed by their kind tile,
+// a tile in the cell where the participant takes part. Each row expands to its handoffs, in order, who → whom.
+import { ArrowRightOutlined } from "@ant-design/icons";
+import { Table, type TableColumnsType } from "antd";
+import type { PageVMs, RequiredItem, SwimLayout } from "@/core/theme/contract";
+import { requiredId } from "@/core/theme/required";
+import { linkKind, pageLabel, participantKind, stepEnds } from "@/core/words";
+import { Choose, PageHead } from "../parts/PageHead";
+import { Req } from "../parts/Req";
+import { KindTile } from "../parts/Tile";
+import s from "./pages.module.css";
+
+type Row = SwimLayout["rows"][number];
+
+export function WorkOrder({ vm, required }: { vm: PageVMs["workOrder"]; required: RequiredItem[] }) {
+  const lanes = vm.layout.lanes;
+  const title = (k: string | null) => lanes.find((l) => l.key === k)?.title ?? "—";
+  const columns: TableColumnsType<Row> = [
+    {
+      key: "step",
+      className: s.stickyCol, // sticky by CSS: Ant's fixed column needs scroll.x, whose overflow-y:hidden box clips the lane heads
+      title: "",
+      render: (_, r) => (
+        <span className={s.rowHead}>
+          <span className={r.step.stuck ? `${s.num} ${s.numStuck}` : s.num}>{r.step.number}</span>
+          <span>
+            <Req required={required} id={requiredId.step(r.step.key)}>{r.step.title}</Req>
+            {r.step.ends && <><br /><span className={s.stepEnds}>{stepEnds}</span></>}
+          </span>
+        </span>
+      ),
+    },
+    ...lanes.map((l) => ({
+      key: l.key,
+      align: "center" as const,
+      title: (
+        <span className={s.laneHead}>
+          <KindTile kind={l.kind} size="sm" />
+          <Req required={required} id={requiredId.lane(l.key)}>{l.title}</Req>
+          <span className={s.laneKind}>{participantKind[l.kind]}</span>
+        </span>
+      ),
+      render: (_: unknown, r: Row) =>
+        r.lanes.includes(l.key) ? <span className={s.inLane} title={`${l.title} · ${r.step.title}`}><KindTile kind={l.kind} size="sm" /></span> : null,
+    })),
+  ];
+  return (
+    <>
+      <PageHead page="workOrder">
+        {vm.works.length > 1 && <Choose label={pageLabel.workOrder} current={vm.work.key} items={vm.works} />}
+      </PageHead>
+      <div className={s.panel}>
+        <div className={s.scroll} tabIndex={0} role="region" aria-label={pageLabel.workOrder} data-print="expand">
+        <Table<Row>
+          rowKey={(r) => r.step.key}
+          columns={columns}
+          dataSource={vm.layout.rows}
+          pagination={false}
+          expandable={{
+            rowExpandable: (r) => r.handoffs.length > 0,
+            expandedRowRender: (r) => (
+              <ol className={s.handoffs}>
+                {r.handoffs.map((h) => (
+                  <li key={h.key} className={s.handoff}>
+                    <span className={s.num}>{h.order}</span>
+                    <strong>{title(h.from)}</strong>
+                    <ArrowRightOutlined role="img" aria-label={linkKind.to!.out} />
+                    <strong>{title(h.to)}</strong>
+                    <span>{h.text}</span>
+                  </li>
+                ))}
+              </ol>
+            ),
+          }}
+        />
+        </div>
+      </div>
+    </>
+  );
+}

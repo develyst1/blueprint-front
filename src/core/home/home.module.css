@@ -1,0 +1,51 @@
+/* The projects home and the new-project dialog — core-owned, library-free. Cards and previews are drawn by themes. */
+.home {
+  font-family: "Sukhumvit Set", "Thonburi", system-ui, sans-serif;
+  color: #1b1f24;
+  padding: 24px 16px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.home:focus { outline: none; }
+.top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
+.top h1 { margin: 0; font-size: 24px; }
+.grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+.grid > li { min-width: 0; }
+.button {
+  font: inherit;
+  min-height: 44px;
+  padding: 8px 16px;
+  border: 1px solid #1458c4;
+  border-radius: 8px;
+  background: #1458c4;
+  color: #ffffff;
+  cursor: pointer;
+}
+.button:hover { background: #0f4aa3; }
+.button:active { background: #0b3a80; }
+.button:disabled { background: #8aa6d6; border-color: #8aa6d6; cursor: not-allowed; }
+.button:focus-visible, .ghost:focus-visible, .field input:focus-visible, .option:focus-within { outline: 3px solid #1458c4; outline-offset: 2px; }
+.ghost { font: inherit; min-height: 44px; padding: 8px 16px; border: 1px solid #8a93a0; border-radius: 8px; background: #ffffff; color: inherit; cursor: pointer; }
+.ghost:hover { background: #f3f4f6; }
+
+.dialog {
+  width: min(960px, calc(100vw - 32px));
+  max-height: calc(100vh - 32px);
+  border: 1px solid #c9ced6;
+  border-radius: 12px;
+  padding: 20px;
+  color: #1b1f24;
+  font-family: "Sukhumvit Set", "Thonburi", system-ui, sans-serif;
+}
+.dialog::backdrop { background: rgba(27, 31, 36, 0.45); }
+.steps { display: flex; gap: 8px; padding: 0; margin: 0 0 16px; list-style: none; flex-wrap: wrap; }
+.steps li { padding: 4px 12px; border-radius: 999px; border: 1px solid #c9ced6; }
+.steps li[aria-current="step"] { border-color: #1458c4; color: #1458c4; font-weight: 700; }
+.field { display: grid; gap: 6px; margin-bottom: 16px; }
+.field input { font: inherit; padding: 10px 12px; min-height: 44px; border: 1px solid #8a93a0; border-radius: 8px; }
+.themes { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; margin: 0 0 16px; padding: 0; border: 0; }
+.option { display: grid; gap: 8px; padding: 10px; border: 2px solid #d5dae1; border-radius: 10px; cursor: pointer; min-width: 0; }
+.option:has(input:checked) { border-color: #1458c4; }
+.option input { width: 20px; height: 20px; }
+.actions { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
+.error { color: #a6460a; margin: 0 0 12px; }

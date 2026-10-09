@@ -1,0 +1,23 @@
+{
+  "participants": [
+    {
+      "key": "SCR-002",
+      "kind": "screen",
+      "title": "หน้ายืนยันการจอง"
+    },
+    {
+      "key": "ROLE-001",
+      "kind": "role",
+      "title": "พนักงาน"
+    }
+  ],
+  "messages": [
+    {
+      "key": "INT-014",
+      "from": "SCR-002",
+      "to": "ROLE-001",
+      "text": "แสดงว่าถูกปฏิเสธ พร้อมเหตุผล",
+      "reply": null
+    }
+  ]
+}

@@ -1,0 +1,1261 @@
+{
+  "project": {
+    "id": "ad7e243c-8d22-4236-9a2b-e3a004b82de9",
+    "organisationId": "00000000-0000-0000-0000-000000000001",
+    "name": "จองห้องประชุม",
+    "createdAt": "2026-10-08T20:02:34.351Z",
+    "theme": "clean-blue",
+    "model": "tier:medium",
+    "creativity": 0.5
+  },
+  "parts": [
+    {
+      "key": "API-001",
+      "kind": "api",
+      "title": "ค้นหาห้องว่าง",
+      "body": {
+        "path": "/rooms",
+        "method": "GET",
+        "responses": []
+      },
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      },
+      "createdIn": "c0a6a1a6-f5eb-4ff6-8705-6e8d0c4fb3eb"
+    },
+    {
+      "key": "API-002",
+      "kind": "api",
+      "title": "สร้างการจอง",
+      "body": {
+        "path": "/bookings",
+        "method": "POST",
+        "responses": []
+      },
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      },
+      "createdIn": "c0a6a1a6-f5eb-4ff6-8705-6e8d0c4fb3eb"
+    },
+    {
+      "key": "API-003",
+      "kind": "api",
+      "title": "อนุมัติการจอง",
+      "body": {
+        "path": "/bookings/{id}/approve",
+        "method": "POST",
+        "responses": []
+      },
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      },
+      "createdIn": "c0a6a1a6-f5eb-4ff6-8705-6e8d0c4fb3eb"
+    },
+    {
+      "key": "DATA-001",
+      "kind": "data",
+      "title": "Room",
+      "body": {
+        "fields": []
+      },
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      },
+      "createdIn": "c0a6a1a6-f5eb-4ff6-8705-6e8d0c4fb3eb"
+    },
+    {
+      "key": "DATA-002",
+      "kind": "data",
+      "title": "Booking",
+      "body": {
+        "fields": []
+      },
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      },
+      "createdIn": "c0a6a1a6-f5eb-4ff6-8705-6e8d0c4fb3eb"
+    },
+    {
+      "key": "DEC-001",
+      "kind": "decision",
+      "title": "ห้องที่จุเกิน 10 คนต้องให้ผู้ดูแลอนุมัติ",
+      "body": {
+        "open": "ห้องพอดี 10 คน",
+        "rule": "ห้องที่จุเกิน 10 คนต้องให้ผู้ดูแลอนุมัติ",
+        "cases": [
+          "ห้องใหญ่ → ผู้ดูแลอนุมัติ",
+          "ห้องเล็ก → ยืนยันทันที"
+        ]
+      },
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      },
+      "createdIn": "c0a6a1a6-f5eb-4ff6-8705-6e8d0c4fb3eb"
+    },
+    {
+      "key": "INT-001",
+      "kind": "interaction",
+      "title": "เลือกวันที่",
+      "body": {
+        "text": "เลือกวันที่"
+      },
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      },
+      "createdIn": "c0a6a1a6-f5eb-4ff6-8705-6e8d0c4fb3eb"
+    },
+    {
+      "key": "INT-002",
+      "kind": "interaction",
+      "title": "ขอรายการห้องว่าง",
+      "body": {
+        "text": "ขอรายการห้องว่าง"
+      },
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      },
+      "createdIn": "c0a6a1a6-f5eb-4ff6-8705-6e8d0c4fb3eb"
+    },
+    {
+      "key": "INT-003",
+      "kind": "interaction",
+      "title": "อ่านห้องว่างจากปฏิทิน",
+      "body": {
+        "text": "อ่านห้องว่างจากปฏิทิน"
+      },
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      },
+      "createdIn": "c0a6a1a6-f5eb-4ff6-8705-6e8d0c4fb3eb"
+    },
+    {
+      "key": "INT-004",
+      "kind": "interaction",
+      "title": "เลือกห้องและช่วงเวลา",
+      "body": {
+        "text": "เลือกห้องและช่วงเวลา"
+      },
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      },
+      "createdIn": "c0a6a1a6-f5eb-4ff6-8705-6e8d0c4fb3eb"
+    },
+    {
+      "key": "INT-005",
+      "kind": "interaction",
+      "title": "เปิดหน้ายืนยันพร้อมห้องที่เลือก",
+      "body": {
+        "text": "เปิดหน้ายืนยันพร้อมห้องที่เลือก"
+      },
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      },
+      "createdIn": "c0a6a1a6-f5eb-4ff6-8705-6e8d0c4fb3eb"
+    },
+    {
+      "key": "INT-006",
+      "kind": "interaction",
+      "title": "กดยืนยันการจอง",
+      "body": {
+        "text": "กดยืนยันการจอง"
+      },
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      },
+      "createdIn": "c0a6a1a6-f5eb-4ff6-8705-6e8d0c4fb3eb"
+    },
+    {
+      "key": "INT-007",
+      "kind": "interaction",
+      "title": "ส่ง Booking",
+      "body": {
+        "text": "ส่ง Booking"
+      },
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      },
+      "createdIn": "c0a6a1a6-f5eb-4ff6-8705-6e8d0c4fb3eb"
+    },
+    {
+      "key": "INT-008",
+      "kind": "interaction",
+      "title": "ตรวจเวลาว่างและบันทึก",
+      "body": {
+        "text": "ตรวจเวลาว่างและบันทึก"
+      },
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      },
+      "createdIn": "c0a6a1a6-f5eb-4ff6-8705-6e8d0c4fb3eb"
+    },
+    {
+      "key": "INT-009",
+      "kind": "interaction",
+      "title": "201 · status pending | confirmed",
+      "body": {
+        "text": "201 · status pending | confirmed"
+      },
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      },
+      "createdIn": "c0a6a1a6-f5eb-4ff6-8705-6e8d0c4fb3eb"
+    },
+    {
+      "key": "INT-010",
+      "kind": "interaction",
+      "title": "เปิดคำขอแล้วกดอนุมัติหรือปฏิเสธ",
+      "body": {
+        "text": "เปิดคำขอแล้วกดอนุมัติหรือปฏิเสธ"
+      },
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      },
+      "createdIn": "c0a6a1a6-f5eb-4ff6-8705-6e8d0c4fb3eb"
+    },
+    {
+      "key": "INT-011",
+      "kind": "interaction",
+      "title": "ส่งผลการพิจารณา",
+      "body": {
+        "text": "ส่งผลการพิจารณา"
+      },
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      },
+      "createdIn": "c0a6a1a6-f5eb-4ff6-8705-6e8d0c4fb3eb"
+    },
+    {
+      "key": "INT-012",
+      "kind": "interaction",
+      "title": "อัปเดตสถานะการจอง",
+      "body": {
+        "text": "อัปเดตสถานะการจอง"
+      },
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      },
+      "createdIn": "c0a6a1a6-f5eb-4ff6-8705-6e8d0c4fb3eb"
+    },
+    {
+      "key": "INT-013",
+      "kind": "interaction",
+      "title": "แสดงว่าการจองสำเร็จ",
+      "body": {
+        "text": "แสดงว่าการจองสำเร็จ"
+      },
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      },
+      "createdIn": "c0a6a1a6-f5eb-4ff6-8705-6e8d0c4fb3eb"
+    },
+    {
+      "key": "INT-014",
+      "kind": "interaction",
+      "title": "แสดงว่าถูกปฏิเสธ พร้อมเหตุผล",
+      "body": {
+        "text": "แสดงว่าถูกปฏิเสธ พร้อมเหตุผล"
+      },
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      },
+      "createdIn": "c0a6a1a6-f5eb-4ff6-8705-6e8d0c4fb3eb"
+    },
+    {
+      "key": "Q-001",
+      "kind": "question",
+      "title": "ผู้ดูแลไม่ตอบใน 24 ชม. ทำอย่างไร",
+      "body": {
+        "text": "ผู้ดูแลไม่ตอบใน 24 ชม. ทำอย่างไร",
+        "cases": [],
+        "status": "open",
+        "proposedAnswer": "ยกเลิกอัตโนมัติและแจ้งพนักงาน"
+      },
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      },
+      "createdIn": "c0a6a1a6-f5eb-4ff6-8705-6e8d0c4fb3eb"
+    },
+    {
+      "key": "ROLE-001",
+      "kind": "role",
+      "title": "พนักงาน",
+      "body": {},
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      },
+      "createdIn": "c0a6a1a6-f5eb-4ff6-8705-6e8d0c4fb3eb"
+    },
+    {
+      "key": "ROLE-002",
+      "kind": "role",
+      "title": "ผู้ดูแลห้อง",
+      "body": {},
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      },
+      "createdIn": "c0a6a1a6-f5eb-4ff6-8705-6e8d0c4fb3eb"
+    },
+    {
+      "key": "SCR-001",
+      "kind": "screen",
+      "title": "หน้าค้นหาห้อง",
+      "body": {
+        "fields": [],
+        "states": [],
+        "actions": []
+      },
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      },
+      "createdIn": "c0a6a1a6-f5eb-4ff6-8705-6e8d0c4fb3eb"
+    },
+    {
+      "key": "SCR-002",
+      "kind": "screen",
+      "title": "หน้ายืนยันการจอง",
+      "body": {
+        "fields": [],
+        "states": [],
+        "actions": []
+      },
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      },
+      "createdIn": "c0a6a1a6-f5eb-4ff6-8705-6e8d0c4fb3eb"
+    },
+    {
+      "key": "SCR-003",
+      "kind": "screen",
+      "title": "หน้าอนุมัติคำขอ",
+      "body": {
+        "fields": [],
+        "states": [],
+        "actions": []
+      },
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      },
+      "createdIn": "c0a6a1a6-f5eb-4ff6-8705-6e8d0c4fb3eb"
+    },
+    {
+      "key": "STEP-001",
+      "kind": "step",
+      "title": "ค้นหาห้องว่าง",
+      "body": {
+        "ends": false
+      },
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      },
+      "createdIn": "c0a6a1a6-f5eb-4ff6-8705-6e8d0c4fb3eb"
+    },
+    {
+      "key": "STEP-002",
+      "kind": "step",
+      "title": "เลือกห้องและเวลา",
+      "body": {
+        "ends": false
+      },
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      },
+      "createdIn": "c0a6a1a6-f5eb-4ff6-8705-6e8d0c4fb3eb"
+    },
+    {
+      "key": "STEP-003",
+      "kind": "step",
+      "title": "ส่งคำขอจอง",
+      "body": {
+        "ends": false
+      },
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      },
+      "createdIn": "c0a6a1a6-f5eb-4ff6-8705-6e8d0c4fb3eb"
+    },
+    {
+      "key": "STEP-004",
+      "kind": "step",
+      "title": "ผู้ดูแลพิจารณา",
+      "body": {
+        "ends": false
+      },
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      },
+      "createdIn": "c0a6a1a6-f5eb-4ff6-8705-6e8d0c4fb3eb"
+    },
+    {
+      "key": "STEP-005",
+      "kind": "step",
+      "title": "ได้รับการยืนยัน",
+      "body": {
+        "ends": true
+      },
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      },
+      "createdIn": "c0a6a1a6-f5eb-4ff6-8705-6e8d0c4fb3eb"
+    },
+    {
+      "key": "STEP-006",
+      "kind": "step",
+      "title": "แจ้งว่าถูกปฏิเสธ",
+      "body": {
+        "ends": true
+      },
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      },
+      "createdIn": "c0a6a1a6-f5eb-4ff6-8705-6e8d0c4fb3eb"
+    },
+    {
+      "key": "SYS-001",
+      "kind": "system",
+      "title": "ระบบปฏิทิน",
+      "body": {},
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      },
+      "createdIn": "c0a6a1a6-f5eb-4ff6-8705-6e8d0c4fb3eb"
+    },
+    {
+      "key": "WRK-001",
+      "kind": "work",
+      "title": "จองห้องประชุม",
+      "body": {},
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      },
+      "createdIn": "c0a6a1a6-f5eb-4ff6-8705-6e8d0c4fb3eb"
+    }
+  ],
+  "links": [
+    {
+      "id": "642b1e50-7ab3-497c-a281-ea69e6db94d6",
+      "kind": "reads",
+      "fromKey": "API-001",
+      "toKey": "DATA-001",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "55ca66ef-70ee-4527-a9ac-50181157f949",
+      "kind": "writes",
+      "fromKey": "API-002",
+      "toKey": "DATA-002",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "af13383a-cb2c-4113-b612-f66859c8c183",
+      "kind": "writes",
+      "fromKey": "API-003",
+      "toKey": "DATA-002",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "44545709-c17f-474a-9e5e-6166cfe37055",
+      "kind": "covers",
+      "fromKey": "DEC-001",
+      "toKey": "STEP-003",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "e0151fb8-456d-49df-b7ae-21a66208b347",
+      "kind": "covers",
+      "fromKey": "DEC-001",
+      "toKey": "STEP-004",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "007015e2-cff7-46d5-bcae-39f1c5b4d1ad",
+      "kind": "from",
+      "fromKey": "INT-001",
+      "toKey": "ROLE-001",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "22d0b341-ed72-4e31-8ee9-f1d11f0859d5",
+      "kind": "to",
+      "fromKey": "INT-001",
+      "toKey": "SCR-001",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "9d40d874-fb39-413a-ba84-fed02b69b4c3",
+      "kind": "from",
+      "fromKey": "INT-002",
+      "toKey": "SCR-001",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "7520bf5d-61b7-4de7-bfb0-34c540a71ae1",
+      "kind": "to",
+      "fromKey": "INT-002",
+      "toKey": "API-001",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "4e1ce892-c460-4628-9dd3-ba77366a1061",
+      "kind": "carries",
+      "fromKey": "INT-003",
+      "toKey": "DATA-001",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "37609726-4b85-49af-a714-6a6c2277ad1a",
+      "kind": "from",
+      "fromKey": "INT-003",
+      "toKey": "API-001",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "82d3619b-1db3-4bfb-9390-56aeb018163c",
+      "kind": "to",
+      "fromKey": "INT-003",
+      "toKey": "SYS-001",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "4c0ad085-8f3f-4928-8907-3a935c3f5056",
+      "kind": "from",
+      "fromKey": "INT-004",
+      "toKey": "ROLE-001",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "572bd21c-83da-4ef8-8dde-86e8affec2e0",
+      "kind": "to",
+      "fromKey": "INT-004",
+      "toKey": "SCR-001",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "0bb00246-6baf-4ae8-a3df-95f15debb70c",
+      "kind": "from",
+      "fromKey": "INT-005",
+      "toKey": "SCR-001",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "6304a4f3-287d-422c-8e30-71856e09627e",
+      "kind": "to",
+      "fromKey": "INT-005",
+      "toKey": "SCR-002",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "b5d7d80c-75df-4896-a7c5-ddb41bc654da",
+      "kind": "from",
+      "fromKey": "INT-006",
+      "toKey": "ROLE-001",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "6f78d7bb-c9f4-45a6-beae-fd94326dab9d",
+      "kind": "to",
+      "fromKey": "INT-006",
+      "toKey": "SCR-002",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "6af49513-9212-4f9d-a33f-88b8c002b134",
+      "kind": "carries",
+      "fromKey": "INT-007",
+      "toKey": "DATA-002",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "017b75c7-ef91-45a5-aac7-963ebc9c97ac",
+      "kind": "from",
+      "fromKey": "INT-007",
+      "toKey": "SCR-002",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "3b62c9bf-1256-4e44-b873-67d734f5aaa6",
+      "kind": "to",
+      "fromKey": "INT-007",
+      "toKey": "API-002",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "f7817c0a-311b-48a3-ba77-055d28e5217b",
+      "kind": "from",
+      "fromKey": "INT-008",
+      "toKey": "API-002",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "e63d9c71-912d-4621-b422-94b94f2f3a0e",
+      "kind": "to",
+      "fromKey": "INT-008",
+      "toKey": "SYS-001",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "411f68b3-bb01-4723-8131-a8e1bebd65a6",
+      "kind": "from",
+      "fromKey": "INT-009",
+      "toKey": "API-002",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "29729b3c-c6d5-4619-bd13-9fa569a51c7a",
+      "kind": "to",
+      "fromKey": "INT-009",
+      "toKey": "SCR-002",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "a8d3df8b-8a9f-44d8-ba33-56100e759eef",
+      "kind": "from",
+      "fromKey": "INT-010",
+      "toKey": "ROLE-002",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "e9cf9a08-9922-4089-adc2-ebbcaa33add2",
+      "kind": "to",
+      "fromKey": "INT-010",
+      "toKey": "SCR-003",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "b1928cb3-4463-41e8-9719-a66f99d2de26",
+      "kind": "from",
+      "fromKey": "INT-011",
+      "toKey": "SCR-003",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "bd098101-1609-47cf-967a-da0be57ff7f4",
+      "kind": "to",
+      "fromKey": "INT-011",
+      "toKey": "API-003",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "17d2601e-689e-460b-b482-39f19237b2dc",
+      "kind": "carries",
+      "fromKey": "INT-012",
+      "toKey": "DATA-002",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "676cd213-c66c-42ac-8296-7f17cf562b8a",
+      "kind": "from",
+      "fromKey": "INT-012",
+      "toKey": "API-003",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "8e6b931a-f19f-4c60-9896-8cd74a742c2a",
+      "kind": "to",
+      "fromKey": "INT-012",
+      "toKey": "SYS-001",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "bcf1b065-15aa-434f-a660-53c6eb371f27",
+      "kind": "from",
+      "fromKey": "INT-013",
+      "toKey": "SCR-002",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "a7a2d208-04ef-478c-a72d-4ebda0606f28",
+      "kind": "to",
+      "fromKey": "INT-013",
+      "toKey": "ROLE-001",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "14ad796f-b085-4ec6-b026-a61716f4a19f",
+      "kind": "from",
+      "fromKey": "INT-014",
+      "toKey": "SCR-002",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "43355532-236b-4f35-a7b4-2d1962aa8e1e",
+      "kind": "to",
+      "fromKey": "INT-014",
+      "toKey": "ROLE-001",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "13d4ffd6-0856-4444-81c7-8b427e3a719e",
+      "kind": "about",
+      "fromKey": "Q-001",
+      "toKey": "STEP-004",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "33651ed2-da87-4f84-a6c9-33f85f31a913",
+      "kind": "shows",
+      "fromKey": "SCR-001",
+      "toKey": "DATA-001",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "0c8c6bdb-3ff9-4cc3-ad66-a9689795cd1d",
+      "kind": "shows",
+      "fromKey": "SCR-002",
+      "toKey": "DATA-002",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "871f1b6a-594f-496f-bcf1-519cf080a194",
+      "kind": "shows",
+      "fromKey": "SCR-003",
+      "toKey": "DATA-002",
+      "position": null,
+      "label": null,
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "6c7b04d5-1572-4326-a5bc-f265d39c2eeb",
+      "kind": "has_interaction",
+      "fromKey": "STEP-001",
+      "toKey": "INT-001",
+      "position": 1,
+      "label": null,
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "ebe9f124-b790-4a7f-97ba-56b6493db289",
+      "kind": "has_interaction",
+      "fromKey": "STEP-001",
+      "toKey": "INT-002",
+      "position": 2,
+      "label": null,
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "8f2f8b42-7428-41f2-937f-ff152ce6722f",
+      "kind": "has_interaction",
+      "fromKey": "STEP-001",
+      "toKey": "INT-003",
+      "position": 3,
+      "label": null,
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "c972801e-3814-4e76-ab59-be8327fab709",
+      "kind": "next",
+      "fromKey": "STEP-001",
+      "toKey": "STEP-002",
+      "position": 1,
+      "label": null,
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "3fb3ddd8-43df-4f20-abb5-cc2091c84f5d",
+      "kind": "has_interaction",
+      "fromKey": "STEP-002",
+      "toKey": "INT-004",
+      "position": 1,
+      "label": null,
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "b7c1fc22-15cc-4a98-b5f6-0b131107ff82",
+      "kind": "has_interaction",
+      "fromKey": "STEP-002",
+      "toKey": "INT-005",
+      "position": 2,
+      "label": null,
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "0d1f5b14-8270-431c-b253-16294f391463",
+      "kind": "next",
+      "fromKey": "STEP-002",
+      "toKey": "STEP-003",
+      "position": 1,
+      "label": null,
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "ce9e514f-e582-4574-b498-12a9bcd7cbb5",
+      "kind": "has_interaction",
+      "fromKey": "STEP-003",
+      "toKey": "INT-006",
+      "position": 1,
+      "label": null,
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "eb54334f-a184-4bfd-8df0-4c9e4b50c050",
+      "kind": "has_interaction",
+      "fromKey": "STEP-003",
+      "toKey": "INT-007",
+      "position": 2,
+      "label": null,
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "a88b30d9-3248-4f74-8f62-6bd26691eded",
+      "kind": "has_interaction",
+      "fromKey": "STEP-003",
+      "toKey": "INT-008",
+      "position": 3,
+      "label": null,
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "a2c00c4f-f182-415c-a189-918d0b2c4c80",
+      "kind": "has_interaction",
+      "fromKey": "STEP-003",
+      "toKey": "INT-009",
+      "position": 4,
+      "label": null,
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "5774af12-1f1b-4c0f-9918-14d5119166ff",
+      "kind": "next",
+      "fromKey": "STEP-003",
+      "toKey": "STEP-004",
+      "position": 1,
+      "label": "ห้องใหญ่ ต้องอนุมัติ",
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "7ccb23f8-a769-4af2-b511-4dbb517a16a9",
+      "kind": "next",
+      "fromKey": "STEP-003",
+      "toKey": "STEP-005",
+      "position": 2,
+      "label": "ห้องเล็ก ไม่ต้องอนุมัติ",
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "1e4a5f35-3d7f-4701-8573-5cea909171db",
+      "kind": "has_interaction",
+      "fromKey": "STEP-004",
+      "toKey": "INT-010",
+      "position": 1,
+      "label": null,
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "020337da-9faf-4c4d-95d0-d843e5a8934f",
+      "kind": "has_interaction",
+      "fromKey": "STEP-004",
+      "toKey": "INT-011",
+      "position": 2,
+      "label": null,
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "d47de313-d60a-40b1-93be-b8dfb0023d65",
+      "kind": "has_interaction",
+      "fromKey": "STEP-004",
+      "toKey": "INT-012",
+      "position": 3,
+      "label": null,
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "28c9878f-aaaf-45ac-a4c0-07b7c9964a92",
+      "kind": "next",
+      "fromKey": "STEP-004",
+      "toKey": "STEP-005",
+      "position": 1,
+      "label": "อนุมัติ",
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "02c5ab17-2cff-49d3-b361-92b188939a15",
+      "kind": "next",
+      "fromKey": "STEP-004",
+      "toKey": "STEP-006",
+      "position": 2,
+      "label": "ปฏิเสธ",
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "8c6935d0-0a37-481a-9a1a-29cfe5ecc0ea",
+      "kind": "has_interaction",
+      "fromKey": "STEP-005",
+      "toKey": "INT-013",
+      "position": 1,
+      "label": null,
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "6a048197-8fe3-45c7-9de1-e9adff1c2670",
+      "kind": "has_interaction",
+      "fromKey": "STEP-006",
+      "toKey": "INT-014",
+      "position": 1,
+      "label": null,
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "e8a3f459-ec0e-4b21-9b06-daad82131279",
+      "kind": "has_step",
+      "fromKey": "WRK-001",
+      "toKey": "STEP-001",
+      "position": 1,
+      "label": null,
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "881a47c9-4491-4b28-af5a-7594fe1b1b4a",
+      "kind": "has_step",
+      "fromKey": "WRK-001",
+      "toKey": "STEP-002",
+      "position": 2,
+      "label": null,
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "8c2871d8-5349-4237-8945-4544f1774825",
+      "kind": "has_step",
+      "fromKey": "WRK-001",
+      "toKey": "STEP-003",
+      "position": 3,
+      "label": null,
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "6fd1835c-30dc-483a-9628-75f39fb3b5f7",
+      "kind": "has_step",
+      "fromKey": "WRK-001",
+      "toKey": "STEP-004",
+      "position": 4,
+      "label": null,
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "69ba86c9-a0c7-454d-9322-5d83fc672394",
+      "kind": "has_step",
+      "fromKey": "WRK-001",
+      "toKey": "STEP-005",
+      "position": 5,
+      "label": null,
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      }
+    },
+    {
+      "id": "bfdaa149-bf66-4194-b68c-dfcd73686793",
+      "kind": "has_step",
+      "fromKey": "WRK-001",
+      "toKey": "STEP-006",
+      "position": 6,
+      "label": null,
+      "origin": {
+        "date": "2026-10-08",
+        "stamp": "operator"
+      }
+    }
+  ]
+}

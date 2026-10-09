@@ -1,0 +1,37 @@
+/* minimal mono's root. The first block is Mantine's page reset kept to this subtree (the recipe in
+   SPEC-B-001 § Round 2): the original targets :root, *, body and bare inputs — the whole page — so it is
+   never imported. The canvas is set here, not through --mantine-color-body, because Card and Paper paint
+   themselves with --mantine-color-body and must stay white. */
+.root {
+  color-scheme: var(--mantine-color-scheme);
+  font-family: var(--mantine-font-family);
+  font-size: var(--mantine-font-size-md);
+  line-height: var(--mantine-line-height);
+  background-color: #f2f2f2;
+  color: #000000;
+  -webkit-font-smoothing: var(--mantine-webkit-font-smoothing);
+  -moz-osx-font-smoothing: var(--mantine-moz-font-smoothing);
+  font-variant-numeric: tabular-nums;
+}
+
+.root :where(input, button, textarea, select) {
+  font: inherit;
+}
+
+.root :where(button, select) {
+  text-transform: none;
+}
+
+/* Focus: 2 px white inside 2 px black, so it shows on white cards and on the black stuck card alike.
+   Instant — never transitioned. The transparent outline draws nothing normally; forced-colors mode drops
+   box-shadow and paints the outline in the system colour, so the ring survives there (TASK-A-027). */
+.root :focus-visible {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px #000000;
+}
+
+.root ::selection {
+  background: #e0e0e0;
+  color: #000000;
+}

@@ -1,0 +1,799 @@
+/*
+ * Luxury gold theme CSS — HeroUI on Tailwind, kept to this theme's subtree.
+ * The recipe is Team B's proof (src/dev/isolation/heroui/heroui.css, TASK-B-002) with the root changed:
+ * Tailwind theme + utilities only (no preflight), HeroUI's component / theme / utility layers, and the
+ * subtree half of HeroUI's base.css. Rules aimed at :root / html / body / * are moved onto
+ * [data-theme-root="luxury-gold"] by Team B's scoping PostCSS step (SPEC-C-001 Q-C1).
+ */
+@layer theme, base, components, utilities;
+
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities) source("./");
+@import "tw-animate-css";
+
+@import "@heroui/styles/components/index.css" layer(components);
+@import "@heroui/styles/themes/default" layer(theme);
+@import "@heroui/styles/utilities";
+@import "@heroui/styles/variants";
+
+/* HeroUI's base.css, kept to its subtree: border colour inheritance. */
+@layer base {
+  [data-theme-root="luxury-gold"],
+  [data-theme-root="luxury-gold"] *,
+  [data-theme-root="luxury-gold"] ::after,
+  [data-theme-root="luxury-gold"] ::before {
+    border-color: var(--border, currentColor);
+  }
+
+  /* What a body would give HeroUI content: its font, colour and background tokens. */
+  [data-theme-root="luxury-gold"] {
+    font-family: var(--font-sans);
+    color: var(--foreground);
+    background-color: var(--background);
+    line-height: 1.7;
+  }
+
+  /* The parts of Tailwind's preflight HeroUI's components lean on, inside this subtree only
+     (zero specificity, so every component style still wins). */
+  [data-theme-root="luxury-gold"] :where(*, ::before, ::after) {
+    box-sizing: border-box;
+    border: 0 solid;
+    margin: 0;
+    padding: 0;
+  }
+  [data-theme-root="luxury-gold"] :where(button, input, select, optgroup, textarea) {
+    font: inherit;
+    letter-spacing: inherit;
+    color: inherit;
+    background-color: transparent;
+    border-radius: 0;
+  }
+  [data-theme-root="luxury-gold"] :where(h1, h2, h3, h4, h5, h6) { font-size: inherit; font-weight: inherit; }
+  [data-theme-root="luxury-gold"] :where(ol, ul, menu) { list-style: none; }
+  [data-theme-root="luxury-gold"] :where(table) { border-collapse: collapse; border-color: inherit; text-indent: 0; }
+}
+
+/*
+ * Luxury gold tokens (direction TASK-C-002 § 3; contrast computed there) and HeroUI's own variables,
+ * set on this theme's root only — never on html / body. Unlayered, so they win over HeroUI's default theme layer.
+ */
+[data-theme-root="luxury-gold"] {
+  --lg-paper: #FBF8F1;
+  --lg-surface: #FFFDF8;
+  --lg-ink: #14213D;
+  --lg-ink-2: #4A5372;
+  --lg-gold-ink: #7A5A1E;
+  --lg-stuck: #8C2F39;
+  --lg-stuck-tint: #F7E9E6;
+  --lg-on-stuck: #FFFFFF;
+  --lg-navy: #1C2B5A;
+  --lg-gold-light: #E9D3A0;
+  --lg-edge: #7A6230;
+  --lg-card-edge: #A8864A;
+  --lg-gold-line: #C9A86A;
+  --lg-k-role: #2a78d6;
+  --lg-k-screen: #008300;
+  --lg-k-api: #5b3a9e;
+  --lg-k-system: #c04a8a;
+  /* Stacking, lowest first: a hand-off's number over its line · a hovered / chosen web node · a hand-off's text ·
+     the work order's sticky step headings · the phone top bar · the skip link over everything. */
+  --lg-z-mark: 1;
+  --lg-z-node: 2;
+  --lg-z-tip: 3;
+  --lg-z-heads: 4;
+  --lg-z-bar: 10;
+  --lg-z-skip: 50;
+  --lg-r-plaque: 20px;
+  --lg-r-card: 14px;
+
+  /* HeroUI variables — this theme's values. */
+  --background: var(--lg-paper);
+  --foreground: var(--lg-ink);
+  --surface: var(--lg-surface);
+  --surface-foreground: var(--lg-ink);
+  --overlay: var(--lg-surface);
+  --overlay-foreground: var(--lg-ink);
+  --muted: var(--lg-ink-2);
+  --accent: var(--lg-navy);
+  --accent-foreground: #FFFFFF;
+  --danger: var(--lg-stuck);
+  --danger-foreground: var(--lg-on-stuck);
+  --border: var(--lg-card-edge);
+  --separator: var(--lg-gold-line);
+  --focus: var(--lg-navy);
+  --link: var(--lg-navy);
+  --default: #F3ECDD;
+  --default-foreground: var(--lg-ink);
+  --radius: 0.875rem;
+
+  /* Fonts: the next/font variables ThemeRoot puts on this same element. */
+  --font-sans: var(--lg-font-sans), "Noto Sans Thai Looped", system-ui, sans-serif;
+  --font-serif: var(--lg-font-serif), "Noto Serif Thai", serif;
+
+  font-size: 16px;
+}
+
+[data-theme-root="luxury-gold"] ::selection { background: var(--lg-gold-light); color: var(--lg-ink); }
+[data-theme-root="luxury-gold"] :focus-visible { outline: 3px solid var(--lg-navy); outline-offset: 2px; }
+
+/* ---------- primitives (class names prefixed lg- — never HeroUI's bare names) ---------- */
+
+.lg-sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+/* Seal: the scalloped wine seal with a white "!" — stuck is a shape, never a fill alone. */
+.lg-seal { display: inline-block; flex: none; vertical-align: middle; }
+
+/* Readiness: the stuck count chip + meter. */
+.lg-readiness { display: inline-flex; align-items: center; gap: 12px; }
+.lg-readiness-chip {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 15px; font-weight: 600; line-height: 1.4;
+}
+.lg-readiness-chip[data-stuck="true"] { color: var(--lg-stuck); }
+/* HeroUI's chip inset is 2px — too tight beside the seal (critique B). Scoped to this theme's readiness only. */
+[data-theme-root="luxury-gold"] .lg-readiness .chip { padding: 6px 12px; }
+
+/* Medallion: navy circle with a serif numeral; the end step is a quiet navy ring. */
+.lg-medallion {
+  position: relative;
+  display: inline-flex; flex-direction: column; align-items: center; gap: 8px;
+  color: var(--lg-ink); font-size: 15px; line-height: 1.4; text-align: center;
+  background: none; border: 1px solid transparent; border-radius: var(--lg-r-card); padding: 4px 8px; cursor: default;
+}
+/* A medallion that opens something says so: pointer, and a surface + edge on hover / press. Same box as the others. */
+button.lg-medallion,
+.lg-medallion-trigger .lg-medallion { cursor: pointer; }
+.lg-medallion-trigger { border-radius: var(--lg-r-card); min-height: 44px; }
+button.lg-medallion:hover,
+.lg-medallion-trigger:hover .lg-medallion,
+.lg-medallion-trigger[aria-expanded="true"] .lg-medallion { background: var(--lg-surface); border-color: var(--lg-card-edge); }
+.lg-medallion svg { overflow: visible; }
+.lg-medallion-num { font-family: var(--font-serif); font-weight: 600; }
+.lg-medallion-title { max-width: 14ch; }
+/* The seal sits on the medallion's upper-right shoulder (medallion r = 30, box 68). */
+.lg-medallion-seal { position: absolute; top: 0; left: calc(50% + 18px); line-height: 0; }
+
+/* Plaque: the side panel beside the page's one picture. */
+.lg-plaque {
+  background: var(--lg-surface);
+  border: 1px solid var(--lg-card-edge);
+  border-radius: var(--lg-r-plaque);
+  padding: 24px;
+  display: grid; gap: 16px; align-content: start;
+}
+.lg-plaque-title { font-family: var(--font-serif); font-size: 24px; font-weight: 600; line-height: 1.4; }
+.lg-plaque-stuck {
+  display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; align-items: start;
+  background: var(--lg-stuck-tint); border-radius: var(--lg-r-card); padding: 12px 16px;
+}
+.lg-plaque-stuck-kind { color: var(--lg-stuck); font-weight: 600; }
+
+/* HeroUI overlays inside this theme: the theme's radius hierarchy, an edge instead of a shadow (direction § 3). */
+[data-theme-root="luxury-gold"] .popover {
+  border-radius: var(--lg-r-card);
+  box-shadow: none;
+  border: 1px solid var(--lg-card-edge);
+  background: var(--lg-surface);
+}
+[data-theme-root="luxury-gold"] .popover__dialog { border-radius: inherit; }
+[data-theme-root="luxury-gold"] .popover__dialog [slot="title"],
+[data-theme-root="luxury-gold"] .popover__heading {
+  font-family: var(--font-serif); font-size: 16px; font-weight: 600; color: var(--lg-ink); margin-bottom: 8px;
+}
+
+/* Kind marks and their legend. */
+.lg-kindmark { display: inline-block; flex: none; vertical-align: middle; }
+.lg-legend { display: flex; flex-wrap: wrap; gap: 8px 20px; color: var(--lg-ink-2); font-size: 15px; }
+.lg-legend li { display: inline-flex; align-items: center; gap: 8px; }
+
+/* End step: the word beside the ring — never the shape alone (REQ-002 จบงาน). */
+.lg-medallion-end {
+  font-size: 14px; font-weight: 600; color: var(--lg-ink-2); line-height: 1.3;
+  border: 1px solid var(--lg-card-edge); border-radius: 999px; padding: 0 8px;
+}
+.lg-medallion[data-small] { font-size: 14px; gap: 4px; }
+.lg-medallion-seal[data-small] { left: calc(50% + 10px); }
+
+/* Skip link: visually hidden until it has keyboard focus, then shown above everything with the navy ring. */
+.lg-skip {
+  position: absolute; left: 12px; top: 12px; z-index: var(--lg-z-skip);
+  padding: 10px 16px; min-height: 44px; display: inline-flex; align-items: center;
+  background: var(--lg-surface); color: var(--lg-navy); font-weight: 600; border-radius: var(--lg-r-card);
+  border: 1px solid var(--lg-card-edge);
+  transform: translateY(-200%);
+}
+.lg-skip:focus-visible, .lg-skip:focus { transform: none; }
+.lg-shell { position: relative; }
+
+/* ---------- shell (TASK-C-004): spine at 1440, sticky top bar at ≤ 640 ---------- */
+.lg-shell { display: grid; grid-template-columns: 248px minmax(0, 1fr); min-height: 100dvh; }
+.lg-spine {
+  position: sticky; top: 0; align-self: start; height: 100dvh; overflow-y: auto;
+  display: flex; flex-direction: column; gap: 20px;
+  padding: 32px 20px; background: var(--lg-surface); border-right: 1px solid var(--lg-card-edge);
+}
+.lg-wordmark {
+  font-family: var(--font-serif); font-size: 22px; font-weight: 600; color: var(--lg-navy); line-height: 1.3;
+  padding-bottom: 12px; border-bottom: 1px solid var(--lg-gold-line);
+}
+.lg-spine-project { font-family: var(--font-serif); font-size: 20px; font-weight: 600; line-height: 1.4; color: var(--lg-ink); }
+.lg-spine-readiness { display: grid; gap: 8px; justify-items: start; }
+.lg-spine-required { font-size: 15px; }
+/* 5 px inside every scrolling list = the 3 px focus ring + its 2 px offset, so the ring is never cut (REVIEW-A-002 row 3) */
+.lg-nav-list { display: grid; gap: 4px; padding: 5px; }
+.lg-nav-link {
+  display: flex; align-items: center; min-height: 44px; padding: 0 14px; border-radius: var(--lg-r-card);
+  color: var(--lg-ink-2); font-size: 15px; font-weight: 500; text-decoration: none;
+}
+.lg-nav-link:hover { background: var(--lg-paper); color: var(--lg-ink); }
+.lg-nav-link[aria-current="page"] { background: var(--lg-navy); color: var(--lg-gold-light); font-weight: 600; }
+.lg-stage { min-width: 0; padding: 40px 48px 64px; }
+
+@media (max-width: 640px) {
+  .lg-shell { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto 1fr; align-content: start; }
+  .lg-spine {
+    height: auto; overflow: visible; z-index: var(--lg-z-bar);
+    display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px 12px; align-items: center;
+    padding: 10px 16px 0; border-right: 0; border-bottom: 1px solid var(--lg-card-edge);
+  }
+  .lg-wordmark { display: none; }
+  .lg-spine-project { font-size: 17px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .lg-spine-readiness { justify-items: end; }
+  .lg-nav { grid-column: 1 / -1; margin: 0 -16px; }
+  .lg-nav-list { display: flex; gap: 4px; padding: 5px 16px 8px; width: max-content; }
+  .lg-nav-link { white-space: nowrap; }
+  .lg-stage { padding: 20px 16px 40px; }
+}
+
+/* ---------- project card + preview (TASK-C-004) ---------- */
+[data-theme-root="luxury-gold"] .lg-card {
+  display: grid; gap: 16px; padding: 20px 22px; min-height: 44px;
+  background: var(--lg-surface); border: 1px solid var(--lg-card-edge); border-radius: var(--lg-r-card);
+  box-shadow: none; color: var(--lg-ink); text-decoration: none;
+}
+[data-theme-root="luxury-gold"] .lg-card:hover { border-color: var(--lg-navy); }
+.lg-card-head { display: grid; gap: 4px; padding: 0; }
+.lg-card-name { font-family: var(--font-serif); font-size: 22px; font-weight: 600; line-height: 1.35; }
+.lg-card-date { font-size: 15px; color: var(--lg-ink-2); }
+
+/* The preview is a sample, not a card: a dashed hairline frame, so it never reads as something to click. */
+.lg-preview {
+  display: grid; gap: 14px; padding: 18px; background: var(--lg-paper);
+  border: 1px dashed var(--lg-gold-line); border-radius: var(--lg-r-card); cursor: default;
+}
+.lg-preview-name { font-family: var(--font-serif); font-size: 18px; font-weight: 600; }
+.lg-preview-steps { display: flex; gap: 12px; align-items: flex-start; }
+
+/* ---------- page states (TASK-C-004) ---------- */
+.lg-state {
+  display: grid; justify-items: start; gap: 16px; max-width: 520px;
+  padding: 28px; background: var(--lg-surface); border: 1px solid var(--lg-card-edge); border-radius: var(--lg-r-plaque);
+}
+/* API down = HeroUI Alert (danger): its own look — a plain danger edge, never the stuck seal or stuck tint. */
+[data-theme-root="luxury-gold"] .lg-state-down {
+  display: flex; align-items: flex-start; gap: 12px;
+  background: var(--lg-surface); border: 1px solid var(--danger); border-radius: var(--lg-r-plaque); box-shadow: none;
+}
+.lg-state-down .lg-state-text { margin-bottom: 12px; }
+.lg-state-text { font-size: 18px; font-weight: 600; line-height: 1.5; }
+/* a list page with nothing in it (D-015): one quiet line on a plaque, the width of a sentence */
+.lg-empty-list { font-size: 17px; font-weight: 600; color: var(--lg-ink-2); max-width: 520px; }
+.lg-state-link {
+  display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; margin-left: -10px;
+  color: var(--lg-navy); font-weight: 600; text-underline-offset: 4px;
+}
+[data-theme-root="luxury-gold"] .lg-state-retry {
+  min-height: 44px; padding: 0 20px; border-radius: var(--lg-r-card); font-size: 16px; font-weight: 600;
+}
+
+/* ---------- list pages (TASK-C-006): stage + plaque ---------- */
+.lg-page { display: grid; gap: 28px; max-width: 1180px; }
+.lg-page-split { grid-template-columns: minmax(0, 8fr) minmax(0, 4fr); align-items: start; gap: 32px; }
+.lg-page-stage { display: grid; grid-template-columns: minmax(0, 1fr); gap: 28px; min-width: 0; }
+.lg-page-title {
+  font-family: var(--font-serif); font-size: 40px; font-weight: 600; line-height: 1.35; color: var(--lg-ink);
+  padding-bottom: 16px; border-bottom: 1px solid var(--lg-gold-line);
+}
+.lg-page-split > .lg-page-stage > .lg-page-title { grid-column: 1; }
+.lg-work { display: grid; gap: 16px; }
+.lg-work-title { font-family: var(--font-serif); font-size: 24px; font-weight: 600; line-height: 1.4; }
+
+/* overview: step medallion cards (a sequence, so numbered) */
+.lg-step-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.lg-step-card {
+  display: flex; justify-content: center; padding: 20px 12px; min-height: 44px; text-decoration: none; color: var(--lg-ink);
+  background: var(--lg-surface); border: 1px solid var(--lg-card-edge); border-radius: var(--lg-r-card);
+}
+.lg-step-card:hover { border-color: var(--lg-navy); }
+.lg-step-card[data-stuck] { background: var(--lg-stuck-tint); border-color: var(--lg-stuck); }
+.lg-step-card .lg-medallion { border: 0; padding: 0; }
+
+/* decisions plaque */
+.lg-decisions { gap: 24px; }
+.lg-decision { display: grid; gap: 10px; }
+.lg-decision + .lg-decision { padding-top: 20px; border-top: 1px solid var(--lg-gold-line); }
+.lg-decision-parts { display: grid; gap: 4px; }
+.lg-decision-parts dt { color: var(--lg-ink-2); font-size: 14px; margin-top: 8px; }
+.lg-decision-open { font-weight: 600; }
+
+/* chips that link to parts (v1.7 hrefs) — 44 px tall, so they are real hit targets */
+.lg-chip-links { display: flex; flex-wrap: wrap; gap: 8px; }
+.lg-chip-link {
+  display: inline-flex; align-items: center; min-height: 44px; padding: 2px 14px; font-size: 15px;
+  background: var(--lg-paper); border: 1px solid var(--lg-card-edge); border-radius: 999px; color: var(--lg-ink);
+  text-decoration: none;
+}
+a.lg-chip-link:hover { border-color: var(--lg-navy); }
+.lg-group-title { font-size: 14px; font-weight: 600; color: var(--lg-ink-2); }
+.lg-screen-lists .lg-group-title { margin-bottom: 6px; }
+.lg-item-stuck { color: var(--lg-stuck); font-weight: 600; font-size: 15px; }
+
+/* ดูรายละเอียด */
+.lg-more-trigger {
+  min-height: 44px; font-weight: 600; color: var(--lg-navy); display: inline-flex; align-items: center; gap: 8px;
+  padding: 0 10px; margin-left: -10px; border-radius: var(--lg-r-card);
+}
+.lg-more-body { display: grid; gap: 12px; padding: 4px 0 0; }
+/* HeroUI's own disclosure focus rule is more specific than the theme's — keep the theme's one navy ring everywhere. */
+[data-theme-root="luxury-gold"] .lg-more-trigger.disclosure__trigger:focus-visible {
+  outline: 3px solid var(--lg-navy); outline-offset: 2px; box-shadow: none;
+}
+
+/* screens + api cards */
+.lg-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+.lg-item-card {
+  display: grid; gap: 12px; align-content: start; padding: 20px 22px;
+  background: var(--lg-surface); border: 1px solid var(--lg-card-edge); border-radius: var(--lg-r-card);
+}
+.lg-item-card[data-stuck] { border-color: var(--lg-stuck); }
+.lg-item-head { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.lg-item-title { font-family: var(--font-serif); font-size: 22px; font-weight: 600; line-height: 1.4; }
+.lg-method { font-weight: 700; }
+.lg-path { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 15px; color: var(--lg-ink); overflow-wrap: anywhere; }
+.lg-api-io { display: grid; gap: 8px; }
+.lg-screen-lists { display: grid; gap: 12px; }
+.lg-detail-list { display: grid; gap: 6px; }
+.lg-detail-list + .lg-detail-list { padding-top: 10px; border-top: 1px dashed var(--lg-gold-line); }
+.lg-detail-list li { display: flex; flex-wrap: wrap; gap: 8px; align-items: baseline; }
+.lg-detail-type { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 14px; color: var(--lg-ink-2); }
+.lg-detail-note { color: var(--lg-ink-2); }
+.lg-json {
+  font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 14px; line-height: 1.55;
+  background: var(--lg-paper); border: 1px solid var(--lg-card-edge); border-radius: 10px;
+  padding: 12px 14px; max-height: 320px; overflow: auto; white-space: pre;
+}
+.lg-response { display: grid; gap: 6px; }
+.lg-response-status { font-family: var(--font-serif); font-weight: 600; }
+
+/* stuck */
+.lg-stuck-list { display: grid; gap: 16px; max-width: 760px; }
+.lg-stuck-item {
+  display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 14px; align-items: start; padding: 20px 22px;
+  background: var(--lg-surface); border: 1px solid var(--lg-stuck); border-radius: var(--lg-r-plaque);
+}
+.lg-stuck-body { display: grid; gap: 6px; }
+.lg-stuck-wording { color: var(--lg-stuck); font-weight: 600; font-size: 17px; }
+.lg-stuck-title { font-size: 17px; }
+.lg-stuck-target {
+  justify-self: start; display: inline-flex; align-items: center; min-height: 44px;
+  color: var(--lg-navy); font-weight: 600; text-underline-offset: 4px;
+}
+.lg-stuck-answer { display: grid; gap: 2px; padding: 10px 14px; background: var(--lg-paper); border-radius: 10px; }
+.lg-stuck-answer-label { font-size: 14px; color: var(--lg-ink-2); }
+
+/* history: a timeline on a bronze rule, oldest first */
+.lg-history-part { font-family: var(--font-serif); font-size: 24px; font-weight: 600; }
+.lg-timeline { display: grid; gap: 20px; padding-left: 24px; border-left: 2px solid var(--lg-edge); }
+.lg-timeline-entry { position: relative; display: grid; gap: 4px; }
+.lg-timeline-dot {
+  position: absolute; left: -32px; top: 6px; width: 14px; height: 14px; border-radius: 50%;
+  background: var(--lg-surface); border: 2px solid var(--lg-navy);
+}
+.lg-timeline-head { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: baseline; }
+.lg-timeline-date { font-weight: 600; }
+.lg-timeline-cause, .lg-timeline-what { color: var(--lg-ink-2); font-size: 15px; }
+.lg-part-chooser ul { display: grid; gap: 4px; }
+.lg-part-pick { font-family: var(--font-serif); font-size: 18px; font-weight: 600; line-height: 1.4; color: var(--lg-ink); margin-bottom: 8px; }
+.lg-part-link {
+  display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 12px; border-radius: var(--lg-r-card);
+  color: var(--lg-ink-2); text-decoration: none; font-size: 15px;
+}
+.lg-part-link .lg-partmark { flex: none; }
+/* on the chosen (navy) link the navy / ink marks would vanish: they sit on a light chip there (a padded square, so a
+   navy circle reads as a filled mark, not as a thin ring) */
+.lg-part-link[aria-current="page"] .lg-partmark { background: var(--lg-surface); border-radius: 6px; padding: 3px; box-sizing: content-box; }
+/* before a part is chosen the chooser is the page's main content: parts in columns, no inner scroll */
+.lg-part-chooser-main .lg-part-scroll { max-height: none; overflow: visible; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
+/* each kind starts its own row, so the VM's runs of one kind read as groups (the order is the VM's, unchanged) */
+.lg-part-chooser-main .lg-part-scroll > li[data-kind-start] { grid-column: 1; }
+/* the legend is a row (`.lg-part-chooser ul` would make it a column) */
+.lg-part-chooser-main .lg-legend { display: flex; margin-bottom: 12px; }
+.lg-part-link:hover { background: var(--lg-paper); color: var(--lg-ink); }
+.lg-part-link[aria-current="page"] { background: var(--lg-navy); color: var(--lg-gold-light); font-weight: 600; }
+
+/* stuck words shown on screen under a stuck step (overview) — never only "!" */
+.lg-medallion-stuck { display: grid; gap: 8px; font-size: 14px; font-weight: 600; color: var(--lg-stuck); line-height: 1.4; max-width: 30ch; }
+/* one line per stuck wording, never one run-on sentence (REVIEW-A-002 row 2) */
+.lg-stuck-line { display: block; text-wrap: pretty; }
+ul.lg-item-stuck { display: grid; gap: 2px; }
+.lg-plaque-step { font-weight: 600; color: var(--lg-ink); }
+[data-theme-root="luxury-gold"] .lg-method { font-size: 14px; }
+.lg-io-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; color: var(--lg-ink-2); }
+.lg-io-mark { flex: none; }
+.lg-io-row[data-io="writes"] .lg-chip-link { background: var(--lg-surface); border-style: dashed; }
+.lg-part-scroll { max-height: min(60dvh, 560px); overflow-y: auto; display: grid; gap: 4px; padding: 5px; overscroll-behavior: contain; }
+
+@media (max-width: 900px) {
+  .lg-page-split { grid-template-columns: minmax(0, 1fr); }
+  .lg-cards { grid-template-columns: minmax(0, 1fr); }
+  .lg-part-scroll { max-height: 280px; }
+}
+@media (max-width: 640px) {
+  .lg-page-title { font-size: 30px; }
+  .lg-step-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* ---------- diagram pages (TASK-C-005): an SVG for lines + HTML for nodes and labels at the core's positions ---------- */
+.lg-diagram {
+  position: relative; overflow: auto; max-width: 100%; overscroll-behavior: contain;
+  background: var(--lg-surface); border: 1px solid var(--lg-card-edge); border-radius: var(--lg-r-plaque);
+}
+.lg-diagram:focus-visible { outline: 3px solid var(--lg-navy); outline-offset: 2px; }
+.lg-canvas { position: relative; }
+.lg-canvas > * { position: absolute; }
+.lg-canvas > svg.lg-lines { left: 0; top: 0; pointer-events: none; }
+.lg-canvas > .lg-sr-only { position: absolute; }
+.lg-edge { fill: none; stroke: var(--lg-edge); stroke-width: 2; stroke-linejoin: round; }
+
+/* flowchart: LR at ≥ 768, TB below — both server-rendered */
+.lg-flow-TB { display: none; }
+@media (max-width: 767px) {
+  .lg-flow-LR { display: none; }
+  .lg-flow-TB { display: block; }
+}
+.lg-fnode {
+  box-sizing: border-box; display: flex; align-items: center; gap: 8px; padding: 6px 10px 6px 6px;
+  background: var(--lg-surface); border: 1px solid var(--lg-card-edge); border-radius: 999px;
+  color: var(--lg-ink); text-decoration: none; min-height: 44px;
+}
+.lg-fnode:hover { border-color: var(--lg-navy); }
+.lg-fnode[data-stuck] { background: var(--lg-stuck-tint); border-color: var(--lg-stuck); border-radius: 18px; }
+.lg-fnode-medal {
+  flex: none; width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center;
+  background: var(--lg-navy); color: var(--accent-foreground); font-family: var(--font-serif); font-weight: 600; font-size: 15px;
+}
+.lg-fnode[data-end] .lg-fnode-medal { background: var(--lg-surface); color: var(--lg-navy); border: 2.5px solid var(--lg-navy); }
+.lg-fnode-text { display: grid; gap: 2px; justify-items: start; min-width: 0; }
+.lg-fnode-title { font-size: 14px; font-weight: 600; line-height: 1.3; }
+.lg-fnode-seal { position: absolute; top: -8px; right: -6px; line-height: 0; }
+/* The end word sits on the node's lower edge under its ring (as the seal sits on the upper corner), so a node holds
+   its title only — never more than 2 lines on first open (REVIEW-A-002 row 1, AC-8). Still visible and read. */
+.lg-fnode .lg-medallion-end { position: absolute; left: 8px; bottom: -11px; background: var(--lg-surface); }
+.lg-flabel {
+  white-space: nowrap; font-size: 14px; font-weight: 600; color: var(--lg-ink); line-height: 1.3;
+  background: var(--lg-paper); border: 1px solid var(--lg-gold-line); border-radius: 999px; padding: 3px 10px;
+}
+
+/* workOrder: fixed participant column + step bands with ordered hand-offs */
+.lg-swim { display: grid; grid-template-columns: 172px minmax(0, 1fr); align-items: start; }
+.lg-swim-lanes { border-right: 1px solid var(--lg-card-edge); background: var(--lg-surface); border-radius: var(--lg-r-plaque) 0 0 var(--lg-r-plaque); }
+.lg-swim-lane { display: flex; align-items: center; gap: 8px; padding: 0 12px; font-size: 15px; font-weight: 500; line-height: 1.25; border-top: 1px solid var(--lg-card-edge); }
+.lg-swim-scroll { border-radius: 0 var(--lg-r-plaque) var(--lg-r-plaque) 0; }
+.lg-swim-rule { left: 0; height: 1px; background: var(--lg-card-edge); }
+/* Sticky step headings (client/SwimHeads): a zero-height first row of .lg-swim, so it sticks only while the swimlane is
+   on screen; its bar overflows below it. Hidden until the real band heads have scrolled under the top edge. */
+.lg-swim-heads { grid-column: 1 / -1; position: sticky; height: 0; z-index: var(--lg-z-heads); }
+.lg-swim-heads:not([data-shown]) { visibility: hidden; }
+.lg-swim-heads-bar { display: grid; grid-template-columns: 172px minmax(0, 1fr); border-bottom: 1px solid var(--lg-card-edge); }
+.lg-swim-heads-bar > span { background: var(--lg-surface); }
+/* 1 px = the frame's own border, so each strip heading lines up with its band below */
+.lg-swim-heads-view { overflow: hidden; background: var(--lg-surface); padding-left: 1px; }
+.lg-swim-heads-track { position: relative; height: 44px; }
+.lg-swim-head {
+  position: absolute; top: 0; height: 100%; display: flex; align-items: center; gap: 6px; padding: 0 12px;
+  font-size: 14px; font-weight: 600; white-space: nowrap; background: var(--lg-paper); border-left: 1px solid var(--lg-gold-line);
+}
+.lg-swim-head[data-stuck] { background: var(--lg-stuck-tint); }
+.lg-swim-head-title { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.lg-band { top: 0; background: var(--lg-paper); border-left: 1px solid var(--lg-gold-line); }
+.lg-band[data-stuck] { background: var(--lg-stuck-tint); box-shadow: inset 0 0 0 1.5px var(--lg-stuck); }
+.lg-band-head {
+  position: absolute; left: 0; right: 0; top: 0; padding: 10px 12px; display: flex; flex-wrap: wrap; align-content: flex-start; gap: 4px 8px;
+}
+.lg-band-num { font-family: var(--font-serif); font-weight: 700; color: var(--lg-gold-ink); }
+.lg-band[data-stuck] .lg-band-num { color: var(--lg-stuck); }
+.lg-band-title { font-size: 15px; font-weight: 600; line-height: 1.35; width: 100%; }
+.lg-band-use { position: absolute; left: 6px; width: 8px; height: 8px; border-radius: 50%; background: var(--lg-edge); }
+.lg-handoff {
+  position: absolute; width: 44px; display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+  background: none; border: 0; padding: 0; cursor: pointer; border-radius: 12px;
+}
+.lg-handoff:not([data-down]) { flex-direction: column-reverse; }
+.lg-handoff-line { position: absolute; left: 21px; top: 16px; bottom: 16px; width: 2px; background: var(--lg-edge); }
+.lg-handoff::after {
+  content: ""; position: absolute; left: 16px; width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent;
+}
+.lg-handoff[data-down]::after { bottom: 8px; border-top: 9px solid var(--lg-edge); }
+.lg-handoff:not([data-down])::after { top: 8px; border-bottom: 9px solid var(--lg-edge); }
+.lg-handoff-n {
+  position: relative; z-index: var(--lg-z-mark); width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center;
+  background: var(--lg-surface); border: 1.5px solid var(--lg-edge); font-size: 14px; font-weight: 700; color: var(--lg-ink);
+}
+.lg-handoff[data-open-from] .lg-handoff-n, .lg-handoff[data-open-to] .lg-handoff-n { border-style: dashed; }
+.lg-handoff:hover .lg-handoff-line, .lg-handoff:focus-visible .lg-handoff-line { background: var(--lg-navy); width: 3px; }
+.lg-handoff:hover .lg-handoff-n, .lg-handoff:focus-visible .lg-handoff-n { background: var(--lg-navy); border-color: var(--lg-navy); color: var(--accent-foreground); }
+.lg-handoff-tip {
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: var(--lg-z-tip); display: none;
+  width: max-content; max-width: 220px; padding: 6px 10px; font-size: 14px; font-weight: 500; line-height: 1.4; color: var(--lg-ink);
+  background: var(--lg-surface); border: 1px solid var(--lg-navy); border-radius: 10px; text-align: left; white-space: normal;
+}
+/* :focus too — a tap focuses the button without matching :focus-visible, and touch has no hover. */
+.lg-handoff:hover .lg-handoff-tip, .lg-handoff:focus .lg-handoff-tip { display: block; }
+
+/* sequence */
+.lg-step-tabs { display: flex; flex-wrap: wrap; gap: 6px; }
+/* baseline: the serif number and the sans title share one baseline (REVIEW-A-002 row 9); the padding keeps 44 px */
+.lg-step-tab {
+  display: inline-flex; align-items: baseline; gap: 8px; min-height: 44px; padding: 10px 14px; font-size: 15px;
+  color: var(--lg-ink-2); text-decoration: none; border: 1px solid var(--lg-card-edge); border-radius: 999px; background: var(--lg-surface);
+}
+.lg-step-tab[aria-current="page"] { background: var(--lg-navy); border-color: var(--lg-navy); color: var(--lg-gold-light); font-weight: 600; }
+.lg-step-tab-num { font-family: var(--font-serif); font-weight: 700; }
+.lg-lifeline { stroke: var(--lg-card-edge); stroke-width: 1.5; stroke-dasharray: 4 5; }
+.lg-msg { stroke: var(--lg-edge); stroke-width: 2; }
+.lg-msg-reply { stroke-dasharray: 6 5; }
+.lg-open-end { fill: var(--lg-surface); stroke: var(--lg-edge); stroke-width: 2; }
+.lg-seq-head {
+  display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; font-size: 14px; font-weight: 600;
+  padding: 6px 10px; background: var(--lg-surface); border: 1px solid var(--lg-card-edge); border-radius: 10px;
+}
+.lg-msg-text {
+  display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; font-size: 14px; line-height: 1.3; color: var(--lg-ink);
+  background: var(--lg-paper); padding: 2px 8px; border-radius: 8px;
+}
+/* The text is the message's focus stop: a 44 px tall hit area around the 22 px chip. */
+.lg-msg-text::before { content: ""; position: absolute; inset: -11px 0; }
+.lg-msg-n { font-weight: 700; color: var(--lg-gold-ink); }
+.lg-msg-reply-text { color: var(--lg-ink-2); }
+
+/* web */
+.lg-web { max-height: min(78dvh, 760px); }
+.lg-thread { stroke: var(--lg-card-edge); stroke-width: 1; }
+.lg-thread-hot { stroke: var(--lg-edge); stroke-width: 2; opacity: 1; }
+.lg-wnode {
+  display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 4px 10px 4px 6px; max-width: 200px;
+  background: var(--lg-surface); border: 1px solid var(--lg-card-edge); border-radius: 999px;
+  font-size: 14px; line-height: 1.3; color: var(--lg-ink); text-decoration: none;
+}
+.lg-wnode:hover { border-color: var(--lg-navy); z-index: var(--lg-z-node); }
+.lg-wnode[data-stuck] { background: var(--lg-stuck-tint); border-color: var(--lg-stuck); }
+.lg-wnode[aria-current="true"] { border: 2px solid var(--lg-navy); z-index: var(--lg-z-node); }
+.lg-wnode[data-kind="interaction"] { font-size: 14px; color: var(--lg-ink-2); }
+.lg-wnode-title { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+.lg-partmark { flex: none; }
+.lg-web-detail { position: sticky; top: 24px; }
+.lg-web-detail-head { display: flex; align-items: center; gap: 8px; }
+.lg-web-kind { font-size: 14px; font-weight: 600; color: var(--lg-ink-2); }
+.lg-web-facts { display: grid; gap: 2px; color: var(--lg-ink-2); font-size: 15px; }
+.lg-web-links { display: grid; gap: 8px; }
+.lg-web-links li { display: grid; gap: 2px; justify-items: start; }
+.lg-web-link-label { font-size: 14px; color: var(--lg-ink-2); }
+
+@media (max-width: 640px) {
+  .lg-swim { grid-template-columns: 120px minmax(0, 1fr); }
+  .lg-swim-heads-bar { grid-template-columns: 120px minmax(0, 1fr); }
+  .lg-swim-lane { font-size: 14px; padding: 0 8px; }
+  .lg-web-detail { position: static; }
+  .lg-web { max-height: 55dvh; }
+}
+
+/* ---------- dev showcase (TASK-C-003; removed with the dev route) ---------- */
+.lg-showcase { max-width: 1180px; display: grid; gap: 32px; }
+.lg-showcase-rule { border: 0; border-top: 1px solid var(--lg-gold-line); margin: 8px 0; }
+.lg-showcase-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 360px)); gap: 24px; align-items: start; }
+.lg-showcase-states { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; align-items: start; }
+.lg-showcase-title {
+  font-family: var(--font-serif); font-size: 40px; font-weight: 600; line-height: 1.35; color: var(--lg-ink);
+  padding-bottom: 16px; border-bottom: 1px solid var(--lg-gold-line);
+}
+.lg-showcase-row { display: flex; flex-wrap: wrap; align-items: center; gap: 16px 32px; }
+.lg-showcase-stage { display: grid; grid-template-columns: minmax(0, 8fr) minmax(0, 4fr); gap: 32px; align-items: start; }
+.lg-showcase-picture { display: grid; gap: 24px; align-content: start; }
+.lg-showcase-steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px 16px; justify-items: center; }
+.lg-showcase-participants { display: flex; flex-wrap: wrap; gap: 8px 24px; font-size: 15px; }
+.lg-showcase-participants li { display: inline-flex; align-items: center; gap: 8px; }
+.lg-showcase-handoffs { display: grid; gap: 8px; font-size: 15px; }
+.lg-showcase-handoffs li { display: flex; gap: 10px; align-items: baseline; }
+.lg-showcase-handoff-n { font-family: var(--font-serif); font-weight: 600; color: var(--lg-gold-ink); min-width: 1.2em; }
+.lg-showcase-more {
+  min-height: 44px; font-weight: 600; color: var(--lg-navy); display: inline-flex; align-items: center; gap: 8px;
+  padding: 0 10px; margin-left: -10px; border-radius: var(--lg-r-card);
+}
+.lg-showcase-readiness { display: grid; gap: 12px; justify-items: start; }
+.lg-showcase-decision { display: grid; gap: 4px; padding-top: 8px; }
+.lg-showcase-decision dt { color: var(--lg-ink-2); font-size: 14px; margin-top: 8px; }
+
+@media (max-width: 640px) {
+  .lg-showcase { gap: 24px; }
+  .lg-showcase-cards, .lg-showcase-states { grid-template-columns: minmax(0, 1fr); }
+  .lg-showcase-title { font-size: 30px; }
+  .lg-showcase-stage { grid-template-columns: minmax(0, 1fr); }
+  .lg-showcase-stage > .lg-plaque { order: -1; }
+  .lg-showcase-steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* ---------- screen ④ พร้อมสร้างหรือยัง (TASK-C-012): stage (summary, then the quiz ledger) + the gate plaque ---------- */
+/* DOM order: summary · gate · quiz (the gate's reasons are read before the long quiz); at 1440 the gate stands
+   beside both, sticky, as the page's one plaque. */
+.lg-ready { grid-template-areas: "summary gate" "quiz gate"; }
+.lg-ready-summary { grid-area: summary; }
+.lg-ready-quiz { grid-area: quiz; }
+.lg-ready-gate { grid-area: gate; position: sticky; top: 24px; align-self: start; display: grid; gap: 14px; }
+.lg-ready-steps { display: flex; flex-wrap: wrap; gap: 4px 6px; }
+.lg-ready-step { display: block; color: inherit; text-decoration: none; border-radius: var(--lg-r-card); }
+.lg-ready-step:hover .lg-medallion { border-color: var(--lg-card-edge); background: var(--lg-surface); }
+.lg-ready-counts { display: flex; flex-wrap: wrap; gap: 8px 32px; }
+.lg-ready-counts div { display: flex; flex-direction: row-reverse; align-items: baseline; gap: 8px; }
+.lg-ready-counts dd { font-family: var(--font-serif); font-size: 30px; font-weight: 600; line-height: 1.2; color: var(--lg-navy); }
+.lg-ready-counts dt { font-size: 15px; color: var(--lg-ink-2); }
+/* the score: the page's one large line (serif), on the plaque */
+.lg-ready-score { font-family: var(--font-serif); font-size: 32px; font-weight: 600; line-height: 1.35; color: var(--lg-navy); }
+[data-theme-root="luxury-gold"] .lg-ready-confirm { width: 100%; min-height: 48px; font-weight: 600; }
+.lg-ready-reasons { display: grid; gap: 2px; }
+.lg-ready-reasons li { display: flex; align-items: center; gap: 8px; }
+.lg-ready-reasons a { display: inline-flex; align-items: center; min-height: 44px; color: var(--lg-ink); font-weight: 600; text-decoration: underline; text-decoration-color: var(--lg-gold-line); text-underline-offset: 4px; }
+.lg-ready-reasons a:hover { text-decoration-color: var(--lg-navy); }
+.lg-ready-version { font-family: var(--font-serif); font-size: 17px; font-weight: 600; color: var(--lg-ink); padding-top: 12px; border-top: 1px solid var(--lg-gold-line); }
+.lg-ready-changed { font-weight: 600; color: var(--lg-stuck); }
+.lg-ready-build { display: grid; gap: 4px; padding-top: 12px; border-top: 1px solid var(--lg-gold-line); color: var(--lg-ink-2); font-size: 15px; }
+.lg-ready-build-button {
+  justify-self: start; min-height: 44px; padding: 0 16px; font: inherit; font-weight: 600; color: var(--lg-ink-2);
+  background: var(--lg-paper); border: 1px dashed var(--lg-card-edge); border-radius: 999px; cursor: not-allowed;
+}
+.lg-ready-hint { color: var(--lg-ink-2); font-size: 15px; max-width: 62ch; }
+.lg-ready-ask { display: flex; flex-wrap: wrap; gap: 10px; align-items: end; }
+.lg-ready-ask-form { display: flex; flex: 1 1 320px; gap: 10px; min-width: 0; }
+.lg-ready-field { flex: 1 1 auto; min-width: 0; }
+/* fields: a visible card-edge border (3.2:1 on paper — white-on-paper alone is 1.06:1); disabled ones look it */
+[data-theme-root="luxury-gold"] .lg-ready-field input { min-height: 44px; font-size: 16px; border: 1px solid var(--lg-card-edge); }
+[data-theme-root="luxury-gold"] .lg-ready-field[data-disabled] input { background: var(--lg-paper); border-style: dashed; color: var(--lg-ink-2); }
+/* every control on this page is a 44 px target (HeroUI's default buttons are 36–40 px) */
+[data-theme-root="luxury-gold"] .lg-ready button { min-height: 44px; }
+/* an off Confirm looks like the off Build (paper, dashed edge, ink-2) — not a half-faded primary at 3:1 */
+[data-theme-root="luxury-gold"] .lg-ready-confirm[data-disabled] {
+  opacity: 1; background: var(--lg-paper); color: var(--lg-ink-2); border: 1px dashed var(--lg-card-edge); box-shadow: none;
+}
+/* the ledger: one row per question, numbered by its position (a real order), hairline between rows */
+.lg-ledger { display: grid; }
+.lg-ledger-row { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 12px; padding: 16px 0; border-top: 1px solid var(--lg-gold-line); }
+.lg-ledger-n { font-family: var(--font-serif); font-size: 18px; font-weight: 600; color: var(--lg-gold-ink); padding-top: 2px; }
+.lg-ledger-body { display: grid; gap: 8px; min-width: 0; }
+.lg-ledger-question { font-family: var(--font-serif); font-size: 18px; font-weight: 600; line-height: 1.45; color: var(--lg-ink); }
+.lg-ledger-answer { font-size: 16px; line-height: 1.6; }
+.lg-ledger-notin { font-weight: 600; color: var(--lg-ink-2); }
+.lg-ledger-parts { display: grid; gap: 4px; }
+.lg-ledger-actions { display: flex; flex-wrap: wrap; align-items: end; gap: 10px; }
+.lg-ledger-notefield { flex: 1 1 100%; display: grid; gap: 4px; }
+.lg-ledger-mark { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; }
+/* a final mark reads as an ink stamp, not a control: serif word over a gold hairline, no pill — the word says which */
+.lg-ledger-stamp { font-family: var(--font-serif); font-weight: 700; color: var(--lg-navy); padding-bottom: 2px; border-bottom: 2px solid var(--lg-gold-line); }
+.lg-ledger-mark[data-mark="wrong"] .lg-ledger-stamp { color: var(--lg-stuck); border-bottom-color: var(--lg-stuck); }
+.lg-ledger-note { color: var(--lg-ink-2); }
+[data-theme-root="luxury-gold"] .lg-ledger-failed { align-items: center; }
+@media (max-width: 900px) {
+  .lg-ready { grid-template-areas: "summary" "gate" "quiz"; }
+  .lg-ready-gate { position: static; }
+}
+
+/* ---------- screen ② the chat (TASK-C-013): the composer and the minutes on the stage, the pack + the quiet edge on the plaque ---------- */
+/* DOM order: composer · plaque · minutes (the questions are read before the long conversation on a phone); at 1440 the
+   plaque stands beside both, sticky. */
+.lg-chat { grid-template-areas: "composer plaque" "log plaque"; row-gap: 24px; }
+.lg-chat-composer { grid-area: composer; display: grid; gap: 12px; min-width: 0; }
+.lg-chat-plaque { grid-area: plaque; position: sticky; top: 24px; align-self: start; gap: 20px; }
+.lg-chat-log { grid-area: log; display: grid; gap: 16px; min-width: 0; }
+[data-theme-root="luxury-gold"] .lg-chat button { min-height: 44px; }
+
+/* the box: the page's one large surface — plaque radius, card edge, the writing set at reading size */
+.lg-chat-form { display: grid; gap: 10px; }
+.lg-chat-box { display: grid; }
+[data-theme-root="luxury-gold"] .lg-chat-box textarea {
+  min-height: 132px; padding: 18px 20px; resize: vertical;
+  font-size: 18px; line-height: 1.7; color: var(--lg-ink);
+  background: var(--lg-surface); border: 1px solid var(--lg-card-edge); border-radius: var(--lg-r-plaque); box-shadow: none;
+}
+[data-theme-root="luxury-gold"] .lg-chat-box textarea::placeholder { color: var(--lg-ink-2); }
+.lg-chat-form-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.lg-chat-hint { flex: 1 1 auto; font-size: 14px; color: var(--lg-ink-2); }
+
+/* who a file came from: asked before the upload, under the box */
+.lg-chat-origin {
+  display: grid; gap: 8px; padding: 16px 20px;
+  background: var(--lg-surface); border: 1px solid var(--lg-card-edge); border-radius: var(--lg-r-card);
+}
+.lg-chat-origin-ask { font-family: var(--font-serif); font-size: 18px; font-weight: 600; }
+.lg-chat-origin-file { color: var(--lg-ink-2); overflow-wrap: anywhere; }
+.lg-chat-origin-row, .lg-chat-alert-row { display: flex; flex-wrap: wrap; gap: 10px; }
+
+.lg-chat-status:empty { display: none; }
+.lg-chat-thinking { display: flex; gap: 16px; align-items: baseline; color: var(--lg-ink-2); font-weight: 500; }
+[data-theme-root="luxury-gold"] .lg-chat-alert { align-items: center; flex-wrap: wrap; gap: 12px; }
+.lg-chat-refused { grid-column: 1 / -1; color: var(--lg-stuck); font-weight: 600; }
+
+/* the minutes: who spoke in a serif column, the words beside it; the bot drafts the brief, so it speaks in the serif */
+.lg-minutes { display: grid; }
+.lg-minutes-row {
+  display: grid; grid-template-columns: 104px minmax(0, 1fr); gap: 4px 20px; align-items: baseline;
+  padding: 14px 0; border-top: 1px solid var(--lg-gold-line);
+}
+.lg-chat-speaker { font-family: var(--font-serif); font-size: 15px; font-weight: 600; color: var(--lg-gold-ink); }
+.lg-minutes-row[data-role="user"] .lg-chat-speaker { color: var(--lg-navy); }
+.lg-minutes-text { max-width: 68ch; font-size: 16px; line-height: 1.7; white-space: pre-wrap; overflow-wrap: anywhere; }
+.lg-minutes-row[data-role="bot"] .lg-minutes-text { font-family: var(--font-serif); font-size: 17px; line-height: 1.75; }
+.lg-minutes-row[data-role="caw"] .lg-minutes-text { padding: 8px 14px; background: var(--lg-surface); border: 1px solid var(--lg-card-edge); border-radius: var(--lg-r-card); }
+.lg-minutes-day { display: flex; align-items: center; gap: 12px; padding: 18px 0 6px; font-family: var(--font-serif); font-size: 14px; color: var(--lg-ink-2); }
+.lg-minutes-day::after { content: ""; flex: 1; border-top: 1px solid var(--lg-gold-line); }
+.lg-minutes-day + .lg-minutes-row { border-top: 0; }
+/* what the last answer changed: under the bot line that made it, in the words column */
+.lg-minutes-change { padding: 0 0 14px 124px; }
+.lg-chat-change {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; padding: 12px 16px;
+  background: var(--lg-surface); border: 1px solid var(--lg-card-edge); border-radius: var(--lg-r-card);
+}
+.lg-chat-change-counts { display: flex; flex-wrap: wrap; gap: 4px 16px; font-family: var(--font-serif); font-size: 17px; font-weight: 600; color: var(--lg-navy); }
+
+/* the pack: cards on the plaque; the list scrolls inside at 1440 (5 px = the focus ring + its offset) */
+.lg-pack { display: grid; gap: 12px; }
+.lg-pack-list { display: grid; gap: 12px; max-height: min(58dvh, 640px); overflow-y: auto; padding: 5px; margin: -5px; border-radius: var(--lg-r-card); }
+[data-theme-root="luxury-gold"] .lg-pack-card {
+  display: grid; gap: 10px; padding: 16px 18px;
+  background: var(--lg-paper); border: 1px solid var(--lg-card-edge); border-radius: var(--lg-r-card); box-shadow: none;
+}
+.lg-pack-question { font-family: var(--font-serif); font-size: 17px; font-weight: 600; line-height: 1.5; color: var(--lg-ink); }
+.lg-pack-answer { display: grid; gap: 2px; }
+.lg-pack-suggestion { display: grid; gap: 8px; justify-items: start; padding: 10px 12px; border: 1px dashed var(--lg-card-edge); border-radius: var(--lg-r-card); }
+.lg-pack-cases { display: grid; gap: 2px; font-size: 15px; color: var(--lg-ink-2); }
+.lg-pack-cases li::before { content: "– "; }
+.lg-pack-own { display: grid; gap: 8px; }
+.lg-pack-own-row { display: flex; gap: 8px; min-width: 0; }
+[data-theme-root="luxury-gold"] .lg-pack-accept { width: 100%; min-height: 48px; font-weight: 600; }
+.lg-chat-field { flex: 1 1 auto; min-width: 0; }
+[data-theme-root="luxury-gold"] .lg-chat-field input { min-height: 44px; font-size: 16px; border: 1px solid var(--lg-card-edge); background: var(--lg-surface); }
+[data-theme-root="luxury-gold"] .lg-chat-field-quiet input { border-style: dashed; }
+
+/* the quiet edge */
+.lg-chat-edge { display: grid; gap: 16px; }
+.lg-pack + .lg-chat-edge { padding-top: 16px; border-top: 1px solid var(--lg-gold-line); }
+.lg-chat-spec {
+  justify-self: start; display: inline-flex; align-items: center; min-height: 44px;
+  color: var(--lg-navy); font-weight: 600; text-decoration: underline; text-decoration-color: var(--lg-gold-line); text-underline-offset: 4px;
+}
+.lg-chat-spec:hover { text-decoration-color: var(--lg-navy); }
+.lg-chat-sources { display: grid; gap: 6px; }
+.lg-chat-sources li { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; }
+.lg-chat-source-name { overflow-wrap: anywhere; }
+[data-theme-root="luxury-gold"] .lg-chat-sources .chip { font-size: 14px; padding: 4px 10px; }
+.lg-chat-select { display: grid; gap: 4px; }
+[data-theme-root="luxury-gold"] .lg-chat-select .select__trigger { min-height: 44px; background: var(--lg-surface); border: 1px solid var(--lg-card-edge); box-shadow: none; }
+.lg-chat-slider { display: grid; gap: 6px; }
+.lg-chat-slider-head { display: flex; justify-content: space-between; align-items: baseline; }
+/* the thumb's own hit area: 44 px tall around the track */
+[data-theme-root="luxury-gold"] .lg-chat-slider .slider__track { min-height: 44px; }
+
+@media (max-width: 900px) {
+  .lg-chat { grid-template-areas: "composer" "plaque" "log"; }
+  .lg-chat-plaque { position: static; }
+  .lg-pack-list { max-height: none; overflow: visible; }
+}
+@media (max-width: 640px) {
+  .lg-minutes-row { grid-template-columns: minmax(0, 1fr); }
+  .lg-minutes-change { padding-left: 0; }
+  .lg-chat-hint { flex-basis: 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-theme-root="luxury-gold"] * { transition: none !important; animation: none !important; }
+}

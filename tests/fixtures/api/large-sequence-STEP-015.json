@@ -1,0 +1,47 @@
+{
+  "participants": [
+    {
+      "key": "ROLE-001",
+      "kind": "role",
+      "title": "ผู้ร้องขอ"
+    },
+    {
+      "key": "SCR-004",
+      "kind": "screen",
+      "title": "หน้าอนุมัติ"
+    },
+    {
+      "key": "API-001",
+      "kind": "api",
+      "title": "ส่งคำขอ"
+    },
+    {
+      "key": "SYS-002",
+      "kind": "system",
+      "title": "ระบบอีเมล"
+    }
+  ],
+  "messages": [
+    {
+      "key": "INT-033",
+      "from": "ROLE-001",
+      "to": "SCR-004",
+      "text": "กรอกข้อมูลขั้น 15",
+      "reply": null
+    },
+    {
+      "key": "INT-034",
+      "from": "SCR-004",
+      "to": "API-001",
+      "text": "ส่งข้อมูลขั้น 15",
+      "reply": null
+    },
+    {
+      "key": "INT-035",
+      "from": "API-001",
+      "to": "SYS-002",
+      "text": "บันทึกลงระบบขั้น 15",
+      "reply": null
+    }
+  ]
+}
