@@ -17,6 +17,7 @@
 .panel > * { min-width: 0; } /* a wide table or diagram scrolls inside the panel, never the page */
 .panelHead { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
 .panelHead h3 { font-size: 20px; line-height: 1.35; font-weight: 700; }
+.cardTitle { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin: 0; font-size: 18px; line-height: 1.4; font-weight: 700; white-space: normal; }
 
 .grid2 {
   display: grid;
@@ -39,8 +40,8 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  min-height: 32px;
-  padding: 4px 12px;
+  min-height: 36px;
+  padding: 4px 14px;
   border-radius: 999px;
   background: var(--cb-blueSoft);
   color: var(--cb-blue) !important;
@@ -66,7 +67,7 @@
 /* ---------- overview: the journey ---------- */
 .journey { padding: 28px 24px 20px; }
 .journey :global(.ant-steps-horizontal) { padding-inline: 48px; } /* end titles sit under their dots, inside the card */
-.stepTitle { font-weight: 600; color: var(--cb-ink) !important; text-decoration: none; }
+.stepTitle { display: inline-block; padding: 9px 4px; margin: -9px -4px; font-weight: 600; color: var(--cb-ink) !important; text-decoration: none; } /* ≥ 44 px target */
 .stepTitle:hover { color: var(--cb-blue) !important; }
 .stepEnds {
   display: inline-block;
@@ -85,6 +86,8 @@
 /* ---------- diagrams ---------- */
 .diagram { padding: 16px; }
 .diagram svg { display: block; }
+.diagram svg a { outline: none; }
+.diagram svg a:focus-visible rect { stroke: var(--cb-blue); stroke-width: 3; }
 .wideOnly { display: block; }
 .narrowOnly { display: none; }
 @media (max-width: 900px) {
@@ -206,6 +209,7 @@
 .stateText { font-size: 16px; color: var(--cb-ink); }
 
 @media (max-width: 640px) {
+  .linkTag { min-height: 44px; }
   .panel { padding: 16px; }
   .journey { padding: 20px 16px 12px; }
   .stuckItem { gap: 12px; }

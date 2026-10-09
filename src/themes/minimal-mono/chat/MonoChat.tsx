@@ -19,7 +19,7 @@ import type { ChatActions, ChatPageProps, ChatVM } from "@/core/theme/contract";
 import { requiredId } from "@/core/theme/required";
 import { proposedAnswer as proposedAnswerWord, showMore } from "@/core/words";
 import {
-  acceptAll, acceptPack, actionError, answerOwn, botFailed, botSuggests, changeCard, chatPlaceholder, chooseFile, creativityLabel,
+  acceptAll, acceptPack, cancel, actionError, answerOwn, botFailed, botSuggests, changeCard, chatPlaceholder, chooseFile, creativityLabel,
   enterHint, logName, modelLabel, notNeeded, originChoices, packName, reasonOptional, send as sendWord, sourceFailed,
   sourceState, speaker, thinking, toSpec, tryAgain, undoRefused, uploadAsks,
 } from "@/features/chat/words";
@@ -175,6 +175,7 @@ export function MonoChat({ vm, actions, required }: ChatPageProps) {
   const [dragging, setDragging] = useState(false);
   const model = useRef<HTMLInputElement>(null);
   const fileInput = useRef<HTMLInputElement>(null);
+  const fileButton = useRef<HTMLButtonElement>(null);
   const ids = { creativity: useId(), origin: useId(), hint: useId() };
 
   useEffect(() => setCreativity(vm.creativity), [vm.creativity]);
@@ -206,6 +207,11 @@ export function MonoChat({ vm, actions, required }: ChatPageProps) {
       const word = r.ok ? null : errorWord(r.code);
       setFailure(word ? { word, again: !r.ok && r.code === "unreachable" ? () => upload(stamp, f) : null } : null);
     });
+  };
+  // ยกเลิก / Escape on "ไฟล์นี้มาจากใคร" (D-034): the question closes, nothing is uploaded, focus goes back to เลือกไฟล์
+  const cancelUpload = () => {
+    setFile(null);
+    fileButton.current?.focus();
   };
   const undo = (changeSetId: string) => {
     setFailure(null);
@@ -255,14 +261,14 @@ export function MonoChat({ vm, actions, required }: ChatPageProps) {
               aria-hidden="true"
               onChange={(e) => { const f = e.target.files?.[0]; if (f) setFile(f); e.target.value = ""; }}
             />
-            <Button variant="default" radius="md" h={44} className={s.outline} onClick={() => fileInput.current?.click()}>{chooseFile}</Button>
+            <Button ref={fileButton} variant="default" radius="md" h={44} className={s.outline} onClick={() => fileInput.current?.click()}>{chooseFile}</Button>
             <Button type="submit" variant="default" radius="md" h={44} className={s.strong} disabled={pending || !text.trim()}>{sendWord}</Button>
           </div>
         </div>
       </form>
 
       {file ? (
-        <Paper radius="lg" p="lg" className={s.panelStrong} role="group" aria-labelledby={ids.origin} onKeyDown={(e) => { if (e.key === "Escape") setFile(null); }}>
+        <Paper radius="lg" p="lg" className={s.panelStrong} role="group" aria-labelledby={ids.origin} onKeyDown={(e) => { if (e.key === "Escape") cancelUpload(); }}>
           <p id={ids.origin} className={s.originAsk}>{uploadAsks}</p>
           <p className={s.originFile}>{file.name}</p>
           <div className={s.row}>
@@ -271,6 +277,7 @@ export function MonoChat({ vm, actions, required }: ChatPageProps) {
                 {o.label}
               </Button>
             ))}
+            <button type="button" className={`${s.textButton} ${s.cancel}`} onClick={cancelUpload}>{cancel}</button>
           </div>
         </Paper>
       ) : null}

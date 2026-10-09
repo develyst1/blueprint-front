@@ -10,18 +10,19 @@ export const color = {
   ink2: "#4A5568", // secondary text, 7.4:1 on paper
   line: "#DCE3EE",
   lineStrong: "#B8C3D3",
-  blue: "#1F6FEB", // the one blue: current page, links, the primary button
+  blue: "#1A5FD6", // the one blue: current page, links, the primary button — 5.05:1 on blueSoft, white on it 5.75:1
   blueSoft: "#E8F1FE",
-  stuck: "#B4570A", // warm amber — only for what is stuck (readiness.stuckCount > 0)
+  stuck: "#A44F08", // warm amber — only for what is stuck (readiness.stuckCount > 0) — 5.22:1 on stuckSoft
   stuckSoft: "#FFF4E5",
   neutralSoft: "#EEF1F5", // empty is not stuck (SPEC-B-001)
 } as const;
 
 // Five groups, not ten kinds (dataviz: fold past 8). Validated 2026-10-09 with the dataviz palette script, light mode:
-// all checks pass, worst adjacent CVD ΔE 9.4. A tile always carries its kind's icon and word, never colour alone.
+// all checks pass, worst adjacent CVD ΔE 9.4 (re-run after the audit's contrast fixes: still all pass). Icons ≥ 3:1 on
+// their own tile. A tile always carries its kind's icon and word, never colour alone.
 export const group = {
-  journey: { fg: "#1F6FEB", bg: "#E8F1FE" },
-  interaction: { fg: "#0F9F8F", bg: "#E3F6F3" },
+  journey: { fg: "#1A5FD6", bg: "#E8F1FE" },
+  interaction: { fg: "#00897B", bg: "#E3F6F3" },
   participant: { fg: "#8E44C9", bg: "#F3EAFB" },
   knowledge: { fg: "#5E8F00", bg: "#EEF6E0" },
   question: { fg: "#C2185B", bg: "#FCE8F0" },
@@ -67,6 +68,7 @@ export function antTheme(fontFamily: string): ThemeConfig {
       borderRadiusLG: radius.card,
       boxShadowTertiary: "0 1px 2px rgba(24, 33, 47, 0.06)",
       motionDurationMid: "0.18s",
+      controlHeightLG: 44, // every large control is a 44 px target (TASK-B-013 audit)
     },
     components: {
       Card: { headerFontSize: 18, bodyPadding: 20, headerPadding: 20 },
@@ -75,6 +77,7 @@ export function antTheme(fontFamily: string): ThemeConfig {
       Tag: { defaultBg: color.neutralSoft, defaultColor: color.ink },
       Timeline: { tailColor: color.line, dotBg: color.paper },
       Collapse: { headerBg: color.paper, contentBg: color.paper },
+      Slider: { handleSize: 18, handleSizeHover: 20, railSize: 6, controlSize: 18 },
     },
   };
 }

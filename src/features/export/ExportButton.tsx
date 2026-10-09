@@ -1,8 +1,10 @@
 "use client";
 
-// ส่งออก PDF (REQ-008 R1, R7; SPEC-A-007 § E2 2). Neutral — no theme styles. The file is saved only after the whole
-// body has arrived, so a failure never leaves half a PDF; a failure says so and offers ลองใหม่.
+// ส่งออก PDF (REQ-008 R1, R7; SPEC-A-007 § E2 2). Neutral: its own zero-specificity default style (TASK-A-051) that
+// any theme rule overrides. The file is saved only after the whole body has arrived, so a failure never leaves half a
+// PDF; a failure says so and offers ลองใหม่.
 import { useState } from "react";
+import s from "./exportButton.module.css";
 import { building, exportPdf as exportWord, failed } from "./words";
 
 /** The server's file name from `Content-Disposition: attachment; filename*=UTF-8''<name>`. */
@@ -41,12 +43,12 @@ export function ExportButton({ href }: { href: string }) {
   if (state === "failed") {
     return (
       <span role="alert">
-        <button type="button" onClick={exportPdf}>{failed}</button>
+        <button type="button" className={s.button} onClick={exportPdf}>{failed}</button>
       </span>
     );
   }
   return (
-    <button type="button" onClick={exportPdf} disabled={state === "building"} aria-busy={state === "building"}>
+    <button type="button" className={s.button} onClick={exportPdf} disabled={state === "building"} aria-busy={state === "building"}>
       {state === "building" ? building : exportWord}
     </button>
   );

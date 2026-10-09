@@ -1,9 +1,11 @@
 "use client";
 
-// Screen ② (REQ-004) in luxury gold — the dictated brief. Stage + plaque, in DOM order: the composer (the one focus,
-// first stop after the skip link) · the plaque (the open-question pack, then the quiet edge) · the conversation set as
-// minutes: speaker in a serif column, words beside it, newest first so the reply sits under the box, the day once per
-// day, and the card of what the last answer changed right after the bot row that made it. At ≤ 900 px one column.
+// Screen ② (REQ-004) in luxury gold — the dictated brief. DOM order = reading order at every width: the composer (the
+// one focus, first stop after the skip link) · the open-question pack · the conversation set as minutes (speaker in a
+// serif column, words beside it, newest first so the reply sits under the box, the day once per day, the card of what
+// the last answer changed right after the newest bot line that answered) · the quiet edge (sources, model, creativity).
+// At 1440 the pack and the edge share the right column (grid areas); at ≤ 900 px one column in DOM order, so on a phone
+// the reply is never below the settings (critique C-013 P1-c).
 // One transition for every action: `thinking` while any runs, every control off. Words only from
 // @/core/words, @/features/chat/words and the view model; never typed here.
 import { Alert, Button, TextArea, TextField } from "@heroui/react";
@@ -33,7 +35,11 @@ export function ChatDesk({ vm, actions, required }: ChatPageProps) {
   const modelRef = useRef<HTMLButtonElement>(null);
   const ids = { hint: useId(), origin: useId() };
 
-  const run: Run = (fn, after) => start(async () => { after?.(await fn()); });
+  // fn first, then after: `after?.(await fn())` would skip fn whenever after is absent (optional call short-circuits)
+  const run: Run = (fn, after) => start(async () => {
+    const r = await fn();
+    after?.(r);
+  });
 
   const send = (e?: FormEvent) => {
     e?.preventDefault();
@@ -67,9 +73,12 @@ export function ChatDesk({ vm, actions, required }: ChatPageProps) {
     });
   };
 
-  // empty rows (a park-only turn) never get a line in the minutes
-  const minutes = [...vm.messages].reverse().filter((m) => m.text.trim() !== "");
-  const changeAfter = vm.lastChange ? minutes.find((m) => m.role === "bot")?.id ?? null : null;
+  const isFailed = (m: { roundStatus: string | null }) => m.roundStatus === "bot_could_not_answer";
+  const newestBot = [...vm.messages].reverse().find((m) => m.role === "bot");
+  // empty rows (a park-only turn) never get a line; nor does the newest failed reply while its alert says the same
+  const minutes = [...vm.messages].reverse().filter((m) => m.text.trim() !== "" && !(vm.failed && !pending && m.id === newestBot?.id));
+  // the change card goes under the newest bot line that answered — never under a failed one (critique C-013 P1-b)
+  const changeAfter = vm.lastChange ? minutes.find((m) => m.role === "bot" && !isFailed(m))?.id ?? null : null;
   const change = vm.lastChange && (
     <div className="lg-chat-change">
       <p className="lg-chat-change-counts">
@@ -139,14 +148,14 @@ export function ChatDesk({ vm, actions, required }: ChatPageProps) {
         </div>
 
         {failure && (
-          <Alert status="danger" className="lg-chat-alert">
+          <Alert status="danger" className="lg-chat-alert" role="alert">
             <Alert.Content><Alert.Title>{failure.word}</Alert.Title></Alert.Content>
             {failure.again && <Button variant="secondary" onPress={failure.again}>{tryAgain}</Button>}
           </Alert>
         )}
 
         {vm.failed && !pending && (
-          <Alert status="warning" className="lg-chat-alert">
+          <Alert status="warning" className="lg-chat-alert" role="alert">
             <Alert.Content><Alert.Title>{botFailed.message}</Alert.Title></Alert.Content>
             <div className="lg-chat-alert-row">
               <Button variant="primary" onPress={() => run(() => actions.retry())}>{botFailed.retry}</Button>
@@ -156,10 +165,7 @@ export function ChatDesk({ vm, actions, required }: ChatPageProps) {
         )}
       </section>
 
-      <aside className="lg-plaque lg-chat-plaque">
-        {vm.pack.length > 0 && <ChatPack pack={vm.pack} focus={vm.focus} required={required} actions={actions} run={run} busy={pending} />}
-        <ChatEdge vm={vm} actions={actions} run={run} busy={pending} reading={reading} modelRef={modelRef} />
-      </aside>
+      {vm.pack.length > 0 && <ChatPack pack={vm.pack} focus={vm.focus} required={required} actions={actions} run={run} busy={pending} />}
 
       <section className="lg-chat-log">
         {change && !changeAfter && change}
@@ -171,7 +177,7 @@ export function ChatDesk({ vm, actions, required }: ChatPageProps) {
                 {(i === 0 || minutes[i - 1]!.atLabel !== m.atLabel) && (
                   <li className="lg-minutes-day"><time dateTime={m.at}>{m.atLabel}</time></li>
                 )}
-                <li className="lg-minutes-row" data-role={m.role}>
+                <li className="lg-minutes-row" data-role={m.role} data-failed={isFailed(m) || undefined}>
                   <span className="lg-chat-speaker">{speaker[m.role]}</span>
                   <p className="lg-minutes-text">{m.text}</p>
                 </li>
@@ -181,6 +187,8 @@ export function ChatDesk({ vm, actions, required }: ChatPageProps) {
           </ol>
         )}
       </section>
+
+      <ChatEdge vm={vm} actions={actions} run={run} busy={pending} reading={reading} modelRef={modelRef} />
     </div>
   );
 }

@@ -1,8 +1,9 @@
 "use client";
 
-// The chat's quiet edge in luxury gold, under the pack on the plaque (REQ-004 R1, R4, R5): `toSpec` · the sources,
-// each a name + a HeroUI Chip with its state in words · the model (HeroUI Select — its listbox portals into the theme
-// root through ThemeRoot's provider) · creativity (HeroUI Slider, sent when the thumb is let go).
+// The chat's quiet edge in luxury gold (REQ-004 R1, R4, R5) — after the minutes in DOM order; at 1440 under the pack in
+// the right column: `toSpec` · the sources, each a name + a HeroUI Chip with its state in words · the model (HeroUI
+// Select — its listbox portals into the theme root through ThemeRoot's provider) · creativity (HeroUI Slider, sent
+// when the thumb is let go).
 import { Chip, Label, ListBox, Select, Slider } from "@heroui/react";
 import { useEffect, useState, type Ref } from "react";
 import type { ChatActions, ChatVM } from "@/core/theme/contract";
@@ -15,7 +16,7 @@ export function ChatEdge({ vm, actions, run, busy, reading, modelRef }: {
   const [creativity, setCreativity] = useState(vm.creativity);
   useEffect(() => setCreativity(vm.creativity), [vm.creativity]);
   return (
-    <div className="lg-chat-edge">
+    <aside className="lg-chat-edge">
       <a className="lg-chat-spec" href={vm.specHref}>{toSpec}</a>
       {(vm.sources.length > 0 || reading) && (
         <ul className="lg-chat-sources">
@@ -77,6 +78,6 @@ export function ChatEdge({ vm, actions, run, busy, reading, modelRef }: {
           <Slider.Thumb />
         </Slider.Track>
       </Slider>
-    </div>
+    </aside>
   );
 }

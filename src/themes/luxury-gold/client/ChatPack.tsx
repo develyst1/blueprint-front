@@ -5,7 +5,7 @@
 // own `acceptPack` · for a question with no proposed answer, `answerOwn` (send) and `notNeeded` with `reasonOptional`.
 // Under the cards, `acceptAll(n)` takes every card that has a proposed answer — never a bot suggestion, which is
 // accepted on its own card after it has been read. ?q=<key> (AC-8) focuses that card.
-import { Button, Card, Input, TextField } from "@heroui/react";
+import { Button, Card, Input, ScrollShadow, TextField } from "@heroui/react";
 import { useEffect, useRef, useState } from "react";
 import type { ChatActions, ChatVM, RequiredItem } from "@/core/theme/contract";
 import { findRequired, requiredId, requiredProps } from "@/core/theme/required";
@@ -63,8 +63,9 @@ export function ChatPack({ pack, focus, required, actions, run, busy }: {
   const answerable = pack.filter((q) => q.proposedAnswer !== null && !q.suggested).map((q) => q.key);
   return (
     <section className="lg-pack">
-      {/* a Tab stop: at 1440 the list scrolls inside the plaque and may hold no control (cards with answers only) */}
-      <div ref={box} className="lg-pack-list" tabIndex={0} role="region" aria-label={packName}>
+      {/* a Tab stop: at 1440 the list scrolls inside its column and may hold no control (cards with answers only); the
+          shadow says there is more below (critique C-013) */}
+      <ScrollShadow ref={box} className="lg-pack-list" size={48} tabIndex={0} role="region" aria-label={packName}>
         {pack.map((q) => {
           const item = findRequired(required, requiredId.part(q.key));
           const titleId = `lg-q-${q.key}`;
@@ -94,7 +95,7 @@ export function ChatPack({ pack, focus, required, actions, run, busy }: {
             </Card>
           );
         })}
-      </div>
+      </ScrollShadow>
       {answerable.length > 0 && (
         <Button className="lg-pack-accept" variant="primary" isDisabled={busy} onPress={() => run(() => actions.accept(answerable))}>
           {acceptAll(answerable.length)}

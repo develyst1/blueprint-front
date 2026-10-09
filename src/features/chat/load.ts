@@ -82,6 +82,7 @@ export function toMessages(rows: ApiMessage[]): ChatMessageVM[] {
     at: m.createdAt,
     atLabel: formatThaiDate(m.createdAt),
     roundStatus: m.roundStatus,
+    changeSetId: m.changeSetId, // set by the back end on bot rows only (a round's set); null elsewhere
   }));
 }
 

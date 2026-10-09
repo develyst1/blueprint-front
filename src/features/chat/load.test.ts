@@ -49,6 +49,21 @@ describe("messages", () => {
   });
 });
 
+test("A-053: each message carries its round's changeSetId — the bot row of the set, null elsewhere; it matches lastChange", () => {
+  const rows = [
+    msg(1, "user", { content: "เพิ่มขั้นแจ้งเตือน" }),
+    msg(2, "bot", { content: "เพิ่มให้แล้ว", roundStatus: "applied", changeSetId: "cs-a" }),
+    msg(3, "user", { content: "ขอบคุณ" }),
+    msg(4, "bot", { content: "ยินดีครับ", roundStatus: "no_changes", changeSetId: null }),
+    msg(5, "caw", { content: "ขอแก้ขั้นที่ 2" }),
+  ];
+  expect(toMessages(rows).map((m) => [m.id, m.role, m.changeSetId])).toEqual([
+    ["m-1", "user", null], ["m-2", "bot", "cs-a"], ["m-3", "user", null], ["m-4", "bot", null], ["m-5", "caw", null],
+  ]);
+  const lastId = lastChangeSetId(rows);
+  expect(toMessages(rows).filter((m) => m.changeSetId === lastId).map((m) => m.id)).toEqual(["m-2"]);
+});
+
 describe("pack", () => {
   test("A-034: every open question, with or without a proposed answer, key order, at most 5", () => {
     const parts = [

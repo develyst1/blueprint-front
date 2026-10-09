@@ -51,6 +51,9 @@ export const originChoices = [
   { stamp: "customer-asked", label: stamp["customer-asked"] },
 ] as const;
 
+/** Closes "ไฟล์นี้มาจากใคร" without uploading (D-034, REQ-004 l.52) — every theme's chat page. */
+export const cancel = "ยกเลิก";
+
 // ---------- added 2026-10-09 (D-020 · REQ-004 table rows "Send" … "Upload / undo errors"; D-021 Addendum A) ----------
 
 export const send = chatSend;

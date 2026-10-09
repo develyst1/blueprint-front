@@ -3,7 +3,7 @@
 // ลำดับงาน — the swimlane as an Ant Table (ref 2): steps are rows, participants are columns headed by their kind tile,
 // a tile in the cell where the participant takes part. Each row expands to its handoffs, in order, who → whom.
 import { ArrowRightOutlined } from "@ant-design/icons";
-import { Table, type TableColumnsType } from "antd";
+import { Table, Tooltip, type TableColumnsType } from "antd";
 import type { PageVMs, RequiredItem, SwimLayout } from "@/core/theme/contract";
 import { requiredId } from "@/core/theme/required";
 import { linkKind, pageLabel, participantKind, stepEnds } from "@/core/words";
@@ -43,7 +43,11 @@ export function WorkOrder({ vm, required }: { vm: PageVMs["workOrder"]; required
         </span>
       ),
       render: (_: unknown, r: Row) =>
-        r.lanes.includes(l.key) ? <span className={s.inLane} title={`${l.title} · ${r.step.title}`}><KindTile kind={l.kind} size="sm" /></span> : null,
+        r.lanes.includes(l.key) ? (
+          <Tooltip title={`${l.title} · ${r.step.title}`}>
+            <span className={s.inLane} role="img" aria-label={`${l.title} · ${r.step.title}`}><KindTile kind={l.kind} size="sm" /></span>
+          </Tooltip>
+        ) : null,
     })),
   ];
   return (
@@ -60,6 +64,7 @@ export function WorkOrder({ vm, required }: { vm: PageVMs["workOrder"]; required
           pagination={false}
           expandable={{
             rowExpandable: (r) => r.handoffs.length > 0,
+            expandRowByClick: true,
             expandedRowRender: (r) => (
               <ol className={s.handoffs}>
                 {r.handoffs.map((h) => (

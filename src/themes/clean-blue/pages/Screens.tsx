@@ -23,7 +23,7 @@ export function Screens({ vm, required }: { vm: PageVMs["screens"]; required: Re
       <div className={s.grid2}>
         {vm.screens.map((sc) => (
           <Card key={sc.key} id={sc.key}
-            title={<span className={s.panelHead}><KindTile kind="screen" /><Req required={required} id={requiredId.screen(sc.key)}>{sc.title}</Req></span>}>
+            title={<h3 className={s.cardTitle}><KindTile kind="screen" /><Req required={required} id={requiredId.screen(sc.key)}>{sc.title}</Req></h3>}>
             <div className={s.decisionBody}>
               {sc.stuckWordings.map((t, i) => <p key={i} className={s.stuckNote}><WarningFilled aria-hidden />{t}</p>)}
               {sc.fields.length > 0 && (

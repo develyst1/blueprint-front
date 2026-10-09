@@ -688,13 +688,16 @@ ul.lg-item-stuck { display: grid; gap: 2px; }
   .lg-ready-gate { position: static; }
 }
 
-/* ---------- screen ② the chat (TASK-C-013): the composer and the minutes on the stage, the pack + the quiet edge on the plaque ---------- */
-/* DOM order: composer · plaque · minutes (the questions are read before the long conversation on a phone); at 1440 the
-   plaque stands beside both, sticky. */
-.lg-chat { grid-template-areas: "composer plaque" "log plaque"; row-gap: 24px; }
+/* ---------- screen ② the chat (TASK-C-013): the composer and the minutes on the stage; the pack, then the quiet edge, beside ---------- */
+/* DOM order = reading order: composer · pack · minutes · edge. At 1440 the pack and the edge share the right column:
+   the pack spans the composer's row and the next, the edge starts where the pack ends, the minutes start under the box.
+   No frame around the right column — cards inside a framed plaque were two frames competing with the box (critique
+   C-013 P1-a). */
+.lg-chat { grid-template-areas: "composer pack" "log pack" "log edge"; grid-template-rows: auto auto 1fr; row-gap: 24px; }
 .lg-chat-composer { grid-area: composer; display: grid; gap: 12px; min-width: 0; }
-.lg-chat-plaque { grid-area: plaque; position: sticky; top: 24px; align-self: start; gap: 20px; }
-.lg-chat-log { grid-area: log; display: grid; gap: 16px; min-width: 0; }
+.lg-chat .lg-pack { grid-area: pack; align-self: start; }
+.lg-chat-log { grid-area: log; display: grid; gap: 16px; align-content: start; min-width: 0; }
+.lg-chat .lg-chat-edge { grid-area: edge; align-self: start; }
 [data-theme-root="luxury-gold"] .lg-chat button { min-height: 44px; }
 
 /* the box: the page's one large surface — plaque radius, card edge, the writing set at reading size */
@@ -703,7 +706,7 @@ ul.lg-item-stuck { display: grid; gap: 2px; }
 [data-theme-root="luxury-gold"] .lg-chat-box textarea {
   min-height: 132px; padding: 18px 20px; resize: vertical;
   font-size: 18px; line-height: 1.7; color: var(--lg-ink);
-  background: var(--lg-surface); border: 1px solid var(--lg-card-edge); border-radius: var(--lg-r-plaque); box-shadow: none;
+  background: var(--lg-surface); border: 1px solid var(--lg-navy); border-radius: var(--lg-r-plaque); box-shadow: none;
 }
 [data-theme-root="luxury-gold"] .lg-chat-box textarea::placeholder { color: var(--lg-ink-2); }
 .lg-chat-form-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
@@ -720,7 +723,15 @@ ul.lg-item-stuck { display: grid; gap: 2px; }
 
 .lg-chat-status:empty { display: none; }
 .lg-chat-thinking { display: flex; gap: 16px; align-items: baseline; color: var(--lg-ink-2); font-weight: 500; }
-[data-theme-root="luxury-gold"] .lg-chat-alert { align-items: center; flex-wrap: wrap; gap: 12px; }
+/* the theme's alert: no shadow (direction § 3), the surface + an edge — wine for an error, card edge for the failed bot */
+/* a grid, not HeroUI's flex row: the words, then the buttons under them — a wrapped flex row spilled out of the box at
+   390 and sat under the pack (measured: alert 389–495, its buttons 494–538) */
+[data-theme-root="luxury-gold"] .lg-chat-alert {
+  display: grid; justify-items: start; gap: 10px; padding: 12px 16px;
+  background: var(--lg-surface); border: 1px solid var(--lg-card-edge); border-radius: var(--lg-r-card); box-shadow: none;
+}
+[data-theme-root="luxury-gold"] .lg-chat-alert.alert--danger { border-color: var(--lg-stuck); }
+[data-theme-root="luxury-gold"] .lg-chat-alert .alert__title { font-size: 16px; font-weight: 600; color: var(--lg-ink); }
 .lg-chat-refused { grid-column: 1 / -1; color: var(--lg-stuck); font-weight: 600; }
 
 /* the minutes: who spoke in a serif column, the words beside it; the bot drafts the brief, so it speaks in the serif */
@@ -733,6 +744,8 @@ ul.lg-item-stuck { display: grid; gap: 2px; }
 .lg-minutes-row[data-role="user"] .lg-chat-speaker { color: var(--lg-navy); }
 .lg-minutes-text { max-width: 68ch; font-size: 16px; line-height: 1.7; white-space: pre-wrap; overflow-wrap: anywhere; }
 .lg-minutes-row[data-role="bot"] .lg-minutes-text { font-family: var(--font-serif); font-size: 17px; line-height: 1.75; }
+/* a reply the bot could not give is a note, not a line of the brief: sans, secondary ink */
+.lg-minutes-row[data-failed] .lg-minutes-text { font-family: var(--font-sans); font-size: 16px; color: var(--lg-ink-2); }
 .lg-minutes-row[data-role="caw"] .lg-minutes-text { padding: 8px 14px; background: var(--lg-surface); border: 1px solid var(--lg-card-edge); border-radius: var(--lg-r-card); }
 .lg-minutes-day { display: flex; align-items: center; gap: 12px; padding: 18px 0 6px; font-family: var(--font-serif); font-size: 14px; color: var(--lg-ink-2); }
 .lg-minutes-day::after { content: ""; flex: 1; border-top: 1px solid var(--lg-gold-line); }
@@ -748,9 +761,10 @@ ul.lg-item-stuck { display: grid; gap: 2px; }
 /* the pack: cards on the plaque; the list scrolls inside at 1440 (5 px = the focus ring + its offset) */
 .lg-pack { display: grid; gap: 12px; }
 .lg-pack-list { display: grid; gap: 12px; max-height: min(58dvh, 640px); overflow-y: auto; padding: 5px; margin: -5px; border-radius: var(--lg-r-card); }
+/* each question is an entry under a hairline, not a card in a frame */
 [data-theme-root="luxury-gold"] .lg-pack-card {
-  display: grid; gap: 10px; padding: 16px 18px;
-  background: var(--lg-paper); border: 1px solid var(--lg-card-edge); border-radius: var(--lg-r-card); box-shadow: none;
+  display: grid; gap: 10px; padding: 14px 0 16px;
+  background: none; border: 0; border-top: 1px solid var(--lg-gold-line); border-radius: 0; box-shadow: none;
 }
 .lg-pack-question { font-family: var(--font-serif); font-size: 17px; font-weight: 600; line-height: 1.5; color: var(--lg-ink); }
 .lg-pack-answer { display: grid; gap: 2px; }
@@ -759,14 +773,13 @@ ul.lg-item-stuck { display: grid; gap: 2px; }
 .lg-pack-cases li::before { content: "– "; }
 .lg-pack-own { display: grid; gap: 8px; }
 .lg-pack-own-row { display: flex; gap: 8px; min-width: 0; }
-[data-theme-root="luxury-gold"] .lg-pack-accept { width: 100%; min-height: 48px; font-weight: 600; }
+[data-theme-root="luxury-gold"] .lg-pack-accept { justify-self: start; min-height: 44px; font-weight: 600; }
 .lg-chat-field { flex: 1 1 auto; min-width: 0; }
 [data-theme-root="luxury-gold"] .lg-chat-field input { min-height: 44px; font-size: 16px; border: 1px solid var(--lg-card-edge); background: var(--lg-surface); }
 [data-theme-root="luxury-gold"] .lg-chat-field-quiet input { border-style: dashed; }
 
 /* the quiet edge */
-.lg-chat-edge { display: grid; gap: 16px; }
-.lg-pack + .lg-chat-edge { padding-top: 16px; border-top: 1px solid var(--lg-gold-line); }
+.lg-chat-edge { display: grid; gap: 16px; padding-top: 16px; border-top: 1px solid var(--lg-gold-line); }
 .lg-chat-spec {
   justify-self: start; display: inline-flex; align-items: center; min-height: 44px;
   color: var(--lg-navy); font-weight: 600; text-decoration: underline; text-decoration-color: var(--lg-gold-line); text-underline-offset: 4px;
@@ -780,12 +793,13 @@ ul.lg-item-stuck { display: grid; gap: 2px; }
 [data-theme-root="luxury-gold"] .lg-chat-select .select__trigger { min-height: 44px; background: var(--lg-surface); border: 1px solid var(--lg-card-edge); box-shadow: none; }
 .lg-chat-slider { display: grid; gap: 6px; }
 .lg-chat-slider-head { display: flex; justify-content: space-between; align-items: baseline; }
-/* the thumb's own hit area: 44 px tall around the track */
-[data-theme-root="luxury-gold"] .lg-chat-slider .slider__track { min-height: 44px; }
+/* HeroUI's 20 px track stays as drawn; an invisible band 12 px above and below makes the pointer target 44 px */
+[data-theme-root="luxury-gold"] .lg-chat-slider .slider__track::before { content: ""; position: absolute; inset: -12px -12px; }
 
 @media (max-width: 900px) {
-  .lg-chat { grid-template-areas: "composer" "plaque" "log"; }
-  .lg-chat-plaque { position: static; }
+  /* one column in DOM order; no named areas, so a missing pack leaves no empty row (and no double gap) behind */
+  .lg-chat { grid-template-areas: none; grid-template-rows: none; }
+  .lg-chat > .lg-chat-composer, .lg-chat > .lg-pack, .lg-chat > .lg-chat-log, .lg-chat > .lg-chat-edge { grid-area: auto; }
   .lg-pack-list { max-height: none; overflow: visible; }
 }
 @media (max-width: 640px) {

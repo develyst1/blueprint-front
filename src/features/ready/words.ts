@@ -15,6 +15,9 @@ export const reasons = {
   notFull: "คะแนนยังไม่ถึง 100%",
   stale: "spec เปลี่ยนหลังทดสอบ ต้องทดสอบใหม่",
   tooFew: "ต้องตอบอย่างน้อย 5 ข้อ",
+  // added 2026-10-09 (REQ-007 lines 54–55: D-030, D-032)
+  confirmed: (n: number): string => `ยืนยันเวอร์ชัน ${n} แล้ว · ยังไม่มีอะไรเปลี่ยน`,
+  empty: "ยังไม่มีข้อมูลในโปรเจกต์นี้ · เริ่มที่แชต",
 } as const;
 export const confirmed = (n: number, date: string): string => `ยืนยันแล้ว เวอร์ชัน ${n} · ${date}`;
 export const changedSince = (n: number): string => `spec เปลี่ยนหลังเวอร์ชัน ${n}`;
@@ -25,7 +28,8 @@ export const startQuiz = "เริ่มทดสอบ";
 export const restartQuiz = "เริ่มทดสอบใหม่";
 export const ask = "ถาม";
 export const partsUsed = "ตอบจากส่วนเหล่านี้";
-export const scoreEarly = (m: number): string => `ตอบแล้ว ${m} ข้อ · ต้องอย่างน้อย 5 ข้อ`;
+// REQ-007 line 53 as amended by D-032 (2026-10-09): {m} counts the user's marks
+export const scoreEarly = (m: number): string => `ตรวจแล้ว ${m} ข้อ · ต้องตรวจอย่างน้อย 5 ข้อ`;
 // added 2026-10-09 (TASK-C-011 Q4, REQ-007 line 54) — the same text as the chat's, as screen ④'s own row
 export const botFailed = "บอทตอบไม่ได้ตอนนี้";
 export const retry = "ลองใหม่";

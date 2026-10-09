@@ -70,7 +70,7 @@ export function Web({ vm, required }: { vm: PageVMs["web"]; required: RequiredIt
           </div>
         </section>
         {sel && (
-          <Card title={<span className={s.panelHead}><KindTile kind={sel.kind} size="lg" /><span>{sel.title}</span></span>}>
+          <Card title={<h3 className={s.cardTitle}><KindTile kind={sel.kind} size="lg" /><span>{sel.title}</span></h3>}>
             <div className={s.decisionBody}>
               <div className={s.detailMeta}>
                 <Tag>{partKind[sel.kind]}</Tag>

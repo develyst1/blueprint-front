@@ -13,6 +13,9 @@ export interface ChatMessageVM {
   at: string;
   atLabel: string;
   roundStatus: string | null;
+  /** a bot row: the change set its round wrote (match it to `ChatVM.lastChange.changeSetId` to place the change card
+   *  under this reply); null for user / caw rows and bot rows that changed nothing (TASK-A-053) */
+  changeSetId: string | null;
 }
 
 /** One open question — a card of the pack (R2; REQ-003 Addendum A: with or without a proposed answer). */

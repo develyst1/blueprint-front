@@ -2,12 +2,12 @@
 
 // Every page opens the same way: its tile and its name, then (optionally) a chooser row on the right.
 import type { ReactNode } from "react";
-import type { PageId } from "@/core/theme/contract";
+import type { NavItemVM } from "@/core/theme/contract";
 import { pageLabel } from "@/core/words";
 import { PageTile } from "./Tile";
 import s from "./parts.module.css";
 
-export function PageHead({ page, children }: { page: PageId; children?: ReactNode }) {
+export function PageHead({ page, children }: { page: NavItemVM["page"]; children?: ReactNode }) {
   return (
     <div className={s.pageHead}>
       <h2 className={s.pageTitle}>

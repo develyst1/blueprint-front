@@ -20,7 +20,7 @@ export function Stuck({ vm, required }: { vm: PageVMs["stuck"]; required: Requir
           <li key={`${i.key}:${i.reason ?? i.kind}`} className={`${s.panel} ${s.stuckItem}`}>
             <StuckTile size="lg" />
             <div className={s.decisionBody}>
-              <p className={s.stuckWording}><Req required={required} id={requiredId.stuck(i)}>{i.wording}</Req></p>
+              <h3 className={s.stuckWording}><Req required={required} id={requiredId.stuck(i)}>{i.wording}</Req></h3>
               <div className={s.stuckMeta}>
                 <a href={i.target.href} className={s.linkTag}>{i.target.title}</a>
                 {i.title !== i.target.title && <span className={s.muted}>{i.title}</span>}

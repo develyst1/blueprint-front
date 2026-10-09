@@ -1,5 +1,5 @@
 // clean-blue — Team B's theme on Ant Design (TASK-B-008). Never "use client": the core's server pages read this
-// object; every piece it names is its own client file. Chat and ready fall back to the core's until TASK-B-013.
+// object; every piece it names is its own client file.
 import type { Theme } from "@/core/theme/contract";
 import { Root } from "./Root";
 import { Shell } from "./Shell";
@@ -15,6 +15,8 @@ import { Api } from "./pages/Api";
 import { Web } from "./pages/Web";
 import { Stuck } from "./pages/Stuck";
 import { History } from "./pages/History";
+import { Chat } from "./pages/Chat";
+import { Ready } from "./pages/Ready";
 
 export const theme: Theme = {
   id: "clean-blue",
@@ -24,5 +26,7 @@ export const theme: Theme = {
   card: Card,
   preview: Preview,
   state: State,
+  chat: Chat, // v1.9 — แชต on Team A's contract (TASK-B-013)
+  ready: Ready, // v1.10 — พร้อมสร้างหรือยัง on Team C's contract (TASK-B-013)
   pages: { overview: Overview, workOrder: WorkOrder, flowchart: Flowchart, sequence: Sequence, screens: Screens, api: Api, web: Web, stuck: Stuck, history: History },
 };

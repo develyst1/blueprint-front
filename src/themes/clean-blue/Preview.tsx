@@ -15,7 +15,12 @@ export function Preview({ sample }: { sample: PreviewVM }) {
         <Readiness readiness={sample.readiness} required={[]} />
       </div>
       <Steps size="small" orientation="vertical" current={-1}
-        items={sample.steps.map((st) => ({ title: `${st.number} ${st.title}`, status: st.stuck ? "error" : "wait" }))} />
+        items={sample.steps.map((st) => ({
+          title: st.title,
+          status: st.stuck ? "error" : "wait",
+          // the same number tile as the overview — not Ant's own index, and never its ✕ for a stuck step
+          icon: <span className={st.stuck ? `${s.num} ${s.numStuck}` : s.num}>{st.number}</span>,
+        }))} />
     </div>
   );
 }

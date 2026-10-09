@@ -6,11 +6,11 @@
 import { api } from "@/core/api/client";
 import type { components } from "@/core/api/schema";
 import { formatThaiDate } from "@/core/format/date";
-import { frame, href, webHref, works } from "@/core/model/build/common";
+import { chatHref, frame, href, webHref, works } from "@/core/model/build/common";
 import type { ProjectData } from "@/core/model/build/types";
 import { loadProjectData } from "@/core/model/load";
 import type { FrameVM, RequiredItem } from "@/core/theme/contract";
-import type { GateCode, ReadyQuizVM, ReadyVM } from "./contract";
+import type { ActionCode, GateCode, ReadyQuizVM, ReadyVM } from "./contract";
 import { readyRequiredId } from "./required";
 import { build, buildNotReady, reasons, score, scoreEarly } from "./words";
 
@@ -36,6 +36,23 @@ export async function call<T>(p: Promise<{ data?: T; error?: unknown; response: 
   } catch {
     return { ok: false, status: 0, body: null };
   }
+}
+
+/** blueprint-back's 409 codes (SPEC-A-004 § API) → the page's codes; the network → unreachable. Here, not in actions.ts:
+ *  a "use server" file may export only async functions, and this mapping is tested. */
+export function actionCode(r: Extract<CallResult<unknown>, { ok: false }>): ActionCode {
+  const code = (r.body as { error?: { code?: string } } | null)?.error?.code;
+  if (r.status === 0 || r.status >= 500) return "unreachable";
+  if (r.status === 409) {
+    if (code === "quiz_stale") return "stale";
+    if (code === "quiz_full") return "full";
+    if (code === "quiz_closed") return "closed";
+    if (code === "already_marked") return "already_marked";
+    if (code === "quiz_missing" || code === "quiz_not_100" || code === "confirm_blocked") return "blocked";
+    // TASK-A-050: an unchanged confirmed spec cannot be confirmed again; the refreshed page shows the `confirmed` state
+    if (code === "already_confirmed") return "already_confirmed";
+  }
+  return "invalid";
 }
 
 // ---------- pure mapping ----------
@@ -83,24 +100,35 @@ export function gateReasons(stuckCount: number, quiz: ReadyQuizVM | null, stuckH
   return out;
 }
 
+/** The whole gate (TASK-C-016): a project with no parts has one reason, `empty`, which leads to the chat (D-032);
+ *  otherwise the five reasons above; with none of them and a confirmed version nothing has changed since, the state
+ *  `confirmed` (D-030) — Confirm is off. Its link is the quiz that passed (#quiz): `href` stays a string, because every
+ *  theme's ready page links each reason (TASK-C-016 Interpreted; a theme may show this state as plain text). */
+export function gate(data: ProjectData, quiz: ReadyQuizVM | null, version: ReadyVM["version"]): ReadyVM["gate"] {
+  const id = data.project.id;
+  if (data.parts.length === 0) return { ok: false, reasons: [{ code: "empty", text: reasons.empty, href: chatHref(id) }] };
+  const out = gateReasons(data.stuck.length, quiz, href(id, "stuck"));
+  if (out.length === 0 && version && !version.changedSince) out.push({ code: "confirmed", text: reasons.confirmed(version.n), href: QUIZ_ANCHOR });
+  return { ok: out.length === 0, reasons: out };
+}
+
 export function buildReadyVM(input: { data: ProjectData; quiz: ApiQuiz | null; versions: ApiVersions["versions"]; changedSinceLatest?: boolean }): ReadyVM {
   const { data } = input;
   const id = data.project.id;
   const count = (kind: string) => data.parts.filter((p) => p.kind === kind).length;
   const stuckHref = href(id, "stuck");
   const quiz = toQuiz(data, input.quiz);
-  const gate = gateReasons(data.stuck.length, quiz, stuckHref);
   const last = input.versions.at(-1);
+  // changedSince: Team A's `changedSinceLatest` (SPEC-C-002 Q2 → TASK-A-032). Absent → false.
+  const version = last ? { n: last.version, dateLabel: formatThaiDate(last.confirmedAt), changedSince: input.changedSinceLatest === true } : null;
   return {
     frame: readyFrame(data),
     steps: works(data)[0]?.steps ?? [],
     counts: { screens: count("screen"), apis: count("api"), people: count("role") },
     stuck: { count: data.stuck.length, href: stuckHref },
     quiz,
-    gate: { ok: gate.length === 0, reasons: gate },
-    // changedSince: Team A's `changedSinceLatest` (SPEC-C-002 Q2 → TASK-A-032). Until the back end sends it, it is
-    // absent → false, and the line "spec เปลี่ยนหลังเวอร์ชัน {N}" stays hidden.
-    version: last ? { n: last.version, dateLabel: formatThaiDate(last.confirmedAt), changedSince: input.changedSinceLatest === true } : null,
+    gate: gate(data, quiz, version),
+    version,
     build: { enabled: false, label: build, reason: buildNotReady },
   };
 }

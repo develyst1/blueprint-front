@@ -13,8 +13,6 @@ import { KindTile } from "../parts/Tile";
 import { Refs } from "./Refs";
 import s from "./pages.module.css";
 
-// identity of the verb, always with its text beside it
-const methodColor: Record<string, string> = { GET: "green", POST: "blue", PUT: "purple", PATCH: "purple", DELETE: "magenta" };
 const json = (v: unknown) => JSON.stringify(v, null, 2);
 
 export function Api({ vm, required }: { vm: PageVMs["api"]; required: RequiredItem[] }) {
@@ -36,7 +34,7 @@ export function Api({ vm, required }: { vm: PageVMs["api"]; required: RequiredIt
                     <div className={s.decisionBody}>
                       {a.responses.map((r, i) => (
                         <div key={i} className={s.group}>
-                          <span><Tag color={r.status < 400 ? "green" : "orange"}>{r.status}</Tag>{r.note}</span>
+                          <span><Tag className={s.method}>{r.status}</Tag>{r.note}</span>
                           {r.body != null && <pre className={s.code} data-print="expand">{json(r.body)}</pre>}
                         </div>
                       ))}
@@ -47,10 +45,10 @@ export function Api({ vm, required }: { vm: PageVMs["api"]; required: RequiredIt
           ].map((it) => ({ ...it, extra: <span className={s.more}>{showMore}</span> }));
           return (
             <Card key={a.key} id={a.key}
-              title={<span className={s.panelHead}><KindTile kind="api" /><Req required={required} id={requiredId.api(a.key)}>{a.title}</Req></span>}>
+              title={<h3 className={s.cardTitle}><KindTile kind="api" /><Req required={required} id={requiredId.api(a.key)}>{a.title}</Req></h3>}>
               <div className={s.decisionBody}>
                 <span className={s.panelHead}>
-                  {a.method && <Tag color={methodColor[a.method.toUpperCase()] ?? "default"} className={s.method}>{a.method}</Tag>}
+                  {a.method && <Tag className={s.method}>{a.method}</Tag>}
                   <code className={s.path}>{a.path}</code>
                 </span>
                 {a.stuckWordings.map((t, i) => <p key={i} className={s.stuckNote}><WarningFilled aria-hidden />{t}</p>)}

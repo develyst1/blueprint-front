@@ -1,9 +1,9 @@
 // Screen ④'s loader mapping against fixture API responses (invented data, shaped as blueprint-back answers).
 import { describe, expect, test } from "bun:test";
 import type { ProjectData } from "@/core/model/build/types";
-import { buildReadyVM, gateReasons, toQuiz, MAX_ANSWERED, QUIZ_ANCHOR, type ApiQuiz, type ApiQuizItem, type ApiVersions } from "./load";
+import { actionCode, buildReadyVM, gate, gateReasons, toQuiz, MAX_ANSWERED, QUIZ_ANCHOR, type ApiQuiz, type ApiQuizItem, type ApiVersions } from "./load";
 import { readyRequiredId } from "./required";
-import { build, buildNotReady, reasons } from "./words";
+import { build, buildNotReady, reasons, scoreEarly } from "./words";
 
 const origin = { stamp: "team-proposed" as const, date: "2026-10-09" };
 const part = (key: string, kind: string, title = `ส่วน ${key}`) =>
@@ -109,7 +109,8 @@ describe("summary, version, build", () => {
       versions: [version(1, "2026-10-08T03:00:00.000Z"), version(2, "2026-10-09T03:00:00.000Z")],
     });
     expect(vm.version).toEqual({ n: 2, dateLabel: "9 ต.ค. 2569", changedSince: false });
-    expect(vm.gate).toEqual({ ok: true, reasons: [] });
+    // clean and confirmed, nothing changed since: the gate's state is `confirmed` and Confirm is off (D-030)
+    expect(vm.gate).toEqual({ ok: false, reasons: [{ code: "confirmed", text: reasons.confirmed(2), href: QUIZ_ANCHOR }] });
     expect(buildReadyVM({ data: data(), quiz: null, versions: [] }).version).toBeNull();
   });
 
@@ -128,5 +129,51 @@ describe("readyRequiredId (TASK-C-014 — moved to ./required, strings unchanged
   test("the same id strings as before the move", () => {
     expect(readyRequiredId.reason("stuck")).toBe("ready:reason:stuck");
     expect(readyRequiredId.score).toBe("ready:score");
+  });
+});
+
+describe("gate states `empty` and `confirmed` (TASK-C-016, D-030, D-032)", () => {
+  const confirmedV1 = { n: 1, dateLabel: "9 ต.ค. 2569", changedSince: false };
+  const empty = (): ProjectData => ({ ...data(), parts: [], links: [] });
+
+  test("empty project → `empty` is the only reason, and it leads to the chat", () => {
+    expect(gate(empty(), null, null)).toEqual({ ok: false, reasons: [{ code: "empty", text: reasons.empty, href: "/p/p-1/chat" }] });
+    // alone even when other reasons would apply (stuck, a quiz, a version)
+    const r = gate({ ...empty(), stuck: [stuckItem("Q-1")] }, toQuiz(data(), quiz(marks(3))), confirmedV1);
+    expect(r.reasons.map((x) => x.code)).toEqual(["empty"]);
+    expect(buildReadyVM({ data: empty(), quiz: null, versions: [] }).gate.reasons.map((x) => x.code)).toEqual(["empty"]);
+  });
+
+  test("confirmed + unchanged + nothing else blocks → `confirmed`, Confirm off; its link is the quiz that passed", () => {
+    expect(gate(data(), toQuiz(data(), quiz(marks(5))), confirmedV1)).toEqual({
+      ok: false, reasons: [{ code: "confirmed", text: reasons.confirmed(1), href: QUIZ_ANCHOR }],
+    });
+  });
+
+  test("`confirmed` is gone once the spec changed, and never shown beside another reason", () => {
+    const clean = toQuiz(data(), quiz(marks(5)));
+    expect(gate(data(), clean, { ...confirmedV1, changedSince: true })).toEqual({ ok: true, reasons: [] });
+    expect(gate(data(), toQuiz(data(), quiz(marks(5), { stale: true })), confirmedV1).reasons.map((x) => x.code)).toEqual(["stale"]);
+    expect(gate(data([stuckItem("Q-1")]), clean, confirmedV1).reasons.map((x) => x.code)).toEqual(["stuck"]);
+    expect(gate(data(), clean, null)).toEqual({ ok: true, reasons: [] });
+  });
+
+  test("REQ-007's new words, verbatim (lines 53–55)", () => {
+    expect(scoreEarly(3)).toBe("ตรวจแล้ว 3 ข้อ · ต้องตรวจอย่างน้อย 5 ข้อ");
+    expect(reasons.confirmed(1)).toBe("ยืนยันเวอร์ชัน 1 แล้ว · ยังไม่มีอะไรเปลี่ยน");
+    expect(reasons.empty).toBe("ยังไม่มีข้อมูลในโปรเจกต์นี้ · เริ่มที่แชต");
+  });
+});
+
+describe("action codes (blueprint-back 409s → the page's codes)", () => {
+  const conflict = (code: string, details?: unknown) => ({ ok: false as const, status: 409, body: { error: { code, message: "", details } } });
+  test("409 already_confirmed {version} → `already_confirmed` (TASK-A-050)", () => {
+    expect(actionCode(conflict("already_confirmed", { version: 1 }))).toBe("already_confirmed");
+  });
+  test("the existing codes are unchanged", () => {
+    expect(actionCode(conflict("quiz_stale"))).toBe("stale");
+    expect(actionCode(conflict("confirm_blocked"))).toBe("blocked");
+    expect(actionCode({ ok: false, status: 0, body: null })).toBe("unreachable");
+    expect(actionCode({ ok: false, status: 400, body: null })).toBe("invalid");
   });
 });

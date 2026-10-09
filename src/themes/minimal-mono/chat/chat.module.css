@@ -179,6 +179,12 @@
   overflow-wrap: anywhere;
 }
 
+/* ยกเลิก (D-034): the quiet way out, after the two choices — 44 px both ways */
+.cancel {
+  min-width: 44px;
+  padding: 0 12px;
+}
+
 /* ---------- the question pack ---------- */
 .pack {
   display: flex;

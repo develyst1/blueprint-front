@@ -10,7 +10,7 @@ import { requiredProps } from "@/core/theme/required";
 import { proposedAnswer as proposedAnswerWord, showMore } from "@/core/words";
 import type { ActionCode, ActionResult, ChatPageProps, ChatQuestionVM, ChatSourceVM } from "./contract";
 import {
-  acceptAll, acceptPack, actionError, answerOwn, botFailed, botSuggests, changeCard, chatPlaceholder, chooseFile, creativityLabel,
+  acceptAll, cancel, acceptPack, actionError, answerOwn, botFailed, botSuggests, changeCard, chatPlaceholder, chooseFile, creativityLabel,
   enterHint, logName, modelLabel, notNeeded, originChoices, packName, reasonOptional, send as sendWord, sourceFailed,
   sourceState, speaker, thinking, toSpec, tryAgain, undoRefused, uploadAsks,
 } from "./words";
@@ -164,6 +164,7 @@ export function DefaultChat({ vm, actions, required }: ChatPageProps) {
   const box = useRef<HTMLTextAreaElement>(null);
   const model = useRef<HTMLSelectElement>(null);
   const fileInput = useRef<HTMLInputElement>(null);
+  const fileButton = useRef<HTMLButtonElement>(null);
   const ids = { model: useId(), creativity: useId(), origin: useId(), hint: useId() };
 
   useEffect(() => setCreativity(vm.creativity), [vm.creativity]);
@@ -196,6 +197,11 @@ export function DefaultChat({ vm, actions, required }: ChatPageProps) {
       // only a connection failure is worth trying again as is; the others need a different file
       setFailure(word ? { word, again: !r.ok && r.code === "unreachable" ? () => upload(stamp, f) : null } : null);
     });
+  };
+  // ยกเลิก / Escape on "ไฟล์นี้มาจากใคร" (D-034): the question closes, nothing is uploaded, focus goes back to เลือกไฟล์
+  const cancelUpload = () => {
+    setFile(null);
+    fileButton.current?.focus();
   };
   const undo = (changeSetId: string) => {
     setFailure(null);
@@ -244,14 +250,14 @@ export function DefaultChat({ vm, actions, required }: ChatPageProps) {
               aria-hidden="true"
               onChange={(e) => { const f = e.target.files?.[0]; if (f) setFile(f); e.target.value = ""; }}
             />
-            <button type="button" className={s.secondary} onClick={() => fileInput.current?.click()}>{chooseFile}</button>
+            <button ref={fileButton} type="button" className={s.secondary} onClick={() => fileInput.current?.click()}>{chooseFile}</button>
             <button type="submit" className={s.primary} disabled={pending || !text.trim()}>{sendWord}</button>
           </div>
         </div>
       </form>
 
       {file ? (
-        <div role="group" aria-labelledby={ids.origin} className={s.origin} onKeyDown={(e) => { if (e.key === "Escape") setFile(null); }}>
+        <div role="group" aria-labelledby={ids.origin} className={s.origin} onKeyDown={(e) => { if (e.key === "Escape") cancelUpload(); }}>
           <p id={ids.origin} className={s.originAsk}>{uploadAsks}</p>
           <p className={s.originFile}>{file.name}</p>
           <div className={s.row}>
@@ -260,6 +266,7 @@ export function DefaultChat({ vm, actions, required }: ChatPageProps) {
                 {o.label}
               </button>
             ))}
+            <button type="button" className={`${s.textButton} ${s.cancel}`} onClick={cancelUpload}>{cancel}</button>
           </div>
         </div>
       ) : null}

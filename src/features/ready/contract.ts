@@ -3,7 +3,9 @@
 // `Theme.ready` (SPEC-C-002 ask 1) these are imported from here; afterwards the core re-exports them.
 import type { FrameVM, RequiredItem, StepVM } from "@/core/theme/contract";
 
-export type GateCode = "stuck" | "no_quiz" | "too_few" | "not_100" | "stale";
+/** `empty` (no parts — the only reason, leads to the chat) and `confirmed` (an unchanged confirmed version — a state,
+ *  shown only when nothing else blocks): TASK-C-016, D-030, D-032. */
+export type GateCode = "empty" | "stuck" | "no_quiz" | "too_few" | "not_100" | "stale" | "confirmed";
 
 export interface ReadyQuizItemVM {
   id: string;
@@ -44,7 +46,7 @@ export interface ReadyVM {
   build: { enabled: false; label: string; reason: string };
 }
 
-export type ActionCode = "stale" | "full" | "closed" | "already_marked" | "invalid" | "blocked" | "unreachable";
+export type ActionCode = "stale" | "full" | "closed" | "already_marked" | "invalid" | "blocked" | "already_confirmed" | "unreachable";
 export type ActionResult = { ok: true } | { ok: false; code: ActionCode };
 
 export interface ReadyActions {

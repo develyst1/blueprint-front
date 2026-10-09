@@ -6,22 +6,8 @@
 // Calls go through the core's typed client (`gen:api`, TASK-B-011).
 import { refresh } from "next/cache";
 import { api } from "@/core/api/client";
-import type { ActionCode, ActionResult } from "./contract";
-import { call, type ApiQuiz, type CallResult } from "./load";
-
-/** blueprint-back's 409 codes (SPEC-A-004 § API) → the page's codes; the network → unreachable. */
-function codeOf(r: Extract<CallResult<unknown>, { ok: false }>): ActionCode {
-  const code = (r.body as { error?: { code?: string } } | null)?.error?.code;
-  if (r.status === 0 || r.status >= 500) return "unreachable";
-  if (r.status === 409) {
-    if (code === "quiz_stale") return "stale";
-    if (code === "quiz_full") return "full";
-    if (code === "quiz_closed") return "closed";
-    if (code === "already_marked") return "already_marked";
-    if (code === "quiz_missing" || code === "quiz_not_100" || code === "confirm_blocked") return "blocked";
-  }
-  return "invalid";
-}
+import type { ActionResult } from "./contract";
+import { actionCode as codeOf, call, type ApiQuiz, type CallResult } from "./load";
 
 function done(r: CallResult<unknown>): ActionResult {
   refresh();
@@ -68,7 +54,8 @@ export async function markAction(projectId: string, itemId: string, mark: "right
  *  shown as a word. */
 const CONFIRMED_BY = "operator";
 
-/** ยืนยัน 100% — POST …/versions. A 409 comes back as `blocked`. */
+/** ยืนยัน 100% — POST …/versions. A 409 comes back as `blocked`, or `already_confirmed` for an unchanged confirmed spec
+ *  (TASK-A-050) — the refreshed page then shows the `confirmed` state (D-030). */
 export async function confirmAction(projectId: string): Promise<ActionResult> {
   return done(await call(api.POST("/v1/projects/{projectId}/versions", {
     params: { path: { projectId } },

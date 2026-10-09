@@ -1,0 +1,28 @@
+/* ส่งออก PDF's own neutral default (TASK-A-051): readable in a theme that does not style it, invisible where one does.
+   Every rule is wrapped in :where(), so it has zero specificity — any theme rule that targets this button wins
+   (minimal-mono's `.tools button`), and the theme's font and colour come through (inherit / currentColor). */
+
+:where(.button) {
+  box-sizing: border-box;
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0 14px;
+  border: 1.5px solid currentColor;
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+:where(.button):focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+/* busy (กำลังสร้าง PDF…): dashed = "not now" */
+:where(.button):disabled {
+  border-style: dashed;
+  cursor: default;
+}
