@@ -99,7 +99,7 @@
 
 /* ---------- work order ---------- */
 .laneHead { display: grid; justify-items: center; gap: 6px; text-align: center; font-weight: 600; min-width: 96px; }
-.laneKind { font-size: 13px; font-weight: 500; color: var(--cb-ink2); }
+.laneKind { font-size: 14px; font-weight: 500; color: var(--cb-ink2); }
 .rowHead { display: flex; align-items: center; gap: 12px; font-weight: 600; min-width: 200px; }
 .num {
   display: inline-grid;
@@ -153,14 +153,20 @@
   border-radius: var(--cb-r-tile);
   background: var(--cb-canvas);
   font-family: ui-monospace, Menlo, Consolas, monospace;
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.5;
 }
 
 /* ---------- history ---------- */
 .historyLayout { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 20px; align-items: start; }
-@media (max-width: 1000px) { .historyLayout { grid-template-columns: minmax(0, 1fr); } }
-.partList { display: grid; gap: 4px; max-height: 70vh; overflow: auto; }
+@media (max-width: 1000px) {
+  .historyLayout { grid-template-columns: minmax(0, 1fr); }
+  /* on a phone the list you pick from comes first, with no scroll box of its own (row 8) */
+  .historyLayout > nav { order: -1; }
+}
+.partList { display: grid; gap: 4px; max-height: 70vh; overflow: auto; padding: 4px; } /* 4 px: rings not cut (row 11) */
+/* on a phone the list has no scroll box of its own (row 8) — after the base rule, so it wins */
+@media (max-width: 1000px) { .partList { max-height: none; overflow: visible; } }
 .partLink {
   display: flex;
   align-items: center;
@@ -215,3 +221,37 @@
   .stuckItem { gap: 12px; }
 }
 .answer { margin: 0 !important; }
+
+/* ---------- B-019 (REVIEW-A-004) ---------- */
+.stuckSteps { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.stuckStep { display: inline-block; padding: 10px 4px; margin: -10px -4px; color: var(--cb-stuck) !important; font-weight: 600; } /* ≥ 44 px target */
+.stuckLink { justify-self: start; min-height: 44px; align-items: center; text-decoration: none; font-weight: 600; }
+.stuckLink:hover { text-decoration: underline; }
+.stepText { display: inline-grid; gap: 2px; justify-items: start; }
+.chipWarn { color: var(--cb-stuck); }
+.pill[aria-current="page"] .chipWarn { color: var(--cb-paper); }
+.nodeGlyph { display: grid; place-items: center; width: 14px; height: 14px; font-size: 12px; line-height: 1; }
+.emptyState { display: grid; justify-items: center; gap: 16px; padding: 48px 24px; text-align: center; }
+.partLinkChip {
+  display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 4px 14px; border-radius: 999px;
+  border: 1px solid var(--cb-line); background: var(--cb-paper); color: var(--cb-blue) !important; text-decoration: underline;
+  text-underline-offset: 3px; font-size: 14px;
+}
+.partLinkChip:hover { border-color: var(--cb-blue); }
+.stuckList { max-width: 880px; }
+
+/* ลำดับงาน: one card per step on a phone, the table above that (row 1) */
+.phoneOnly { display: none; }
+@media (max-width: 640px) {
+  .phoneOnly { display: grid; }
+  .tableOnly { display: none; }
+  .partLinkChip { min-height: 44px; }
+}
+.stepCards { gap: 12px; margin: 0; padding: 0; list-style: none; }
+.laneChips { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.laneChip { display: inline-flex; align-items: center; gap: 8px; padding: 4px 12px 4px 4px; border-radius: 999px; background: var(--cb-canvas); }
+
+/* every Steps connector the same: the amber step and its words carry stuck, not a "progress" rail (row 16) */
+.journey :global(.ant-steps-item-rail),
+.journey :global(.ant-steps-item-rail::before),
+.journey :global(.ant-steps-item-rail::after) { background-color: var(--cb-line) !important; border-color: var(--cb-line) !important; }

@@ -12,7 +12,7 @@ import { Alert, Button, TextArea, TextField } from "@heroui/react";
 import { Fragment, useId, useRef, useState, useTransition, type FormEvent, type KeyboardEvent } from "react";
 import type { ChatActions, ChatPageProps } from "@/core/theme/contract";
 import {
-  actionError, botFailed, changeCard, chatPlaceholder, chooseFile, enterHint, logName, navChat, originChoices, send as sendWord,
+  actionError, botFailed, cancel, changeCard, chatPlaceholder, chooseFile, enterHint, logName, navChat, originChoices, send as sendWord,
   speaker, thinking, tryAgain, undoRefused, uploadAsks,
 } from "@/features/chat/words";
 import { ChatEdge } from "./ChatEdge";
@@ -33,6 +33,7 @@ export function ChatDesk({ vm, actions, required }: ChatPageProps) {
   const [reading, setReading] = useState<string | null>(null);
   const fileInput = useRef<HTMLInputElement>(null);
   const modelRef = useRef<HTMLButtonElement>(null);
+  const chooseRef = useRef<HTMLButtonElement>(null);
   const ids = { hint: useId(), origin: useId() };
 
   // fn first, then after: `after?.(await fn())` would skip fn whenever after is absent (optional call short-circuits)
@@ -77,8 +78,14 @@ export function ChatDesk({ vm, actions, required }: ChatPageProps) {
   const newestBot = [...vm.messages].reverse().find((m) => m.role === "bot");
   // empty rows (a park-only turn) never get a line; nor does the newest failed reply while its alert says the same
   const minutes = [...vm.messages].reverse().filter((m) => m.text.trim() !== "" && !(vm.failed && !pending && m.id === newestBot?.id));
-  // the change card goes under the newest bot line that answered — never under a failed one (critique C-013 P1-b)
-  const changeAfter = vm.lastChange ? minutes.find((m) => m.role === "bot" && !isFailed(m))?.id ?? null : null;
+  // the change card goes under the line whose round wrote that change set (TASK-A-053 `changeSetId`, C-013 Q1); a set
+  // whose line is not among the newest 50 is shown above the minutes
+  const changeAfter = vm.lastChange ? minutes.find((m) => m.changeSetId === vm.lastChange!.changeSetId)?.id ?? null : null;
+  // D-034: leaving the origin question adds no file; focus goes back to the button that opened it
+  const closeOrigin = () => {
+    setFile(null);
+    chooseRef.current?.focus();
+  };
   const change = vm.lastChange && (
     <div className="lg-chat-change">
       <p className="lg-chat-change-counts">
@@ -100,7 +107,7 @@ export function ChatDesk({ vm, actions, required }: ChatPageProps) {
       <h1 className="lg-sr-only">{navChat}</h1>
 
       <section className="lg-chat-composer">
-        <form className="lg-chat-form" onSubmit={send}>
+        <form className="lg-chat-form" onSubmit={send} data-print="screen-only">
           <TextField className="lg-chat-box" value={text} onChange={setText} aria-label={chatPlaceholder} aria-describedby={ids.hint}>
             <TextArea
               rows={4}
@@ -124,13 +131,13 @@ export function ChatDesk({ vm, actions, required }: ChatPageProps) {
               aria-hidden="true"
               onChange={(e) => { const f = e.target.files?.[0]; if (f) setFile(f); e.target.value = ""; }}
             />
-            <Button variant="secondary" isDisabled={pending} onPress={() => fileInput.current?.click()}>{chooseFile}</Button>
+            <Button ref={chooseRef} variant="secondary" isDisabled={pending} onPress={() => fileInput.current?.click()}>{chooseFile}</Button>
             <Button type="submit" variant="primary" isDisabled={pending || !text.trim()}>{sendWord}</Button>
           </div>
         </form>
 
         {file && (
-          <div role="group" aria-labelledby={ids.origin} className="lg-chat-origin" onKeyDown={(e) => { if (e.key === "Escape") setFile(null); }}>
+          <div role="group" aria-labelledby={ids.origin} className="lg-chat-origin" onKeyDown={(e) => { if (e.key === "Escape") closeOrigin(); }}>
             <p id={ids.origin} className="lg-chat-origin-ask">{uploadAsks}</p>
             <p className="lg-chat-origin-file">{file.name}</p>
             <div className="lg-chat-origin-row">
@@ -139,6 +146,7 @@ export function ChatDesk({ vm, actions, required }: ChatPageProps) {
                   {o.label}
                 </Button>
               ))}
+              <Button variant="tertiary" onPress={closeOrigin}>{cancel}</Button>
             </div>
           </div>
         )}

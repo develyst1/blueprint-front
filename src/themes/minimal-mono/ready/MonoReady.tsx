@@ -131,11 +131,27 @@ function AskBox({ hasQuiz, restart, actions }: { hasQuiz: boolean; restart: bool
   );
 }
 
-function Confirm({ enabled, actions }: { enabled: boolean; actions: ReadyActions }) {
+/** ยืนยัน 100% — or, when the newest version is confirmed and nothing has changed (gate code `confirmed`, D-030), the same
+ *  button off and reading that state's words. A confirm that comes back `already_confirmed` (another tab got there
+ *  first) shows the same words until the page refreshes. `attrs` = the state's required-item marks, on its words. */
+function Confirm({ enabled, done, alreadyWords, attrs, actions }: {
+  enabled: boolean; done: string | null; alreadyWords: string | null; attrs: Record<string, string>; actions: ReadyActions;
+}) {
   const [busy, start] = useTransition();
+  const [already, setAlready] = useState<string | null>(null);
+  const words = done ?? already;
   return (
-    <Button variant="default" radius="md" h={48} className={s.confirm} disabled={!enabled || busy} onClick={() => start(async () => { await actions.confirm(); })}>
-      {confirmWord}
+    <Button
+      variant="default"
+      radius="md"
+      className={s.confirm}
+      disabled={!enabled || busy || words !== null}
+      onClick={() => start(async () => {
+        const r = await actions.confirm();
+        if (!r.ok && r.code === "already_confirmed" && done === null) setAlready(alreadyWords);
+      })}
+    >
+      {words ? <span {...(done ? attrs : {})}>{words}</span> : confirmWord}
     </Button>
   );
 }
@@ -148,6 +164,11 @@ export function MonoReady({ vm, actions, required }: ReadyPageProps) {
   const scoreLine = q ? (q.score !== null ? score(q.score, q.marked) : scoreEarly(q.marked)) : null;
   const scoreAttrs = scoreLine ? picker.take(scoreLine) : {};
   const reasonAttrs = new Map(vm.gate.reasons.map((r) => [r.code, picker.take(r.text)]));
+  // C-016 states: `confirmed` is drawn as the Confirm button's own words (not a link under it); `empty` is the only
+  // reason and leads to the chat, so the quiz is not offered beside it (D-032)
+  const done = vm.gate.reasons.find((r) => r.code === "confirmed")?.text ?? null;
+  const empty = vm.gate.reasons.some((r) => r.code === "empty");
+  const links = vm.gate.reasons.filter((r) => r.code !== "confirmed");
   const leftover = picker.rest();
   const counts = [
     { kind: "screen" as const, n: vm.counts.screens, word: pageLabel.screens },
@@ -190,10 +211,16 @@ export function MonoReady({ vm, actions, required }: ReadyPageProps) {
 
       {/* the gate (R3) and Build (R5): the page's answer */}
       <Paper radius="lg" p="lg" className={s.gate} component="section">
-        <Confirm enabled={vm.gate.ok} actions={actions} />
-        {vm.gate.reasons.length ? (
+        <Confirm
+          enabled={vm.gate.ok}
+          done={done}
+          alreadyWords={vm.version ? reasonWords.confirmed(vm.version.n) : null}
+          attrs={reasonAttrs.get("confirmed") ?? {}}
+          actions={actions}
+        />
+        {links.length ? (
           <ul className={s.reasons}>
-            {vm.gate.reasons.map((r) => (
+            {links.map((r) => (
               <li key={r.code}>
                 <a href={r.href} className={s.reason} {...(reasonAttrs.get(r.code) ?? {})}>
                   {r.text}
@@ -212,11 +239,13 @@ export function MonoReady({ vm, actions, required }: ReadyPageProps) {
         </div>
       </Paper>
 
-      {/* the quiz (R2) */}
+      {/* the quiz (R2) — not on an empty project: its one way on is the chat (D-032) */}
+      {empty ? null : (
       <section id="quiz" className={s.quiz} aria-labelledby="mono-ready-quiz">
         <h3 id="mono-ready-quiz" className={s.h3}>{quizHeading}</h3>
         <p id="mono-ready-hint" className={s.hint}>{quizHint}</p>
-        {scoreLine ? <p className={s.score} {...scoreAttrs}>{scoreLine}</p> : null}
+        {/* a stale quiz's score is history: quiet, so the gate's stale reason leads (REVIEW-A-003 row 2) */}
+        {scoreLine ? <p className={q?.stale ? s.scoreStale : s.score} {...scoreAttrs}>{scoreLine}</p> : null}
         <AskBox hasQuiz={q !== null} restart={q !== null && (q.stale || q.full)} actions={actions} />
         {q && q.items.length ? (
           <ol className={s.items}>
@@ -249,6 +278,7 @@ export function MonoReady({ vm, actions, required }: ReadyPageProps) {
           </ol>
         ) : null}
       </section>
+      )}
 
       <RequiredList items={leftover} />
     </div>

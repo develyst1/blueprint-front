@@ -2,9 +2,10 @@
 
 // พร้อมสร้างหรือยัง in clean-blue (TASK-B-013, REQ-007 on Team C's contract). The picture first — the work as the
 // overview's journey, three count tiles, what is stuck, the confirmed version — then the quiz card, then the gate card:
-// ยืนยัน 100% as the one primary button, every reason it is off as an amber link, and Build, off, with its reason.
+// ยืนยัน 100% as the one primary button, every reason it is off as an amber link (`confirmed` in the done tone), and
+// Build, off, with its reason.
 // Words only from Team C's ready words and @/core/words; every action is Team C's.
-import { WarningFilled } from "@ant-design/icons";
+import { CheckCircleFilled, MessageOutlined, WarningFilled } from "@ant-design/icons";
 import { Button, Card, Input, Steps, Tag, Typography } from "antd";
 import { useState, useTransition } from "react";
 import type { ReadyPageProps } from "@/core/theme/contract";
@@ -92,12 +93,16 @@ export function Ready({ vm, actions, required }: ReadyPageProps) {
       {/* the picture first (R1) */}
       <section className={`${p.panel} ${s.summary}`}>
         {vm.steps.length > 0 && (
-          <Steps size="small" current={-1} className={s.steps}
-            items={vm.steps.map((st) => ({
-              title: st.title,
-              status: st.stuck ? "error" : "wait",
-              icon: <span className={st.stuck ? `${p.num} ${p.numStuck}` : p.num}>{st.number}</span>,
-            }))} />
+          // past 7 steps the row scrolls and each title keeps ~120 px, instead of squeezing to two short lines (row 16)
+          <div className={s.stepsRow} tabIndex={vm.steps.length > 7 ? 0 : undefined} role={vm.steps.length > 7 ? "region" : undefined}
+            aria-label={vm.steps.length > 7 ? pageLabel.overview : undefined}>
+            <Steps size="small" current={-1} className={s.steps} style={vm.steps.length > 7 ? { minWidth: vm.steps.length * 120 } : undefined}
+              items={vm.steps.map((st) => ({
+                title: st.title,
+                status: st.stuck ? "error" : "wait",
+                icon: <span className={st.stuck ? `${p.num} ${p.numStuck}` : p.num}>{st.number}</span>,
+              }))} />
+          </div>
         )}
         <ul className={s.counts}>
           <li className={s.count}><KindTile kind="screen" size="lg" /><span className={s.countN}>{vm.counts.screens}</span><span>{pageLabel.screens}</span></li>
@@ -155,8 +160,10 @@ export function Ready({ vm, actions, required }: ReadyPageProps) {
             <ul className={s.reasons}>
               {vm.gate.reasons.map((r) => (
                 <li key={r.code}>
-                  <a href={r.href} className={s.reason}>
-                    <WarningFilled aria-hidden />
+                  {/* `confirmed` is a state (TASK-B-020 Q1) and `empty` a next step — the chat (TASK-B-019, C-016): neither is
+                      stuck, so the blue tone and no ⚠; each keeps its link */}
+                  <a href={r.href} className={r.code === "confirmed" || r.code === "empty" ? `${s.reason} ${s.reasonDone}` : s.reason}>
+                    {r.code === "confirmed" ? <CheckCircleFilled aria-hidden /> : r.code === "empty" ? <MessageOutlined aria-hidden /> : <WarningFilled aria-hidden />}
                     <Req required={required} id={requiredId.readyReason(r.code)}>{r.text}</Req>
                   </a>
                 </li>

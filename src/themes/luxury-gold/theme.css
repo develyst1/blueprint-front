@@ -231,6 +231,15 @@ button.lg-medallion:hover,
 .lg-nav-link:hover { background: var(--lg-paper); color: var(--lg-ink); }
 .lg-nav-link[aria-current="page"] { background: var(--lg-navy); color: var(--lg-gold-light); font-weight: 600; }
 .lg-stage { min-width: 0; padding: 40px 48px 64px; }
+/* tools (contract v1.11): the core's PDF export beside the readiness — a quiet outlined pill in the theme's edge and
+   navy ink, so it never competes with a page's own primary action. Its own module style has zero specificity. */
+.lg-shell-tools { display: flex; }
+[data-theme-root="luxury-gold"] .lg-shell-tools button {
+  min-height: 44px; padding: 0 16px; font: inherit; font-size: 15px; font-weight: 600; color: var(--lg-navy); cursor: pointer;
+  background: var(--lg-surface); border: 1px solid var(--lg-card-edge); border-radius: 999px;
+}
+[data-theme-root="luxury-gold"] .lg-shell-tools button:hover { border-color: var(--lg-navy); }
+[data-theme-root="luxury-gold"] .lg-shell-tools button:disabled { color: var(--lg-ink-2); border-style: dashed; cursor: progress; }
 
 @media (max-width: 640px) {
   .lg-shell { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto 1fr; align-content: start; }
@@ -242,6 +251,17 @@ button.lg-medallion:hover,
   .lg-wordmark { display: none; }
   .lg-spine-project { font-size: 17px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .lg-spine-readiness { justify-items: end; }
+  /* with tools (v1.11): the project keeps the first row beside the seal; the tools open the second row, before the page
+     strip (their DOM order too, so Tab follows the eye) — the bar does not grow, and the name is not cut to a stub
+     (measured 86 px when the tools shared the first row) */
+  .lg-spine:has(.lg-shell-tools) { grid-template-columns: auto minmax(0, 1fr) auto; grid-template-areas: "project project seal" "tools nav nav"; }
+  .lg-spine:has(.lg-shell-tools) .lg-spine-readiness { display: contents; }
+  .lg-spine:has(.lg-shell-tools) .lg-spine-project { grid-area: project; }
+  .lg-spine:has(.lg-shell-tools) .lg-readiness { grid-area: seal; justify-self: end; }
+  .lg-spine:has(.lg-shell-tools) .lg-spine-required { grid-column: 1 / -1; }
+  .lg-spine:has(.lg-shell-tools) .lg-shell-tools { grid-area: tools; padding-bottom: 8px; }
+  .lg-spine:has(.lg-shell-tools) .lg-nav { grid-area: nav; margin: 0 -16px 0 0; }
+  .lg-spine:has(.lg-shell-tools) .lg-nav-list { padding-left: 5px; }
   .lg-nav { grid-column: 1 / -1; margin: 0 -16px; }
   .lg-nav-list { display: flex; gap: 4px; padding: 5px 16px 8px; width: max-content; }
   .lg-nav-link { white-space: nowrap; }
@@ -662,8 +682,10 @@ ul.lg-item-stuck { display: grid; gap: 2px; }
 [data-theme-root="luxury-gold"] .lg-ready-field[data-disabled] input { background: var(--lg-paper); border-style: dashed; color: var(--lg-ink-2); }
 /* every control on this page is a 44 px target (HeroUI's default buttons are 36–40 px) */
 [data-theme-root="luxury-gold"] .lg-ready button { min-height: 44px; }
-/* an off Confirm looks like the off Build (paper, dashed edge, ink-2) — not a half-faded primary at 3:1 */
-[data-theme-root="luxury-gold"] .lg-ready-confirm[data-disabled] {
+/* an off Confirm looks like the off Build (paper, dashed edge, ink-2) — not a half-faded primary at 3:1. Confirm stays a
+   Tab stop when off (`data-off` + aria-disabled, TASK-C-016 row 5); the off ถาม uses the same rule (row 10). */
+[data-theme-root="luxury-gold"] .lg-ready-confirm[data-off],
+[data-theme-root="luxury-gold"] .lg-ready-ask-button[data-disabled] {
   opacity: 1; background: var(--lg-paper); color: var(--lg-ink-2); border: 1px dashed var(--lg-card-edge); box-shadow: none;
 }
 /* the ledger: one row per question, numbered by its position (a real order), hairline between rows */
@@ -682,10 +704,36 @@ ul.lg-item-stuck { display: grid; gap: 2px; }
 .lg-ledger-stamp { font-family: var(--font-serif); font-weight: 700; color: var(--lg-navy); padding-bottom: 2px; border-bottom: 2px solid var(--lg-gold-line); }
 .lg-ledger-mark[data-mark="wrong"] .lg-ledger-stamp { color: var(--lg-stuck); border-bottom-color: var(--lg-stuck); }
 .lg-ledger-note { color: var(--lg-ink-2); }
-[data-theme-root="luxury-gold"] .lg-ledger-failed { align-items: center; }
+/* a failed answer is a ledger line: the words, then ลองใหม่ inline (row 11) */
+.lg-ledger-failed { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; color: var(--lg-ink-2); font-weight: 600; }
+/* the plaque's bold slot when it is not the score (rows 1–2): the confirmed state in navy, a stale quiz's reason in wine */
+.lg-ready-lead { font-family: var(--font-serif); font-size: 22px; font-weight: 600; line-height: 1.45; color: var(--lg-navy); text-wrap: balance; }
+.lg-ready-lead a { color: inherit; text-decoration: underline; text-decoration-color: var(--lg-gold-line); text-underline-offset: 5px; }
+/* the version lines as a footnote when a lead already says it (critique C-016 P2-b): one size, no second wine sentence */
+.lg-ready-version[data-quiet], .lg-ready-changed[data-quiet] { font-family: var(--font-sans); font-size: 15px; font-weight: 500; color: var(--lg-ink-2); }
+.lg-ready-changed[data-quiet] { padding-top: 0; }
+/* Confirm's label at body size — the page's decisive control (critique C-016 P3) */
+[data-theme-root="luxury-gold"] .lg-ready-confirm { font-size: 16px; }
+/* ลองใหม่ in the ledger: a visible edge (its beige fill alone was 1.11:1 on paper) */
+[data-theme-root="luxury-gold"] .lg-ledger-failed button { border: 1px solid var(--lg-card-edge); }
+.lg-ready-lead[data-code="stale"] a { color: var(--lg-stuck); text-decoration: underline; text-decoration-color: currentColor; text-underline-offset: 5px; }
+.lg-ready-lead[data-code="stale"] a:hover { text-decoration-thickness: 2px; }
+/* the score at body size when it is not the news: before 5 marks (row 4), or quiet under a stale quiz / confirmed (row 2) */
+.lg-ready-score[data-tone] { font-family: var(--font-sans); font-size: 16px; line-height: 1.6; font-weight: 600; }
+.lg-ready-score[data-tone="quiet"] { color: var(--lg-ink-2); font-weight: 500; }
+/* a stale quiz's marks no longer count: the stamps go quiet too */
+.lg-ledger[data-stale] .lg-ledger-stamp { color: var(--lg-ink-2); font-family: var(--font-sans); font-weight: 600; border-bottom-color: var(--lg-gold-line); }
 @media (max-width: 900px) {
   .lg-ready { grid-template-areas: "summary" "gate" "quiz"; }
   .lg-ready-gate { position: static; }
+}
+/* on a phone the steps are one row that scrolls inside itself (each medallion is a link, so the keyboard reaches all):
+   15 steps wrapped into 4 rows pushed Build below the first screen (TASK-C-016 row 12, measured 870–986 of 844) */
+/* the steps' scroller (client/ReadySteps): 5 px inside = the focus ring + its offset, so a ring is never cut */
+.lg-ready-steps-scroll { padding: 5px; margin: -5px; }
+@media (max-width: 640px) {
+  .lg-ready-steps { flex-wrap: nowrap; }
+  .lg-ready-steps li { flex: none; }
 }
 
 /* ---------- screen ② the chat (TASK-C-013): the composer and the minutes on the stage; the pack, then the quiet edge, beside ---------- */

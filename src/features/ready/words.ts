@@ -14,7 +14,8 @@ export const reasons = {
   noQuiz: "ยังไม่ได้ทดสอบความเข้าใจ",
   notFull: "คะแนนยังไม่ถึง 100%",
   stale: "spec เปลี่ยนหลังทดสอบ ต้องทดสอบใหม่",
-  tooFew: "ต้องตอบอย่างน้อย 5 ข้อ",
+  // REQ-007 line 46 as amended 2026-10-09 (C-016 Q1, PM): the D-032 verb, like the early line
+  tooFew: "ต้องตรวจอย่างน้อย 5 ข้อ",
   // added 2026-10-09 (REQ-007 lines 54–55: D-030, D-032)
   confirmed: (n: number): string => `ยืนยันเวอร์ชัน ${n} แล้ว · ยังไม่มีอะไรเปลี่ยน`,
   empty: "ยังไม่มีข้อมูลในโปรเจกต์นี้ · เริ่มที่แชต",

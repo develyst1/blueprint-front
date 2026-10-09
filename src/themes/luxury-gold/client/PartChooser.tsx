@@ -24,7 +24,8 @@ export function PartChooser({ parts, current, main = false }: { parts: Part[]; c
   }, []);
   const present = [...new Set(parts.map((p) => p.kind))];
   return (
-    <nav className={main ? "lg-plaque lg-part-chooser lg-part-chooser-main" : "lg-plaque lg-part-chooser"} aria-labelledby="lg-part-pick">
+    // print (v1.11): beside a chosen part it is navigation (screen-only); as the page's main content its list opens up
+    <nav className={main ? "lg-plaque lg-part-chooser lg-part-chooser-main" : "lg-plaque lg-part-chooser"} aria-labelledby="lg-part-pick" data-print={main ? undefined : "screen-only"}>
       <h2 id="lg-part-pick" className="lg-part-pick">{historyPick}</h2>
       {main && (
         <ul className="lg-legend" aria-hidden="true">
@@ -36,7 +37,7 @@ export function PartChooser({ parts, current, main = false }: { parts: Part[]; c
           ))}
         </ul>
       )}
-      <ul className="lg-part-scroll" ref={box} onFocus={(e) => box.current && keepRingInView(box.current, e.target as HTMLElement)}>
+      <ul className="lg-part-scroll" data-print={main ? "expand" : undefined} ref={box} onFocus={(e) => box.current && keepRingInView(box.current, e.target as HTMLElement)}>
         {parts.map((p, i) => (
           <li key={p.key} data-kind-start={i === 0 || parts[i - 1]!.kind !== p.kind || undefined}>
             <a

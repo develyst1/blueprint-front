@@ -111,7 +111,7 @@ export function Flowchart({ vm, required }: { vm: FlowchartVM; required: Require
       <div className="lg-page-stage">
       <h1 className="lg-page-title">{pageLabel.flowchart}</h1>
       {vm.works.length > 1 && (
-        <nav className="lg-chip-links" aria-label={pageLabel.flowchart}>
+        <nav className="lg-chip-links" aria-label={pageLabel.flowchart} data-print="screen-only">
           {vm.works.map((w) => (
             <a key={w.key} className="lg-chip-link" href={w.href} aria-current={w.key === vm.work.key ? "page" : undefined}>
               {w.title}

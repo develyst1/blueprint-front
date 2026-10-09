@@ -4,6 +4,7 @@
 // Ant overlays (Select, Popover, Modal, Drawer, Tooltip) portal into this element via getPopupContainer, so they keep
 // this theme's tokens (SPEC-B-001 "Overlays must portal into the theme's own root").
 import { ConfigProvider } from "antd";
+import thTH from "antd/locale/th_TH"; // Ant's own control names in Thai on a lang="th" page (REVIEW-A-004 row 12)
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { cleanBlueFont } from "./font";
 import { antTheme, color, group, radius } from "./tokens";
@@ -34,7 +35,7 @@ export function Root({ children }: { children: ReactNode }) {
   const theme = useMemo(() => (still ? { ...base, token: { ...base.token, motion: false } } : base), [still]);
   return (
     <div ref={ref} data-theme-root="clean-blue" className={`${s.root} ${cleanBlueFont.className}`} style={vars}>
-      <ConfigProvider theme={theme} getPopupContainer={container} getTargetContainer={container}>
+      <ConfigProvider theme={theme} locale={thTH} getPopupContainer={container} getTargetContainer={container}>
         {children}
       </ConfigProvider>
     </div>

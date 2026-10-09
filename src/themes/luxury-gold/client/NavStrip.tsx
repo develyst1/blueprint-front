@@ -22,6 +22,7 @@ export function NavStrip({ nav }: { nav: NavItemVM[] }) {
   return (
     <nav
       className="lg-nav"
+      data-print="screen-only"
       onFocus={(e) => {
         const strip = (e.target as HTMLElement).closest(".lg-nav-scroll");
         if (strip instanceof HTMLElement) keepRingInView(strip, e.target as HTMLElement);

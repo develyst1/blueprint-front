@@ -65,7 +65,7 @@ export function ChatPack({ pack, focus, required, actions, run, busy }: {
     <section className="lg-pack">
       {/* a Tab stop: at 1440 the list scrolls inside its column and may hold no control (cards with answers only); the
           shadow says there is more below (critique C-013) */}
-      <ScrollShadow ref={box} className="lg-pack-list" size={48} tabIndex={0} role="region" aria-label={packName}>
+      <ScrollShadow ref={box} className="lg-pack-list" size={48} tabIndex={0} role="region" aria-label={packName} data-print="expand">
         {pack.map((q) => {
           const item = findRequired(required, requiredId.part(q.key));
           const titleId = `lg-q-${q.key}`;

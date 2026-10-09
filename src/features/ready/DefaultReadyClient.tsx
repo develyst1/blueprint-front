@@ -6,7 +6,7 @@
 import { useState, useTransition, type FormEvent } from "react";
 import type { ReadyActions } from "./contract";
 import {
-  ask as askWord, confirm as confirmWord, markRight, markWrong, restartQuiz, retry as retryWord, startQuiz as startWord, wrongNote,
+  ask as askWord, confirm as confirmWord, markRight, markWrong, restartQuiz, retry as retryWord, wrongNote,
 } from "./words";
 import s from "./ready.module.css";
 
@@ -31,13 +31,15 @@ export function AskBox({ hasQuiz, restart, startQuiz, ask }: {
   };
   return (
     <div className={s.askRow}>
-      {(!hasQuiz || restart) && (
+      {/* one next step (REVIEW-A-003 row 7): before the first quiz the box + ask is the step (the first question starts
+          the quiz); restarting is offered only when the quiz is stale or full */}
+      {restart && (
         <button type="button" className={s.button} disabled={busy} onClick={() => start(async () => { await startQuiz(); })}>
-          {hasQuiz ? restartQuiz : startWord}
+          {restartQuiz}
         </button>
       )}
       <form className={s.askForm} onSubmit={send}>
-        {/* Enter sends (an <input>), and ถาม beside it; labelled by the quiz hint above */}
+        {/* Enter sends (an <input>), and `askWord` beside it; labelled by the quiz heading */}
         <input
           className={s.input}
           value={text}

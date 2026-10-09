@@ -108,6 +108,8 @@ export const retry = "ลองใหม่";
 
 // Empty project — also its readiness: an empty project is never พร้อมสร้าง (D-015)
 export const emptyProject = "ยังไม่มีข้อมูลในโปรเจกต์นี้";
+// …and where it starts: the link to the chat beside it (D-032, REQ-007 l.55)
+export const startInChat = "เริ่มที่แชต";
 
 // A list page with nothing in it, every theme — "ยังไม่มี{…}ในโปรเจกต์นี้" with the page's own noun (D-015).
 // The spaces around "API" are SA-B's spelling in TASK-B-010; the REQ-002 row gives no spacing (TASK-B-010 § Questions).

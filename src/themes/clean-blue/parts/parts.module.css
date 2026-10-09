@@ -40,7 +40,7 @@
   display: flex;
   gap: 8px;
   overflow-x: auto;
-  padding: 2px;
+  padding: 4px; /* the focus ring stays inside the scroll box (REVIEW-A-004 row 11) */
   max-width: 100%;
   scrollbar-width: thin;
 }
@@ -65,3 +65,7 @@
 @media (max-width: 640px) {
   .pageTitle { font-size: 20px; gap: 12px; }
 }
+
+.choose[data-more="end"] { mask-image: linear-gradient(to right, black calc(100% - 40px), transparent); }
+.choose[data-more="start"] { mask-image: linear-gradient(to left, black calc(100% - 40px), transparent); }
+.choose[data-more="both"] { mask-image: linear-gradient(to right, transparent, black 40px, black calc(100% - 40px), transparent); }

@@ -51,7 +51,7 @@ export function DiagramFrame({
 }) {
   const style: CSSProperties = { width, height };
   return (
-    <div className={`lg-diagram ${className ?? ""}`} role="region" aria-label={label} tabIndex={0}>
+    <div className={`lg-diagram ${className ?? ""}`} role="region" aria-label={label} tabIndex={0} data-print="expand">
       <div className="lg-canvas" style={style}>
         {children}
       </div>

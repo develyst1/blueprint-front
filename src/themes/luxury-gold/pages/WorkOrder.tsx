@@ -36,7 +36,7 @@ export function WorkOrder({ vm, required }: { vm: WorkOrderVM; required: Require
     <div className="lg-page">
       <h1 className="lg-page-title">{pageLabel.workOrder}</h1>
       {vm.works.length > 1 && (
-        <nav className="lg-chip-links" aria-label={pageLabel.workOrder}>
+        <nav className="lg-chip-links" aria-label={pageLabel.workOrder} data-print="screen-only">
           {vm.works.map((w) => (
             <a key={w.key} className="lg-chip-link" href={w.href} aria-current={w.key === vm.work.key ? "page" : undefined}>
               {w.title}
@@ -65,7 +65,7 @@ export function WorkOrder({ vm, required }: { vm: WorkOrderVM; required: Require
         </div>
 
         <CenterOn x={stuck ? stuck.x + stuck.w / 2 : 0} y={0} nearest>
-        <div className="lg-diagram lg-swim-scroll" role="region" aria-label={pageLabel.workOrder} tabIndex={0}>
+        <div className="lg-diagram lg-swim-scroll" role="region" aria-label={pageLabel.workOrder} tabIndex={0} data-print="expand">
           <div className="lg-canvas" style={{ width, height }}>
             {lanes.slice(1).map((l, i) => (
               <span key={`rule-${l.key}`} className="lg-swim-rule" style={{ top: HEAD + (i + 1) * LANE, width }} aria-hidden="true" />

@@ -162,6 +162,8 @@ describe("gate states `empty` and `confirmed` (TASK-C-016, D-030, D-032)", () =>
     expect(scoreEarly(3)).toBe("ตรวจแล้ว 3 ข้อ · ต้องตรวจอย่างน้อย 5 ข้อ");
     expect(reasons.confirmed(1)).toBe("ยืนยันเวอร์ชัน 1 แล้ว · ยังไม่มีอะไรเปลี่ยน");
     expect(reasons.empty).toBe("ยังไม่มีข้อมูลในโปรเจกต์นี้ · เริ่มที่แชต");
+    // the too-few reason uses the same verb as the early line (C-016 Q1, PM 2026-10-09, REQ-007 line 46)
+    expect(reasons.tooFew).toBe("ต้องตรวจอย่างน้อย 5 ข้อ");
   });
 });
 

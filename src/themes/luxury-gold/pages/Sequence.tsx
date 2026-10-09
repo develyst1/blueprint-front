@@ -23,7 +23,7 @@ export function Sequence({ vm, required }: { vm: SequenceVM; required: RequiredI
     <div className="lg-page">
       <h1 className="lg-page-title">{pageLabel.sequence}</h1>
 
-      <nav className="lg-step-tabs" aria-label={pageLabel.sequence}>
+      <nav className="lg-step-tabs" aria-label={pageLabel.sequence} data-print="screen-only">
         {vm.steps.map((s) => (
           <a key={s.key} className="lg-step-tab" href={s.href} aria-current={s.key === vm.step.key ? "page" : undefined}>
             <span className="lg-step-tab-num">{s.number}</span>

@@ -40,7 +40,7 @@ export function SwimHeads({ heads, width, headHeight }: { heads: Head[]; width: 
   }, [headHeight]);
 
   return (
-    <div ref={strip} className="lg-swim-heads" style={{ top }} data-shown={shown || undefined} aria-hidden="true">
+    <div ref={strip} className="lg-swim-heads" style={{ top }} data-shown={shown || undefined} aria-hidden="true" data-print="screen-only">
       <div className="lg-swim-heads-bar">
         <span />
         <div className="lg-swim-heads-view">

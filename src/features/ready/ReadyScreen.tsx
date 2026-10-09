@@ -4,12 +4,14 @@
 import type { FC } from "react";
 import { notFound } from "next/navigation";
 import { retryAction as coreRetry } from "@/app/actions";
+import { exportHref } from "@/core/model/build/common";
 import { shellRequired } from "@/core/model/build/required";
 import { StateView } from "@/core/render/ProjectPage";
 import { contentId } from "@/core/theme/anchors";
 import type { Theme } from "@/core/theme/contract";
 import { defaultTheme } from "@/core/theme/default";
 import { getTheme } from "@/core/theme/registry";
+import { ExportButton } from "@/features/export/ExportButton";
 import { askAction, confirmAction, markAction, startQuizAction } from "./actions";
 import type { ReadyActions, ReadyPageProps } from "./contract";
 import { DefaultReady } from "./DefaultReady";
@@ -38,7 +40,8 @@ export async function ReadyScreen({ projectId }: { projectId: string }) {
   };
   return (
     <Root>
-      <Shell frame={vm.frame} required={shellRequired(vm.frame)}>
+      {/* the PDF export, as the core passes it on the spec pages (contract v1.11 `tools`, TASK-C-015) */}
+      <Shell frame={vm.frame} required={shellRequired(vm.frame)} tools={<ExportButton href={exportHref(vm.frame.project.id)} />}>
         <main id={contentId} tabIndex={-1} className={theme === defaultTheme ? s.bare : undefined}>
           <Ready vm={vm} actions={actions} required={readyRequired(vm)} />
         </main>

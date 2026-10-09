@@ -9,7 +9,7 @@ import { useEffect, useId, useRef, useState, useTransition, type KeyboardEvent, 
 import type { ChatPageProps } from "@/core/theme/contract";
 import type { ActionCode, ActionResult, ChatQuestionVM, ChatSourceVM } from "@/features/chat/contract";
 import {
-  acceptAll, acceptPack, actionError, answerOwn, botFailed, botSuggests, changeCard, chatPlaceholder, chooseFile, creativityLabel,
+  acceptAll, acceptPack, actionError, answerOwn, botFailed, botSuggests, cancel, changeCard, chatPlaceholder, chooseFile, creativityLabel,
   enterHint, logName, modelLabel, notNeeded, originChoices, packName, reasonOptional, send as sendWord, sourceFailed, sourceState,
   speaker, thinking, toSpec, tryAgain, undoRefused, uploadAsks,
 } from "@/features/chat/words";
@@ -110,6 +110,9 @@ export function Chat({ vm, actions, required }: ChatPageProps) {
   const [reading, setReading] = useState<string | null>(null);
   const [creativity, setCreativity] = useState(vm.creativity);
   const fileInput = useRef<HTMLInputElement>(null);
+  const chooser = useRef<HTMLButtonElement>(null);
+  // ยกเลิก or Escape (D-034): the question closes, nothing is uploaded, focus goes back to เลือกไฟล์
+  const dropFile = () => { setFile(null); requestAnimationFrame(() => chooser.current?.focus()); };
   const model = useRef<RefSelectProps>(null);
   const ids = { hint: useId(), origin: useId(), model: useId(), creativity: useId() };
 
@@ -170,7 +173,7 @@ export function Chat({ vm, actions, required }: ChatPageProps) {
                 <div className={s.row}>
                   <input ref={fileInput} type="file" className={s.srOnly} tabIndex={-1} aria-hidden="true"
                     onChange={(e) => { const f = e.target.files?.[0]; if (f) setFile(f); e.target.value = ""; }} />
-                  <Button size="large" onClick={() => fileInput.current?.click()}>{chooseFile}</Button>
+                  <Button ref={chooser} size="large" onClick={() => fileInput.current?.click()}>{chooseFile}</Button>
                   <Button size="large" type="primary" htmlType="submit" disabled={pending || !text.trim()}>{sendWord}</Button>
                 </div>
               </div>
@@ -179,13 +182,14 @@ export function Chat({ vm, actions, required }: ChatPageProps) {
 
           {file && (
             <Card className={s.origin}>
-              <div role="group" aria-labelledby={ids.origin} onKeyDown={(e) => { if (e.key === "Escape") setFile(null); }} className={s.originBody}>
+              <div role="group" aria-labelledby={ids.origin} onKeyDown={(e) => { if (e.key === "Escape") dropFile(); }} className={s.originBody}>
                 <p id={ids.origin} className={s.originAsk}>{uploadAsks}</p>
                 <p className={s.muted}>{file.name}</p>
                 <div className={s.row}>
                   {originChoices.map((o) => (
                     <Button key={o.stamp} size="large" autoFocus={o.stamp === "operator"} onClick={() => upload(o.stamp, file)}>{o.label}</Button>
                   ))}
+                  <Button size="large" type="text" onClick={dropFile}>{cancel}</Button>
                 </div>
               </div>
             </Card>

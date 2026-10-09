@@ -69,7 +69,7 @@
 .user { justify-self: end; background: var(--cb-blueSoft); border-color: transparent; border-bottom-right-radius: 4px; }
 .bot { justify-self: start; border-bottom-left-radius: 4px; }
 .caw { justify-self: start; background: var(--cb-participant-soft); border-color: transparent; border-bottom-left-radius: 4px; }
-.at { color: var(--cb-ink2); font-size: 13px; }
+.at { color: var(--cb-ink2); font-size: 14px; }
 
 /* ---------- the edge ---------- */
 .edgeBody { display: grid; gap: 20px; }

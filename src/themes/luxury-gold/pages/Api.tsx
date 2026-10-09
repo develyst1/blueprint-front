@@ -93,7 +93,7 @@ export function Api({ vm, required }: { vm: ApisVM; required: RequiredItem[] }) 
                     {a.request != null && (
                       <>
                         <h3 className="lg-group-title">{apiDetail.request}</h3>
-                        <pre className="lg-json">{json(a.request)}</pre>
+                        <pre className="lg-json" data-print="expand">{json(a.request)}</pre>
                       </>
                     )}
                     {a.responses.length > 0 && <h3 className="lg-group-title">{apiDetail.response}</h3>}
@@ -101,7 +101,7 @@ export function Api({ vm, required }: { vm: ApisVM; required: RequiredItem[] }) 
                       <div key={r.status} className="lg-response">
                         <span className="lg-response-status">{r.status}</span>
                         {r.note && <span className="lg-detail-note">{r.note}</span>}
-                        {r.body != null && <pre className="lg-json">{json(r.body)}</pre>}
+                        {r.body != null && <pre className="lg-json" data-print="expand">{json(r.body)}</pre>}
                       </div>
                     ))}
                   </MoreDisclosure>

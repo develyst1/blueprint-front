@@ -1,25 +1,27 @@
 "use client";
 
 // Screen ④'s interactive parts in luxury gold, on HeroUI: the question box (TextField + Input + Button; Enter sends,
-// the first question with no quiz starts one), the right / wrong row with the optional note, a failed answer (Alert +
-// `retry`), and Confirm. Each calls a server action handed down by the core (it refreshes the page) inside a
-// transition; a control is off while its action runs. Words only from @/features/ready/words.
-import { Alert, Button, Input, Label, TextField } from "@heroui/react";
-import { useState, useTransition, type FormEvent } from "react";
+// the first question with no quiz starts one — the only way to start, REVIEW-A-003 row 7), the right / wrong row with
+// the optional note, a failed answer (a ledger line + `retry`, row 11), and Confirm (a Tab stop even when off, row 5).
+// Each calls a server action handed down by the core (it refreshes the page) inside a transition; a control is off
+// while its action runs. Words only from @/features/ready/words.
+import { Button, Input, Label, ScrollShadow, TextField } from "@heroui/react";
+import { useEffect, useRef, useState, useTransition, type FormEvent, type ReactNode } from "react";
 import type { ReadyActions } from "@/core/theme/contract";
 import {
-  ask as askWord, confirm as confirmWord, markRight, markWrong, restartQuiz, retry as retryWord, startQuiz as startWord, wrongNote,
+  ask as askWord, confirm as confirmWord, markRight, markWrong, restartQuiz, retry as retryWord, wrongNote,
 } from "@/features/ready/words";
 
-export function QuizAsk({ hasQuiz, restart, startQuiz, ask }: {
-  hasQuiz: boolean; restart: boolean; startQuiz: ReadyActions["startQuiz"]; ask: ReadyActions["ask"];
+/** `off`: nothing to ask about yet (an empty project — critique C-016 P2-a); the page's lead leads to the chat. */
+export function QuizAsk({ hasQuiz, restart, startQuiz, ask, labelledBy, describedBy, off = false }: {
+  hasQuiz: boolean; restart: boolean; startQuiz: ReadyActions["startQuiz"]; ask: ReadyActions["ask"]; labelledBy: string; describedBy: string; off?: boolean;
 }) {
   const [text, setText] = useState("");
   const [busy, start] = useTransition();
   const send = (e?: FormEvent) => {
     e?.preventDefault();
     const q = text.trim();
-    if (!q || busy) return;
+    if (!q || busy || off) return;
     start(async () => {
       if (!hasQuiz) {
         const s = await startQuiz();
@@ -29,19 +31,19 @@ export function QuizAsk({ hasQuiz, restart, startQuiz, ask }: {
     });
   };
   return (
-    <div className="lg-ready-ask">
-      {(!hasQuiz || restart) && (
-        // when the quiz is stale or full, (re)starting is the one way on — the page's primary action then
-        <Button variant={restart ? "primary" : "secondary"} isDisabled={busy} onPress={() => start(async () => { await startQuiz(); })}>
-          {hasQuiz ? restartQuiz : startWord}
+    <div className="lg-ready-ask" data-print="screen-only">
+      {restart && (
+        // when the quiz is stale or full, restarting is the one way on — the page's primary action then
+        <Button variant="primary" isDisabled={busy} onPress={() => start(async () => { await startQuiz(); })}>
+          {restartQuiz}
         </Button>
       )}
       <form className="lg-ready-ask-form" onSubmit={send}>
-        {/* labelled by the quiz heading; Enter sends */}
-        <TextField className="lg-ready-field" value={text} onChange={setText} isDisabled={busy || restart} aria-labelledby="lg-ready-quiz">
+        {/* named by the quiz heading, described by the hint (row 9); Enter sends */}
+        <TextField className="lg-ready-field" value={text} onChange={setText} isDisabled={busy || restart || off} aria-labelledby={labelledBy} aria-describedby={describedBy}>
           <Input maxLength={1000} />
         </TextField>
-        <Button type="submit" variant="primary" isDisabled={busy || restart || !text.trim()}>
+        <Button type="submit" variant="primary" className="lg-ready-ask-button" isDisabled={busy || restart || off || !text.trim()}>
           {askWord}
         </Button>
       </form>
@@ -65,7 +67,7 @@ export function QuizMark({ itemId, mark, note, onMark }: {
   }
   // right and wrong side by side, then the note under them — it goes with wrong (critique C-012 rows 1–2)
   return (
-    <div className="lg-ledger-actions">
+    <div className="lg-ledger-actions" data-print="screen-only">
       <Button variant="secondary" isDisabled={busy} onPress={() => start(async () => { await onMark(itemId, "right"); })}>
         {markRight}
       </Button>
@@ -80,26 +82,56 @@ export function QuizMark({ itemId, mark, note, onMark }: {
   );
 }
 
-/** A `failed` item: REQ-007 l.54's words + the `retry` button = the same question asked again. It never counts. */
+/** A `failed` item: REQ-007 l.54's words + the `retry` button = the same question asked again. It never counts.
+ *  A line of the ledger, with `retry` inline — not a card inside the ledger (row 11). */
 export function QuizRetry({ text, question, ask }: { text: string; question: string; ask: ReadyActions["ask"] }) {
   const [busy, start] = useTransition();
   return (
-    <Alert className="lg-ledger-failed" status="warning">
-      <Alert.Content>
-        <Alert.Title>{text}</Alert.Title>
-      </Alert.Content>
-      <Button variant="secondary" isDisabled={busy} onPress={() => start(async () => { await ask(question); })}>
+    <p className="lg-ledger-failed">
+      <span>{text}</span>
+      <Button variant="secondary" isDisabled={busy} onPress={() => start(async () => { await ask(question); })} data-print="screen-only">
         {retryWord}
       </Button>
-    </Alert>
+    </p>
   );
 }
 
-export function GateConfirm({ enabled, confirm }: { enabled: boolean; confirm: ReadyActions["confirm"] }) {
+/** Confirm. Off, it stays a Tab stop (`aria-disabled`, the press guarded) and is described by the reasons — a
+ *  screen-reader user who meets it hears why (row 5). Off look: `data-off`. */
+export function GateConfirm({ enabled, confirm, describedBy }: { enabled: boolean; confirm: ReadyActions["confirm"]; describedBy?: string }) {
   const [busy, start] = useTransition();
+  const off = !enabled || busy;
   return (
-    <Button className="lg-ready-confirm" variant="primary" isDisabled={!enabled || busy} onPress={() => start(async () => { await confirm(); })}>
+    <Button
+      className="lg-ready-confirm"
+      data-print="screen-only"
+      variant="primary"
+      aria-disabled={off || undefined}
+      data-off={off || undefined}
+      aria-describedby={describedBy}
+      onPress={() => { if (!off) start(async () => { await confirm(); }); }}
+    >
       {confirmWord}
     </Button>
+  );
+}
+
+/** The row of steps in a HeroUI ScrollShadow. At 1440 the row wraps and nothing scrolls. On a phone it is one line that
+ *  scrolls inside itself: the shadow says there is more, and on open the first stuck step is centred (critique C-016
+ *  P1 — a stuck medallion was cut at the edge with no cue). By scrollLeft only, never scrollIntoView (it would move the
+ *  browser's focus starting point past the skip link — TASK-C-006 lesson). */
+export function ReadySteps({ children }: { children: ReactNode }) {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const box = ref.current;
+    const stuck = box?.querySelector<HTMLElement>("[data-stuck]");
+    if (!box || !stuck || box.scrollWidth <= box.clientWidth) return;
+    const s = stuck.getBoundingClientRect(), b = box.getBoundingClientRect();
+    box.scrollLeft += s.left - b.left - (b.width - s.width) / 2;
+  }, []);
+  return (
+    <ScrollShadow ref={ref} className="lg-ready-steps-scroll" orientation="horizontal" hideScrollBar size={48} data-print="expand">
+      {children}
+    </ScrollShadow>
   );
 }
