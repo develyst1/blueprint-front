@@ -168,9 +168,14 @@ export function DefaultChat({ vm, actions, required }: ChatPageProps) {
   const ids = { model: useId(), creativity: useId(), origin: useId(), hint: useId() };
 
   useEffect(() => setCreativity(vm.creativity), [vm.creativity]);
+  // A refusal belongs to the change card it was answered for: a different card (a new change set) clears it (A-056 row 1)
+  const cardId = vm.lastChange?.changeSetId ?? null;
+  useEffect(() => setRefused(null), [cardId]);
 
+  // Any action starts by clearing the last undo refusal; `undo` sets a new one after it has run (A-056 row 1)
   const run: Run = (fn, after) =>
     start(async () => {
+      setRefused(null);
       const r = await fn();
       after?.(r);
     });

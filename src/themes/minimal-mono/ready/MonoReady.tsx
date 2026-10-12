@@ -11,13 +11,13 @@ import "@mantine/core/styles/Button.css";
 import "@mantine/core/styles/Paper.css";
 import { Button, Paper } from "@mantine/core";
 import { IconCheck, IconX } from "@tabler/icons-react";
-import { useLayoutEffect, useRef, useState, useTransition, type FormEvent, type ReactNode } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, useTransition, type FormEvent, type ReactNode } from "react";
 import type { ReadyActions, ReadyPageProps, ReadyVM } from "@/core/theme/contract";
-import { pageLabel, participantKind, showMore } from "@/core/words";
+import { pageLabel, participantKind, partKind, showMore } from "@/core/words";
 import {
   ask as askWord, botFailed, build as buildWord, changedSince, confirm as confirmWord, confirmed, markRight, markWrong,
   notInSpec, partsUsed, quizHeading, quizHint, readyPage, reasons as reasonWords, restartQuiz, retry as retryWord, score,
-  scoreEarly, startQuiz as startWord, wrongNote,
+  scoreEarly, wrongNote,
 } from "@/features/ready/words";
 import { KindMark } from "../parts/KindMark";
 import { RequiredList, RequiredPicker } from "../parts/Required";
@@ -89,7 +89,8 @@ function Retry({ question, actions }: { question: string; actions: ReadyActions 
   );
 }
 
-/** เริ่มทดสอบ / เริ่มทดสอบใหม่ and the question box (ถาม). The first question with no quiz starts one first. */
+/** The question box (ถาม) — the first question with no quiz starts one first — and เริ่มทดสอบใหม่ only when the quiz
+ *  is stale or full, the one way on then (REVIEW-C-003 row 5: one way to each step). */
 function AskBox({ hasQuiz, restart, actions }: { hasQuiz: boolean; restart: boolean; actions: ReadyActions }) {
   const [text, setText] = useState("");
   const [busy, start] = useTransition();
@@ -108,9 +109,9 @@ function AskBox({ hasQuiz, restart, actions }: { hasQuiz: boolean; restart: bool
   };
   return (
     <div className={s.askRow}>
-      {!hasQuiz || restart ? (
+      {restart ? (
         <Button variant="default" radius="md" h={44} className={s.strong} disabled={busy} onClick={() => start(async () => { await actions.startQuiz(); })}>
-          {hasQuiz ? restartQuiz : startWord}
+          {restartQuiz}
         </Button>
       ) : null}
       <form className={s.askForm} onSubmit={send}>
@@ -131,29 +132,63 @@ function AskBox({ hasQuiz, restart, actions }: { hasQuiz: boolean; restart: bool
   );
 }
 
-/** ยืนยัน 100% — or, when the newest version is confirmed and nothing has changed (gate code `confirmed`, D-030), the same
- *  button off and reading that state's words. A confirm that comes back `already_confirmed` (another tab got there
- *  first) shows the same words until the page refreshes. `attrs` = the state's required-item marks, on its words. */
-function Confirm({ enabled, done, alreadyWords, attrs, actions }: {
-  enabled: boolean; done: string | null; alreadyWords: string | null; attrs: Record<string, string>; actions: ReadyActions;
+/** ยืนยัน 100%. Off, it stays a Tab stop that says why (`aria-disabled` + a guarded click + `aria-describedby` → the
+ *  reasons; REVIEW-C-003 row 3). When the newest version is confirmed and nothing has changed (gate code `confirmed`,
+ *  D-030) it is not a button at all but a settled line — ink and a check, never the dashed "off" look (row 2). A confirm
+ *  that comes back `already_confirmed` (another tab got there first) shows that line until the page refreshes.
+ *  `attrs` = the state's required-item marks, on its words. */
+function Confirm({ enabled, done, alreadyWords, attrs, describedBy, actions }: {
+  enabled: boolean; done: string | null; alreadyWords: string | null; attrs: Record<string, string>; describedBy: string | undefined;
+  actions: ReadyActions;
 }) {
   const [busy, start] = useTransition();
   const [already, setAlready] = useState<string | null>(null);
   const words = done ?? already;
+  if (words) {
+    return (
+      <p className={s.settled}>
+        <IconCheck size={22} aria-hidden="true" />
+        <span {...(done ? attrs : {})}>{words}</span>
+      </p>
+    );
+  }
+  const off = !enabled || busy;
   return (
     <Button
       variant="default"
       radius="md"
       className={s.confirm}
-      disabled={!enabled || busy || words !== null}
-      onClick={() => start(async () => {
-        const r = await actions.confirm();
-        if (!r.ok && r.code === "already_confirmed" && done === null) setAlready(alreadyWords);
-      })}
+      aria-disabled={off || undefined}
+      data-disabled={off || undefined}
+      aria-describedby={off ? describedBy : undefined}
+      onClick={() => {
+        if (off) return;
+        start(async () => {
+          const r = await actions.confirm();
+          if (!r.ok && r.code === "already_confirmed") setAlready(alreadyWords);
+        });
+      }}
     >
-      {words ? <span {...(done ? attrs : {})}>{words}</span> : confirmWord}
+      {confirmWord}
     </Button>
   );
+}
+
+/** The steps row is a Tab stop only where it scrolls (a phone, a long work) — elsewhere it would be an extra stop
+ *  announced as nothing new (REVIEW-C-003 row 11). */
+function useScrolls<T extends HTMLElement>() {
+  const ref = useRef<T>(null);
+  const [scrolls, setScrolls] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const check = () => setScrolls(el.scrollWidth > el.clientWidth + 1);
+    check();
+    const ro = new ResizeObserver(check);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+  return [ref, scrolls] as const;
 }
 
 export function MonoReady({ vm, actions, required }: ReadyPageProps) {
@@ -169,6 +204,9 @@ export function MonoReady({ vm, actions, required }: ReadyPageProps) {
   const done = vm.gate.reasons.find((r) => r.code === "confirmed")?.text ?? null;
   const empty = vm.gate.reasons.some((r) => r.code === "empty");
   const links = vm.gate.reasons.filter((r) => r.code !== "confirmed");
+  // row 4: a new failed answer is said once, politely (the newest item is the one just asked)
+  const lastFailed = q?.items.at(-1)?.status === "failed";
+  const [stepsRef, stepsScroll] = useScrolls<HTMLOListElement>();
   const leftover = picker.rest();
   const counts = [
     { kind: "screen" as const, n: vm.counts.screens, word: pageLabel.screens },
@@ -184,7 +222,7 @@ export function MonoReady({ vm, actions, required }: ReadyPageProps) {
       <section className={s.summary}>
         {vm.steps.length ? (
           // a grid from 48em; on a phone one row that scrolls inside itself (a keyboard stop, named by the page title)
-          <ol className={s.steps} tabIndex={0} role="region" aria-labelledby="mono-ready-title">
+          <ol ref={stepsRef} className={s.steps} tabIndex={stepsScroll ? 0 : undefined} role={stepsScroll ? "region" : undefined} aria-label={partKind.step}>
             {vm.steps.map((st) => (
               <li key={st.key}>
                 <StepCard step={st} size="sm" />
@@ -216,10 +254,11 @@ export function MonoReady({ vm, actions, required }: ReadyPageProps) {
           done={done}
           alreadyWords={vm.version ? reasonWords.confirmed(vm.version.n) : null}
           attrs={reasonAttrs.get("confirmed") ?? {}}
+          describedBy={links.length ? "mono-ready-reasons" : undefined}
           actions={actions}
         />
         {links.length ? (
-          <ul className={s.reasons}>
+          <ul id="mono-ready-reasons" className={s.reasons}>
             {links.map((r) => (
               <li key={r.code}>
                 <a href={r.href} className={s.reason} {...(reasonAttrs.get(r.code) ?? {})}>
@@ -244,8 +283,12 @@ export function MonoReady({ vm, actions, required }: ReadyPageProps) {
       <section id="quiz" className={s.quiz} aria-labelledby="mono-ready-quiz">
         <h3 id="mono-ready-quiz" className={s.h3}>{quizHeading}</h3>
         <p id="mono-ready-hint" className={s.hint}>{quizHint}</p>
-        {/* a stale quiz's score is history: quiet, so the gate's stale reason leads (REVIEW-A-003 row 2) */}
-        {scoreLine ? <p className={q?.stale ? s.scoreStale : s.score} {...scoreAttrs}>{scoreLine}</p> : null}
+        {/* the big slot is for a real score: a stale quiz's score is history and the early count is a step, both quiet,
+            so the gate's reason leads (REVIEW-A-003 row 2, REVIEW-C-003 row 6). Announced as it changes (row 4). */}
+        <div role="status">
+          {scoreLine ? <p className={q?.stale || q?.score === null ? s.scoreQuiet : s.score} {...scoreAttrs}>{scoreLine}</p> : null}
+        </div>
+        <p role="status" className={s.srOnly}>{lastFailed ? botFailed : ""}</p>
         <AskBox hasQuiz={q !== null} restart={q !== null && (q.stale || q.full)} actions={actions} />
         {q && q.items.length ? (
           <ol className={s.items}>

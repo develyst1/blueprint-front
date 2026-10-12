@@ -87,6 +87,7 @@ export function frame(data: ProjectWithSeal, page: PageId, current: NavItemVM["p
     readiness: readiness(data.stuck.length, isEmpty(data), data.confirmed === true),
     nav: nav(data.project.id, current),
     page,
+    homeHref: HOME_HREF, // the project list — a theme never builds a URL (v1.12, AC-22)
   };
 }
 

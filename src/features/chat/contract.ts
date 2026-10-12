@@ -75,7 +75,9 @@ export interface ChatVM {
 export type ActionCode = "undo_refused" | "invalid" | "unreachable" | "too_large" | "unsupported_file" | "already_added";
 export type ActionResult = { ok: true } | { ok: false; code: ActionCode; parts?: string[] };
 
-/** Server actions, bound to the project. Each ends with refresh(); none returns data the page must render. */
+/** Server actions, bound to the project. Each ends with refresh(); none returns data the page must render.
+ *  An action's failure is shown until the next action: a page clears its last failure (an undo refusal, an error word)
+ *  when the user does anything else, and when the change card it belongs to is replaced. */
 export interface ChatActions {
   send(text: string): Promise<ActionResult>;
   /** keys of questions that have a proposed answer only — any other key → `invalid`, nothing sent */

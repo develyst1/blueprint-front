@@ -20,7 +20,7 @@ export interface Point { x: number; y: number }
 export interface ProjectHeadVM { id: string; name: string; createdAt: string; createdLabel: string /* "9 ต.ค. 2569" — core-formatted, D-006 */; theme: string }
 export interface ReadinessVM { stuckCount: number; label: string /* words.readinessStuck(n) | words.readinessClean */; ready: boolean }
 export interface NavItemVM { page: PageId | "chat" | "ready"; label: string; href: string; current: boolean } // "chat" v1.9 · "ready" v1.10
-export interface FrameVM { project: ProjectHeadVM; readiness: ReadinessVM; nav: NavItemVM[]; page: PageId }
+export interface FrameVM { project: ProjectHeadVM; readiness: ReadinessVM; nav: NavItemVM[]; page: PageId; homeHref: string /* v1.12: the project list, built by the core (AC-22, D-036) */ }
 export interface StepVM { key: string; number: string /* "01" */; title: string; ends: boolean; stuck: boolean; stuckWordings: string[] /* words of every stuck item targeting this step, [] if none (v1.3) */; href: string /* its sequence */ }
 export interface WorkVM { key: string; title: string; steps: StepVM[] }
 export interface DecisionVM { key: string; title: string; rule: string; cases: string[]; open: string | null; covers: { key: string; title: string; href: string /* v1.7 */ }[] }

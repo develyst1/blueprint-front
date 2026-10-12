@@ -83,3 +83,7 @@ export const reasonOptional = "เหตุผล (ไม่บังคับ)"
 
 /** A proposed answer the bot suggested (A-R4); accepting it uses acceptPack (ตามนั้น). */
 export const botSuggests = (answer: string) => `บอทเสนอ: ${answer}`;
+
+/** The gateway's three tiers in the model list (D-035, REQ-004 table). A tier not listed here keeps the gateway's own name;
+ *  `provider/model` ids are product names and are not worded. */
+export const tierLabel = { small: "เร็ว", medium: "สมดุล", flagship: "เก่งที่สุด" } as const;

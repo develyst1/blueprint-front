@@ -221,7 +221,7 @@ button.lg-medallion:hover,
   padding-bottom: 12px; border-bottom: 1px solid var(--lg-gold-line);
   text-decoration: none; transition: color 0.15s ease;
 }
-.lg-wordmark:hover { color: var(--lg-gold-deep, var(--lg-navy)); text-decoration: underline; text-underline-offset: 6px; }
+.lg-wordmark:hover { color: var(--lg-gold-ink); text-decoration: underline; text-underline-offset: 6px; }
 .lg-spine-project { font-family: var(--font-serif); font-size: 20px; font-weight: 600; line-height: 1.4; color: var(--lg-ink); }
 .lg-spine-readiness { display: grid; gap: 8px; justify-items: start; }
 .lg-spine-required { font-size: 15px; }

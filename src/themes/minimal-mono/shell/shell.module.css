@@ -30,15 +30,32 @@
   border-bottom: 1px solid #e0e0e0;
 }
 
-.wordmark {
+/* the two ways home (AC-22): the wordmark and โปรเจกต์ทั้งหมด — ink, no fill, underline on hover, 44 px tall
+   targets; the root's focus ring. No transition (mono has none). */
+.wordmark,
+.allProjects {
+  display: inline-flex;
+  align-items: center;
   flex: none;
-  letter-spacing: -0.01em;
-  color: inherit;
+  min-height: 44px;
+  color: #000000;
   text-decoration: none;
   border-radius: 6px;
 }
 
-.wordmark:hover {
+.wordmark {
+  letter-spacing: -0.01em;
+}
+
+.allProjects {
+  padding: 0 4px;
+  font-size: 15px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.wordmark:hover,
+.allProjects:hover {
   text-decoration: underline;
   text-underline-offset: 4px;
 }
@@ -204,11 +221,6 @@
     flex-wrap: wrap;
     row-gap: 8px;
     padding: 10px var(--mantine-spacing-md);
-  }
-
-  /* the project name needs the width more than the wordmark does */
-  .wordmark {
-    display: none;
   }
 
   .content {

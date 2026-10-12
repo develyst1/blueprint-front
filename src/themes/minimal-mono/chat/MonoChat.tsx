@@ -54,10 +54,13 @@ function Clamp({ children, className }: { children: ReactNode; className?: strin
   );
 }
 
-/** A question with no proposed answer: answer it (ส่ง), or park it with an optional reason (ไม่ต้องใช้ข้อนี้, quiet). */
+/** A question with no proposed answer: answer it (ส่ง), or park it (ไม่ต้องใช้ข้อนี้, quiet). The optional reason field
+ *  opens from ไม่ต้องใช้ข้อนี้ — not shown beside every question (REVIEW-C-003 row 12); then the same words send it. */
 function OwnAnswer({ q, titleId, actions, run, busy }: { q: Question; titleId: string; actions: ChatActions; run: Run; busy: boolean }) {
   const [answer, setAnswer] = useState("");
   const [reason, setReason] = useState("");
+  const [parking, setParking] = useState(false);
+  const opener = useRef<HTMLButtonElement>(null);
   const ids = { answer: useId(), reason: useId() };
   return (
     <div className={s.own}>
@@ -75,18 +78,25 @@ function OwnAnswer({ q, titleId, actions, run, busy }: { q: Question; titleId: s
           {sendWord}
         </Button>
       </form>
-      <form
-        className={s.ownRow}
-        onSubmit={(e) => {
-          e.preventDefault();
-          const why = reason.trim();
-          run(() => actions.park(q.key, why || undefined), (r) => { if (r.ok) setReason(""); });
-        }}
-      >
-        <label htmlFor={ids.reason} className={s.srOnly}>{reasonOptional}</label>
-        <input id={ids.reason} className={`${s.input} ${s.inputQuiet}`} placeholder={reasonOptional} value={reason} aria-describedby={titleId} onChange={(e) => setReason(e.target.value)} />
-        <button type="submit" className={s.textButton} disabled={busy} aria-describedby={titleId}>{notNeeded}</button>
-      </form>
+      {parking ? (
+        <form
+          className={s.ownRow}
+          onSubmit={(e) => {
+            e.preventDefault();
+            const why = reason.trim();
+            run(() => actions.park(q.key, why || undefined), (r) => { if (r.ok) setReason(""); });
+          }}
+          onKeyDown={(e) => { if (e.key === "Escape") { setParking(false); requestAnimationFrame(() => opener.current?.focus()); } }}
+        >
+          <label htmlFor={ids.reason} className={s.srOnly}>{reasonOptional}</label>
+          <input id={ids.reason} autoFocus className={`${s.input} ${s.inputQuiet}`} placeholder={reasonOptional} value={reason} aria-describedby={titleId} onChange={(e) => setReason(e.target.value)} />
+          <button type="submit" className={s.textButton} disabled={busy} aria-describedby={titleId}>{notNeeded}</button>
+        </form>
+      ) : (
+        <div className={s.ownRow}>
+          <button ref={opener} type="button" className={s.textButton} aria-expanded={false} aria-describedby={titleId} onClick={() => setParking(true)}>{notNeeded}</button>
+        </div>
+      )}
     </div>
   );
 }
@@ -95,6 +105,18 @@ function Pack({ pack, focus, marks, actions, run, busy }: {
   pack: Question[]; focus: string | null; marks: Map<string, Record<string, string>>; actions: ChatActions; run: Run; busy: boolean;
 }) {
   const box = useRef<HTMLDivElement>(null);
+  // more below the fold of the box? (drives the phone's bottom fade — REVIEW-C-003 row 10; gone once scrolled to the end)
+  const [more, setMore] = useState(false);
+  useEffect(() => {
+    const el = box.current;
+    if (!el) return;
+    const check = () => setMore(el.scrollTop + el.clientHeight < el.scrollHeight - 1);
+    check();
+    el.addEventListener("scroll", check, { passive: true });
+    const ro = new ResizeObserver(check);
+    ro.observe(el);
+    return () => { el.removeEventListener("scroll", check); ro.disconnect(); };
+  }, [pack.length]);
   // ?q=<key> (R7, AC-8): that card scrolled into the box (its own scrollTop, never scrollIntoView) and focused
   useEffect(() => {
     const el = box.current;
@@ -107,7 +129,7 @@ function Pack({ pack, focus, marks, actions, run, busy }: {
   const answerable = pack.filter((q) => q.proposedAnswer !== null && !q.suggested).map((q) => q.key);
   return (
     <section className={s.pack}>
-      <div ref={box} className={s.packBox} tabIndex={0} role="region" aria-label={packName}>
+      <div ref={box} className={s.packBox} tabIndex={0} role="region" aria-label={packName} data-more={more || undefined}>
         {pack.map((q) => {
           const titleId = `mono-q-${q.key}`;
           return (
@@ -180,11 +202,19 @@ export function MonoChat({ vm, actions, required }: ChatPageProps) {
 
   useEffect(() => setCreativity(vm.creativity), [vm.creativity]);
 
-  const run: Run = (fn, after) =>
+  // a refused undo answers only that undo: any later action clears it, and so does a new change card (REVIEW-C-003 row 1)
+  const run: Run = (fn, after) => {
+    setRefused(null);
     start(async () => {
       const r = await fn();
       after?.(r);
     });
+  };
+  useEffect(() => setRefused(null), [vm.lastChange?.changeSetId]);
+  const choose = (f: File) => {
+    setRefused(null);
+    setFile(f);
+  };
 
   const send = (e?: FormEvent) => {
     e?.preventDefault();
@@ -246,7 +276,7 @@ export function MonoChat({ vm, actions, required }: ChatPageProps) {
           onDrop={(e) => {
             setDragging(false);
             const f = e.dataTransfer.files[0];
-            if (f) { e.preventDefault(); setFile(f); }
+            if (f) { e.preventDefault(); choose(f); }
           }}
         />
         <div className={s.composerRow}>
@@ -259,7 +289,7 @@ export function MonoChat({ vm, actions, required }: ChatPageProps) {
               className={s.srOnly}
               tabIndex={-1}
               aria-hidden="true"
-              onChange={(e) => { const f = e.target.files?.[0]; if (f) setFile(f); e.target.value = ""; }}
+              onChange={(e) => { const f = e.target.files?.[0]; if (f) choose(f); e.target.value = ""; }}
             />
             <Button ref={fileButton} variant="default" radius="md" h={44} className={s.outline} onClick={() => fileInput.current?.click()}>{chooseFile}</Button>
             <Button type="submit" variant="default" radius="md" h={44} className={s.strong} disabled={pending || !text.trim()}>{sendWord}</Button>
@@ -323,6 +353,20 @@ export function MonoChat({ vm, actions, required }: ChatPageProps) {
         </Paper>
       ) : null}
 
+      {newestFirst.length ? (
+        <ol className={s.messages} reversed aria-label={logName}>
+          {newestFirst.map((m, i) => (
+            <li key={m.id} className={m.role === "user" ? s.user : m.role === "caw" ? s.caw : s.bot}>
+              <span className={s.srOnly}>{speaker[m.role]}</span>
+              <Clamp>{m.text}</Clamp>
+              {i === 0 || newestFirst[i - 1]!.atLabel !== m.atLabel ? <time dateTime={m.at} className={s.at}>{m.atLabel}</time> : null}
+            </li>
+          ))}
+        </ol>
+      ) : null}
+
+      {/* the edge comes after the conversation: on a phone the newest reply is read first (REVIEW-C-003 row 8); from
+          64em the grid pins it to the right column whatever its place in the DOM */}
       <aside className={s.edge}>
         <a href={vm.specHref} className={s.spec}>{toSpec}</a>
         {vm.sources.length || reading ? (
@@ -371,18 +415,6 @@ export function MonoChat({ vm, actions, required }: ChatPageProps) {
           </div>
         </div>
       </aside>
-
-      {newestFirst.length ? (
-        <ol className={s.messages} reversed aria-label={logName}>
-          {newestFirst.map((m, i) => (
-            <li key={m.id} className={m.role === "user" ? s.user : m.role === "caw" ? s.caw : s.bot}>
-              <span className={s.srOnly}>{speaker[m.role]}</span>
-              <Clamp>{m.text}</Clamp>
-              {i === 0 || newestFirst[i - 1]!.atLabel !== m.atLabel ? <time dateTime={m.at} className={s.at}>{m.atLabel}</time> : null}
-            </li>
-          ))}
-        </ol>
-      ) : null}
 
       <RequiredList items={leftover} />
     </div>

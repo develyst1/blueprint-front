@@ -3,14 +3,14 @@ import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { findRequired, requiredId } from "@/core/theme/required";
-import { stuck as words } from "@/core/words";
+import { allProjects, productMark, stuck as words } from "@/core/words";
 import type { GateCode } from "@/features/ready/contract";
 import { readyRequiredId } from "@/features/ready/required";
 import {
   buildApis, buildCard, buildFlowchart, buildHistory, buildOverview, buildScreens, buildSequence, buildStuck, buildWeb,
   buildWorkOrder,
 } from "./pages";
-import { sampleHistory } from "@/core/model/samples";
+import { sampleFrame, sampleHistory } from "@/core/model/samples";
 import { confirmedOf, exportHref, frame, readiness } from "./common";
 import { pageRequired, shellRequired } from "./required";
 import { sampleLayouts as L } from "./sample-layouts";
@@ -310,6 +310,24 @@ describe("TASK-B-015: the ready page's required ids come from Team C's own modul
     const codes: GateCode[] = ["stuck", "no_quiz", "too_few", "not_100", "stale"];
     for (const code of codes) expect(requiredId.readyReason(code)).toBe(readyRequiredId.reason(code));
     expect(requiredId.readyScore).toBe(readyRequiredId.score);
+  });
+});
+
+describe("v1.12: every frame carries the project list's href, built by the core (AC-22, D-036)", () => {
+  test("homeHref is \"/\" on real frames of every seed, on the chat / ready frames, and on the sample", () => {
+    for (const d of [worked, every, empty]) {
+      expect(frame(d, "overview").homeHref).toBe("/");
+      expect(frame(d, "overview", "chat").homeHref).toBe("/");
+      expect(frame(d, "overview", "ready").homeHref).toBe("/");
+    }
+    expect(vm(buildStuck(worked)).frame.homeHref).toBe("/");
+    expect(sampleFrame("overview").homeHref).toBe("/");
+    expect(sampleFrame("history").homeHref).toBe("/");
+  });
+
+  test("the two words are REQ-002's, verbatim", () => {
+    expect(allProjects).toBe("โปรเจกต์ทั้งหมด");
+    expect(productMark).toBe("Blueprint");
   });
 });
 

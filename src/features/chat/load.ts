@@ -13,7 +13,7 @@ import { loadProjectData } from "@/core/model/load";
 import type { FrameVM, RequiredItem } from "@/core/theme/contract";
 import { requiredId } from "@/core/theme/required";
 import type { ChatChangeVM, ChatMessageVM, ChatModelVM, ChatQuestionVM, ChatSourceVM, ChatVM } from "./contract";
-import { acceptPack, botFailed, cawAsks } from "./words";
+import { acceptPack, botFailed, cawAsks, tierLabel } from "./words";
 
 // ---------- API shapes not in the generated schema yet (blueprint-back src/http/routes/*.ts, read 2026-10-09) ----------
 export type ApiMessage = {
@@ -131,11 +131,12 @@ export function toSources(rows: ApiSource[]): ChatSourceVM[] {
  *  Labels are the gateway's own names — no word is written for them. The current model stays in the list. */
 export function toModel(current: string, m: ApiModels | null): ChatModelVM | null {
   if (!m) return null;
+  const tierWord = (t: string) => (t in tierLabel ? tierLabel[t as keyof typeof tierLabel] : t);
   const options = [
-    ...m.tiers.map((t) => ({ value: `tier:${t}`, label: t })),
+    ...m.tiers.map((t) => ({ value: `tier:${t}`, label: tierWord(t) })),
     ...Object.entries(m.models).flatMap(([provider, names]) => names.map((n) => ({ value: `${provider}/${n}`, label: `${provider}/${n}` }))),
   ];
-  if (!options.some((o) => o.value === current)) options.unshift({ value: current, label: current.startsWith("tier:") ? current.slice(5) : current });
+  if (!options.some((o) => o.value === current)) options.unshift({ value: current, label: current.startsWith("tier:") ? tierWord(current.slice(5)) : current });
   return { current, options };
 }
 
@@ -145,16 +146,18 @@ export function buildChatVM(input: {
 }): ChatVM {
   const { data } = input;
   const newestBot = [...input.messages].reverse().find((m) => m.role === "bot");
+  const failed = newestBot?.roundStatus === "bot_could_not_answer";
   return {
     frame: chatFrame(data),
-    messages: toMessages(input.messages),
+    // The failed alert already says "บอทตอบไม่ได้ตอนนี้": the newest failed bot row is not shown a second time (older ones stay).
+    messages: toMessages(input.messages).filter((m) => !(failed && m.id === newestBot!.id)),
     pack: toPack(data, input.focus),
     focus: input.focus,
     lastChange: input.change,
     sources: toSources(input.sources),
     model: toModel(data.project.model, input.models),
     creativity: data.project.creativity,
-    failed: newestBot?.roundStatus === "bot_could_not_answer",
+    failed,
     specHref: href(data.project.id, "overview"),
   };
 }

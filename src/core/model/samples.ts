@@ -7,7 +7,7 @@ import type {
   ScreensVM, SeqLayout, SequenceVM, StepVM, StuckVM, SwimLayout, WebLayout, WebVM, WorkOrderVM, WorkVM,
 } from "@/core/theme/contract";
 import { formatThaiDate } from "@/core/format/date";
-import { nav, pageSlug } from "@/core/model/build/common";
+import { HOME_HREF, nav, pageSlug } from "@/core/model/build/common";
 import { requiredId } from "@/core/theme/required";
 import { realLayouts } from "@/core/layout";
 import type { ApiFlowchart, ApiLink, ApiPart } from "@/core/model/build/types";
@@ -156,7 +156,7 @@ const STUCK_COUNT = 1; // GET …/stuck → 1 item (Q-001)
 const readiness: ReadinessVM = { stuckCount: STUCK_COUNT, label: readinessStuck(STUCK_COUNT), ready: false };
 
 export function sampleFrame(page: PageId): FrameVM {
-  return { project, readiness, nav: nav(PROJECT_ID, page), page }; // the core's own strip (TASK-B-011 Q1)
+  return { project, readiness, nav: nav(PROJECT_ID, page), page, homeHref: HOME_HREF }; // the core's own strip (TASK-B-011 Q1)
 }
 
 const steps: StepVM[] = STEPS.map(([key, title, ends], i) => ({

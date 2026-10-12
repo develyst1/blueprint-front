@@ -8,8 +8,7 @@ import type { ReactNode } from "react";
 import type { FrameVM, RequiredItem } from "@/core/theme/contract";
 import { contentHref } from "@/core/theme/anchors";
 import { requiredId } from "@/core/theme/required";
-import { HOME_HREF } from "@/core/model/build/common";
-import { backHome, pageNav, skipToContent } from "@/core/words";
+import { allProjects, pageNav, productMark, skipToContent } from "@/core/words";
 import { ReadinessStrip } from "../parts/ReadinessStrip";
 import { RequiredList, RequiredPicker } from "../parts/Required";
 import { StripScroll } from "./StripScroll";
@@ -42,14 +41,18 @@ export function Shell({ frame, required = [], tools, children }: { frame: FrameV
         {/* one row from 48em up; below it the row wraps, so the project name keeps its width (A-048 R1) */}
         <div className={s.headerRow}>
           <Group gap="lg" wrap="nowrap" miw={0} className={s.headerStart}>
-            {/* the wordmark is the way back home (the core's HOME_HREF) */}
-            <Text component="a" href={HOME_HREF} aria-label={backHome} fw={800} fz="md" className={s.wordmark}>
-              Blueprint
+            {/* the wordmark is a way home (AC-22): the frame's homeHref; its accessible name is its visible word (WCAG 2.5.3) */}
+            <Text component="a" href={frame.homeHref} fw={800} fz="md" className={s.wordmark}>
+              {productMark}
             </Text>
             <Text component="h1" fw={700} fz="lg" truncate="end" className={s.project}>
               {frame.project.name}
             </Text>
           </Group>
+          {/* the way home in words (AC-22, D-036) — quiet: ink text, underline on hover; a screen-only control */}
+          <a href={frame.homeHref} className={s.allProjects} data-print="screen-only">
+            {allProjects}
+          </a>
           {stuckNav ? (
             <a href={stuckNav.href} className={s.stripHome}>
               {strip}

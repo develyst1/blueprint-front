@@ -458,3 +458,19 @@
   border-color: #8a8a8a;
   border-style: dashed;
 }
+
+/* motion is a courtesy: with reduced motion the fades and the 1px press are off (frontend-finish rule 9) */
+@media (prefers-reduced-motion: reduce) {
+  .box,
+  .input,
+  .primary,
+  .secondary,
+  .textButton {
+    transition: none;
+  }
+
+  .primary:active:not(:disabled),
+  .secondary:active:not(:disabled) {
+    transform: none;
+  }
+}

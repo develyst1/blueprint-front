@@ -6,7 +6,7 @@ import {
 } from "./load";
 import * as core from "@/core/words";
 import * as chatWords from "./words";
-import { acceptPack, botFailed, cawAsks } from "./words";
+import { acceptPack, botFailed, cawAsks, tierLabel } from "./words";
 
 const origin = { stamp: "team-proposed" as const, date: "2026-10-09" };
 const question = (key: string, extra: Record<string, unknown> = {}) => ({
@@ -147,6 +147,36 @@ describe("sources and model", () => {
     const m = toModel("old/gone", { models: { prov: ["m1"] }, tiers: ["small", "medium", "flagship"] })!;
     expect(m.options.map((o) => o.value)).toEqual(["old/gone", "tier:small", "tier:medium", "tier:flagship", "prov/m1"]);
   });
+
+  test("A-056 row 13 (D-035): the three tiers read เร็ว · สมดุล · เก่งที่สุด; provider/model ids stay as they are", () => {
+    expect(tierLabel).toEqual({ small: "เร็ว", medium: "สมดุล", flagship: "เก่งที่สุด" });
+    const m = toModel("tier:medium", { models: { openai: ["gpt-4.1-mini"] }, tiers: ["small", "medium", "flagship"] })!;
+    expect(m.options.map((o) => [o.value, o.label])).toEqual([
+      ["tier:small", "เร็ว"], ["tier:medium", "สมดุล"], ["tier:flagship", "เก่งที่สุด"], ["openai/gpt-4.1-mini", "openai/gpt-4.1-mini"],
+    ]);
+    // a current tier the list no longer holds is still worded; a tier the words do not know keeps the gateway's own name
+    expect(toModel("tier:small", { models: {}, tiers: ["medium"] })!.options[0]).toEqual({ value: "tier:small", label: "เร็ว" });
+    expect(toModel("tier:huge", { models: {}, tiers: ["huge"] })!.options.map((o) => o.label)).toEqual(["huge"]);
+  });
+});
+
+test("A-056 row 7: when the bot failed, the newest failed bot row is left out (the alert says it); older ones stay; not failed → all rows", () => {
+  const input = (messages: ApiMessage[]) => buildChatVM({ data: data([question("Q-001")]), messages, focus: null, change: null, sources: [], models: null });
+  const rows = [
+    msg(1, "user"), msg(2, "bot", { content: "", roundStatus: "bot_could_not_answer" }), // an older failure, already retried
+    msg(3, "user"), msg(4, "bot", { content: "ตอบแล้ว", roundStatus: "no_changes" }),
+    msg(5, "user"), msg(6, "bot", { content: "", roundStatus: "bot_could_not_answer" }), // the newest bot row: failed
+  ];
+  const failed = input(rows);
+  expect(failed.failed).toBe(true);
+  expect(failed.messages.map((m) => m.id)).toEqual(["m-1", "m-2", "m-3", "m-4", "m-5"]);
+  expect(failed.messages.find((m) => m.id === "m-2")!.text).toBe(botFailed.message);
+  const ok = input(rows.slice(0, 4));
+  expect(ok.failed).toBe(false);
+  expect(ok.messages.map((m) => m.id)).toEqual(["m-1", "m-2", "m-3", "m-4"]);
+  // a failed row that is not the newest bot row (the bot answered since) is not "the" failure
+  expect(input([...rows.slice(0, 2), msg(3, "user"), msg(4, "bot", { content: "ตอบแล้ว", roundStatus: "applied", changeSetId: "cs-a" })]).messages.map((m) => m.id))
+    .toEqual(["m-1", "m-2", "m-3", "m-4"]);
 });
 
 test("buildChatVM: failed from the newest bot row, the nav marks แชต current (A-039), ดู spec → overview", () => {

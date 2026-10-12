@@ -128,6 +128,10 @@ export const pageNav = "หน้าใน spec";
 export const notFound = "ไม่พบโปรเจกต์นี้";
 export const backHome = "กลับหน้าโปรเจกต์";
 
+// Back to the project list, in every frame (AC-22, D-036): the wordmark is the link, and the words say where it goes
+export const allProjects = "โปรเจกต์ทั้งหมด";
+export const productMark = "Blueprint";
+
 // The new-project dialog's close button
 export const closeDialog = "ปิด";
 

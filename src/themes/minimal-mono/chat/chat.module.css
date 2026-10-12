@@ -213,6 +213,17 @@
   }
 }
 
+/* more cards below: the box's bottom fades, the cue that it scrolls (REVIEW-C-003 row 10, like ④'s step row) — at
+   every width, since 1440 caps the box too (A-057 critique: ตามนั้นทั้ง N ข้อ under cards you cannot see); gone once
+   scrolled to the end, and while focus is inside so nothing being read is faded */
+.packBox[data-more] {
+  mask-image: linear-gradient(to bottom, #000 calc(100% - 40px), transparent);
+}
+
+.packBox[data-more]:focus-within {
+  mask-image: none;
+}
+
 .card {
   padding: 16px 18px;
   border: 1.5px solid #8a8a8a;
@@ -420,33 +431,36 @@
   gap: 10px;
 }
 
+/* every turn left-aligned, mono's own rows — no left/right bubbles (direction § 2, REVIEW-C-003 row 9). The speaker
+   is carried by weight and edge: the person in 700 ink on the canvas, the bot 400 on a white row with the 1.5 px line,
+   CAW dashed. No fills. */
 .messages li {
   max-width: 44em;
   padding: 12px 14px;
+  border: 1.5px solid transparent;
   border-radius: var(--mantine-radius-lg);
+  color: #000000;
   font-size: 16px;
   line-height: 1.55;
 }
 
-/* the person: on the right, a light fill (decoration — never black, which is the stuck strip's) */
-.user {
-  align-self: flex-end;
-  background: #e0e0e0;
-  color: #000000;
+/* each kind under .messages li, so its edge beats the row's transparent one (specificity) */
+.messages .user {
+  font-weight: 700;
 }
 
-.bot {
-  align-self: flex-start;
+.messages .bot {
   background: #ffffff;
-  color: #000000;
-  border: 1.5px solid #8a8a8a;
+  border-color: #8a8a8a;
 }
 
-.caw {
-  align-self: flex-start;
+.messages .caw {
   background: #ffffff;
-  color: #000000;
   border: 1.5px dashed #000000;
+}
+
+.messages .at {
+  font-weight: 400;
 }
 
 .at {

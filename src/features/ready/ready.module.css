@@ -303,3 +303,15 @@
   padding-top: 12px;
   border-top: 1px solid #767676;
 }
+
+/* Reduced motion (frontend-finish rule 9, TASK-C-019): no transition on the field or the buttons, and a pressed button
+   does not move. */
+@media (prefers-reduced-motion: reduce) {
+  .input,
+  .button {
+    transition: none;
+  }
+  .button:active:not(:disabled) {
+    transform: none;
+  }
+}
