@@ -3,7 +3,8 @@ import type { ReactNode } from "react";
 import type { FrameVM, RequiredItem } from "../contract";
 import { contentHref } from "../anchors";
 import { requiredId } from "../required";
-import { pageNav, skipToContent } from "@/core/words";
+import { HOME_HREF } from "@/core/model/build/common";
+import { backHome, pageNav, skipToContent } from "@/core/words";
 import { Mark } from "./Mark";
 import s from "./default.module.css";
 
@@ -14,6 +15,7 @@ export function Shell({ frame, required, tools, children }: { frame: FrameVM; re
     <>
       <a className={s.skip} href={contentHref} data-print="screen-only">{skipToContent}</a>
       <header className={s.header}>
+        <a className={s.homeLink} href={HOME_HREF} data-print="screen-only">← {backHome}</a>
         <h1>{frame.project.name}</h1>
         <span className={s.muted}>{frame.project.createdLabel}</span>
         <span className={frame.readiness.stuckCount > 0 ? `${s.readiness} ${s.readinessStuck}` : s.readiness}>

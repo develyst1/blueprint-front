@@ -8,7 +8,8 @@
 import type { FrameVM, RequiredItem } from "@/core/theme/contract";
 import { contentHref } from "@/core/theme/anchors";
 import { findRequired, requiredId, requiredProps } from "@/core/theme/required";
-import { skipToContent } from "@/core/words";
+import { HOME_HREF } from "@/core/model/build/common";
+import { backHome, skipToContent } from "@/core/words";
 import type { ReactNode } from "react";
 import { NavStrip } from "./client/NavStrip";
 import { Readiness } from "./primitives/Seal";
@@ -23,7 +24,8 @@ export function Shell({ frame, required, tools, children }: { frame: FrameVM; re
         {skipToContent}
       </a>
       <header className="lg-spine">
-        <p className="lg-wordmark">Blueprint</p>
+        {/* the wordmark is the way back home (the core's HOME_HREF) */}
+        <a className="lg-wordmark" href={HOME_HREF} aria-label={backHome}>Blueprint</a>
         <p className="lg-spine-project">{frame.project.name}</p>
         <div className="lg-spine-readiness">
           <Readiness

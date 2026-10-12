@@ -45,6 +45,7 @@
   background: #ffffff;
   border: 1px solid #767676;
   border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(17, 17, 17, 0.08);
 }
 
 /* ---------- summary: the steps as a small numbered row (R1) ---------- */
@@ -66,6 +67,8 @@
   font-size: 15px;
   border: 1px solid #767676;
   border-radius: 999px;
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgba(17, 17, 17, 0.06);
 }
 
 /* a stuck step is drawn heavier — never by colour alone (the stuck words are the link below) */
@@ -156,6 +159,12 @@
   background: #ffffff;
   border: 1px solid #767676;
   border-radius: 10px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.input:focus {
+  border-color: #111111;
+  box-shadow: 0 0 0 4px rgba(17, 17, 17, 0.1);
 }
 
 .button {
@@ -169,13 +178,20 @@
   background: #ffffff;
   color: #111111;
   border: 2px solid #3d3d3d;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.12s ease, box-shadow 0.15s ease;
 }
+
+.button:hover:not(:disabled) { background: #f2f2f2; border-color: #111111; }
+.button:active:not(:disabled) { transform: translateY(1px); }
 
 .primary {
   background: #111111;
   color: #ffffff;
   border-color: #111111;
+  box-shadow: 0 1px 3px rgba(17, 17, 17, 0.25);
 }
+
+.primary:hover:not(:disabled) { background: #2b2b2b; border-color: #2b2b2b; }
 
 .button:disabled {
   opacity: 0.55;

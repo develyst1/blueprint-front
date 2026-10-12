@@ -2,12 +2,13 @@
 
 // clean-blue shell: skip link · top bar (project, date, readiness, the core's tools) · the page dock · the page.
 // No sidebar — mono and gold both have one (direction § 1).
-import { CheckCircleFilled, WarningFilled } from "@ant-design/icons";
+import { ArrowLeftOutlined, CheckCircleFilled, WarningFilled } from "@ant-design/icons";
 import type { ReactNode } from "react";
 import type { FrameVM, ReadinessVM, RequiredItem } from "@/core/theme/contract";
 import { contentHref } from "@/core/theme/anchors";
 import { requiredId } from "@/core/theme/required";
-import { pageNav, skipToContent } from "@/core/words";
+import { HOME_HREF } from "@/core/model/build/common";
+import { backHome, pageNav, skipToContent } from "@/core/words";
 import { PageTile } from "./parts/Tile";
 import { Req } from "./parts/Req";
 import { useEdges } from "./parts/useEdges";
@@ -28,6 +29,7 @@ export function Readiness({ readiness, required }: { readiness: ReadinessVM; req
 export function Bar({ frame, required, tools }: { frame: FrameVM; required: RequiredItem[]; tools?: ReactNode }) {
   return (
     <header className={s.bar}>
+      <a className={s.homeLink} href={HOME_HREF} data-print="screen-only"><ArrowLeftOutlined /> {backHome}</a>
       <div className={s.project}>
         <h1>{frame.project.name}</h1>
         <span className={s.created}>{frame.project.createdLabel}</span>

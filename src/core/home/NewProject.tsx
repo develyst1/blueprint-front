@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useRef, useState, useTransition, type ReactNode } from "react";
 import { createProjectAction } from "@/app/actions";
 import { chatHref } from "@/core/model/build/common";
-import { apiDown, newProject, newProjectSteps } from "@/core/words";
+import { apiDown, closeDialog, newProject, newProjectSteps } from "@/core/words";
 import s from "./home.module.css";
 
 export type ThemeOption = { id: string; name: string; preview: ReactNode };
@@ -32,6 +32,7 @@ export function NewProject({ themes }: { themes: ThemeOption[] }) {
     <>
       <button type="button" className={s.button} onClick={() => dialog.current?.showModal()}>{newProject}</button>
       <dialog ref={dialog} className={s.dialog} aria-label={newProject} onClose={() => setFailed(false)}>
+        <button type="button" className={s.close} aria-label={closeDialog} onClick={close}>×</button>
         <ol className={s.steps}>
           {newProjectSteps.map((label, i) => <li key={label} aria-current={i === step ? "step" : undefined}>{label}</li>)}
         </ol>

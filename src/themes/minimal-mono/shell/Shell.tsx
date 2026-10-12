@@ -8,7 +8,8 @@ import type { ReactNode } from "react";
 import type { FrameVM, RequiredItem } from "@/core/theme/contract";
 import { contentHref } from "@/core/theme/anchors";
 import { requiredId } from "@/core/theme/required";
-import { pageNav, skipToContent } from "@/core/words";
+import { HOME_HREF } from "@/core/model/build/common";
+import { backHome, pageNav, skipToContent } from "@/core/words";
 import { ReadinessStrip } from "../parts/ReadinessStrip";
 import { RequiredList, RequiredPicker } from "../parts/Required";
 import { StripScroll } from "./StripScroll";
@@ -41,7 +42,8 @@ export function Shell({ frame, required = [], tools, children }: { frame: FrameV
         {/* one row from 48em up; below it the row wraps, so the project name keeps its width (A-048 R1) */}
         <div className={s.headerRow}>
           <Group gap="lg" wrap="nowrap" miw={0} className={s.headerStart}>
-            <Text component="span" fw={800} fz="md" className={s.wordmark}>
+            {/* the wordmark is the way back home (the core's HOME_HREF) */}
+            <Text component="a" href={HOME_HREF} aria-label={backHome} fw={800} fz="md" className={s.wordmark}>
               Blueprint
             </Text>
             <Text component="h1" fw={700} fz="lg" truncate="end" className={s.project}>

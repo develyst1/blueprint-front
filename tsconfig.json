@@ -45,7 +45,9 @@
     ".next-b-check/types/**/*.ts",
     ".next-b-check/dev/types/**/*.ts",
     ".next-b2-check/types/**/*.ts",
-    ".next-b2-check/dev/types/**/*.ts"
+    ".next-b2-check/dev/types/**/*.ts",
+    ".next-ui/types/**/*.ts",
+    ".next-ui/dev/types/**/*.ts"
   ],
   "exclude": [
     "node_modules",

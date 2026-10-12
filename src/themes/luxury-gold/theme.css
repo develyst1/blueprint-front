@@ -216,9 +216,12 @@ button.lg-medallion:hover,
   padding: 32px 20px; background: var(--lg-surface); border-right: 1px solid var(--lg-card-edge);
 }
 .lg-wordmark {
+  display: block;
   font-family: var(--font-serif); font-size: 22px; font-weight: 600; color: var(--lg-navy); line-height: 1.3;
   padding-bottom: 12px; border-bottom: 1px solid var(--lg-gold-line);
+  text-decoration: none; transition: color 0.15s ease;
 }
+.lg-wordmark:hover { color: var(--lg-gold-deep, var(--lg-navy)); text-decoration: underline; text-underline-offset: 6px; }
 .lg-spine-project { font-family: var(--font-serif); font-size: 20px; font-weight: 600; line-height: 1.4; color: var(--lg-ink); }
 .lg-spine-readiness { display: grid; gap: 8px; justify-items: start; }
 .lg-spine-required { font-size: 15px; }

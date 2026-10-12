@@ -2,50 +2,176 @@
 .home {
   font-family: "Sukhumvit Set", "Thonburi", system-ui, sans-serif;
   color: #1b1f24;
-  padding: 24px 16px;
+  padding: 40px 24px 64px;
   max-width: 1200px;
   margin: 0 auto;
+  min-height: 100vh;
+}
+/* the canvas, full-bleed behind the centered column */
+.home::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(1200px 400px at 85% -10%, rgba(20, 88, 196, 0.07), transparent 60%),
+    radial-gradient(900px 360px at -10% 0%, rgba(20, 88, 196, 0.05), transparent 55%),
+    #f7f8fa;
 }
 .home:focus { outline: none; }
-.top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
-.top h1 { margin: 0; font-size: 24px; }
-.grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
-.grid > li { min-width: 0; }
+.top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 28px; }
+.top h1 {
+  margin: 0;
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.top h1::before {
+  content: "";
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+  background: linear-gradient(135deg, #2f7aeb, #1458c4);
+  box-shadow: 0 2px 6px rgba(20, 88, 196, 0.4);
+}
+.grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+/* every theme's card on the home grid lifts a little under the pointer */
+.grid > li { min-width: 0; transition: transform 0.15s ease; }
+.grid > li:hover { transform: translateY(-2px); }
 .button {
+  font: inherit;
+  font-weight: 600;
+  min-height: 44px;
+  padding: 8px 18px;
+  border: 1px solid #1458c4;
+  border-radius: 10px;
+  background: linear-gradient(180deg, #2f7aeb, #1458c4);
+  color: #ffffff;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(20, 88, 196, 0.35), 0 4px 12px rgba(20, 88, 196, 0.22);
+  transition: transform 0.12s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+.button:hover { background: linear-gradient(180deg, #2168d8, #0f4aa3); box-shadow: 0 2px 4px rgba(20, 88, 196, 0.35), 0 8px 20px rgba(20, 88, 196, 0.28); transform: translateY(-1px); }
+.button:active { background: #0b3a80; transform: translateY(0); box-shadow: 0 1px 2px rgba(20, 88, 196, 0.3); }
+.button:disabled { background: #8aa6d6; border-color: #8aa6d6; box-shadow: none; cursor: not-allowed; }
+.button:focus-visible, .ghost:focus-visible, .field input:focus-visible, .option:focus-within { outline: 3px solid #1458c4; outline-offset: 2px; }
+.ghost {
   font: inherit;
   min-height: 44px;
   padding: 8px 16px;
-  border: 1px solid #1458c4;
-  border-radius: 8px;
-  background: #1458c4;
-  color: #ffffff;
+  border: 1px solid #8a93a0;
+  border-radius: 10px;
+  background: #ffffff;
+  color: inherit;
   cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
 }
-.button:hover { background: #0f4aa3; }
-.button:active { background: #0b3a80; }
-.button:disabled { background: #8aa6d6; border-color: #8aa6d6; cursor: not-allowed; }
-.button:focus-visible, .ghost:focus-visible, .field input:focus-visible, .option:focus-within { outline: 3px solid #1458c4; outline-offset: 2px; }
-.ghost { font: inherit; min-height: 44px; padding: 8px 16px; border: 1px solid #8a93a0; border-radius: 8px; background: #ffffff; color: inherit; cursor: pointer; }
-.ghost:hover { background: #f3f4f6; }
+.ghost:hover { background: #f3f4f6; border-color: #5b6573; }
 
 .dialog {
+  position: relative;
   width: min(960px, calc(100vw - 32px));
   max-height: calc(100vh - 32px);
-  border: 1px solid #c9ced6;
-  border-radius: 12px;
-  padding: 20px;
+  border: 1px solid #e2e6eb;
+  border-radius: 16px;
+  padding: 24px 28px;
   color: #1b1f24;
   font-family: "Sukhumvit Set", "Thonburi", system-ui, sans-serif;
+  box-shadow: 0 24px 64px rgba(27, 31, 36, 0.22), 0 4px 16px rgba(27, 31, 36, 0.12);
 }
-.dialog::backdrop { background: rgba(27, 31, 36, 0.45); }
-.steps { display: flex; gap: 8px; padding: 0; margin: 0 0 16px; list-style: none; flex-wrap: wrap; }
-.steps li { padding: 4px 12px; border-radius: 999px; border: 1px solid #c9ced6; }
-.steps li[aria-current="step"] { border-color: #1458c4; color: #1458c4; font-weight: 700; }
-.field { display: grid; gap: 6px; margin-bottom: 16px; }
-.field input { font: inherit; padding: 10px 12px; min-height: 44px; border: 1px solid #8a93a0; border-radius: 8px; }
-.themes { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; margin: 0 0 16px; padding: 0; border: 0; }
-.option { display: grid; gap: 8px; padding: 10px; border: 2px solid #d5dae1; border-radius: 10px; cursor: pointer; min-width: 0; }
-.option:has(input:checked) { border-color: #1458c4; }
-.option input { width: 20px; height: 20px; }
-.actions { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
+/* an open dialog is a column, so the action row can stick to its bottom edge while the themes scroll */
+.dialog[open] { display: flex; flex-direction: column; }
+.close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: #5b6573;
+  font-size: 26px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.close:hover { background: #eef1f5; color: #1b1f24; }
+.close:focus-visible { outline: 3px solid #1458c4; outline-offset: 2px; }
+.dialog::backdrop { background: rgba(27, 31, 36, 0.45); backdrop-filter: blur(3px); }
+.steps { display: flex; gap: 8px; padding: 0; margin: 0 0 20px; list-style: none; flex-wrap: wrap; counter-reset: step; }
+.steps li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 14px 5px 6px;
+  border-radius: 999px;
+  border: 1px solid #d5dae1;
+  background: #ffffff;
+  color: #5b6573;
+  font-size: 14px;
+  counter-increment: step;
+}
+.steps li::before {
+  content: counter(step);
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #eef1f5;
+  color: #5b6573;
+  font-size: 13px;
+  font-weight: 700;
+}
+.steps li[aria-current="step"] { border-color: #1458c4; color: #1458c4; font-weight: 700; background: #eef4fd; }
+.steps li[aria-current="step"]::before { background: #1458c4; color: #ffffff; }
+.field { display: grid; gap: 6px; margin-bottom: 20px; }
+.field > span { font-weight: 600; }
+.field input {
+  font: inherit;
+  padding: 10px 14px;
+  min-height: 44px;
+  border: 1px solid #8a93a0;
+  border-radius: 10px;
+  background: #ffffff;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.field input:hover { border-color: #5b6573; }
+.field input:focus { border-color: #1458c4; box-shadow: 0 0 0 4px rgba(20, 88, 196, 0.14); }
+.themes { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; margin: 0 0 20px; padding: 0; border: 0; }
+.themes > legend { font-weight: 600; padding: 0; margin-bottom: 4px; }
+.option {
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+  border: 2px solid #d5dae1;
+  border-radius: 14px;
+  background: #ffffff;
+  cursor: pointer;
+  min-width: 0;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+}
+.option:hover { border-color: #8a93a0; box-shadow: 0 4px 14px rgba(27, 31, 36, 0.08); transform: translateY(-1px); }
+.option:has(input:checked) { border-color: #1458c4; background: #f6f9fe; box-shadow: 0 4px 16px rgba(20, 88, 196, 0.14); }
+.option input { width: 20px; height: 20px; accent-color: #1458c4; }
+.option > span { display: flex; align-items: center; gap: 8px; font-weight: 600; }
+.actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  position: sticky;
+  bottom: -24px; /* cover the dialog's own bottom padding, so the row hugs the edge */
+  margin: 4px -28px -24px;
+  padding: 12px 28px 16px;
+  background: #ffffff;
+  border-top: 1px solid #eef1f5;
+  border-radius: 0 0 16px 16px;
+}
 .error { color: #a6460a; margin: 0 0 12px; }
