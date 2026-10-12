@@ -117,8 +117,11 @@ export function Chat({ vm, actions, required }: ChatPageProps) {
   const ids = { hint: useId(), origin: useId(), model: useId(), creativity: useId() };
 
   useEffect(() => setCreativity(vm.creativity), [vm.creativity]);
+  // an action's failure is shown until the next action (REVIEW-C-004 row 5; the rule TASK-A-056 writes into ChatActions):
+  // a new change set clears an old undo refusal too
+  useEffect(() => setRefused(null), [vm.lastChange?.changeSetId]);
 
-  const run: Run = (fn, after) => start(async () => { const r = await fn(); after?.(r); });
+  const run: Run = (fn, after) => { setRefused(null); start(async () => { const r = await fn(); after?.(r); }); };
   const send = () => {
     if (!text.trim() || pending) return;
     const said = text;
@@ -254,7 +257,9 @@ export function Chat({ vm, actions, required }: ChatPageProps) {
               {vm.model && (
                 <div className={s.field}>
                   <label htmlFor={ids.model}>{modelLabel}</label>
-                  <Select id={ids.model} ref={model} size="large" value={vm.model.current} disabled={pending} options={vm.model.options}
+                  {/* virtual={false}: Ant's virtual list draws a hidden listbox whose text is each option's value (`tier:small`) —
+                      @rc-component/select OptionList.js:262–283; a few models need no virtualising (REVIEW-C-004 row 14) */}
+                  <Select id={ids.model} ref={model} size="large" virtual={false} value={vm.model.current} disabled={pending} options={vm.model.options}
                     onChange={(v: string) => run(() => actions.setModel(v))} />
                 </div>
               )}

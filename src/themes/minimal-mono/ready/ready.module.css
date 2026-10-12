@@ -118,6 +118,13 @@
   flex: none;
 }
 
+/* the confirmed version's date, on the settled line: quiet */
+.settledDate {
+  font-size: 15px;
+  font-weight: 600;
+  color: #5c5c5c;
+}
+
 .strong:hover,
 .outline:hover,
 .confirm:hover {

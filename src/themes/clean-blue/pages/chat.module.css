@@ -6,7 +6,7 @@
 .edge { position: sticky; top: 16px; min-width: 0; }
 @media (max-width: 1100px) {
   .desk { grid-template-columns: minmax(0, 1fr); }
-  .edge { position: static; order: 0; }
+  .edge { position: static; order: 2; } /* after the conversation on one column (row 7; closes B-013's tab-order P3) */
   /* on one column the edge reads after the pack, as Team A's default page does */
   .work { display: contents; }
   .work > * { order: -1; }
@@ -17,7 +17,8 @@
 .muted { color: var(--cb-ink2); font-size: 14px; }
 .row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
 
-.composer { border-color: var(--cb-blue); }
+/* row 1: Ant's own card border out-ranked a bare class — scope it to the Ant card so the rule lands */
+.composer:global(.ant-card) { border: 2px solid var(--cb-blue); }
 .composerForm { display: grid; gap: 12px; }
 .composerRow { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; }
 .hint { color: var(--cb-ink2); font-size: 14px; }

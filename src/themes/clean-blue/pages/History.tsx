@@ -31,7 +31,7 @@ export function History({ vm, required }: { vm: PageVMs["history"]; required: Re
                     <div className={s.entry}>
                       <div className={s.entryHead}>
                         <strong>{e.atLabel}</strong>
-                        {e.whatLabel && <Tag color="blue">{e.whatLabel}</Tag>}
+                        {e.whatLabel && <Tag className={s.tagBlue}>{e.whatLabel}</Tag>}
                         <span className={s.muted}>{e.cause}</span>
                       </div>
                       <span>{e.summary}</span>

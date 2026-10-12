@@ -198,6 +198,18 @@
   cursor: default;
 }
 
+/* The gate's off Confirm is a state ("not yet"), not a dead grey slab (TASK-C-021, frontend-finish rule 8): the card's
+   own surface, a dashed edge, readable grey ink, full opacity. The reasons under it say why. Other off buttons keep the
+   rule above. */
+.primary:disabled {
+  background: transparent;
+  color: #5c5c5c;
+  border: 1px dashed #767676;
+  box-shadow: none;
+  opacity: 1;
+  cursor: not-allowed;
+}
+
 .items {
   display: grid;
   gap: 12px;

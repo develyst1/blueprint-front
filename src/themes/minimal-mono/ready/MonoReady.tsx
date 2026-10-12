@@ -137,9 +137,9 @@ function AskBox({ hasQuiz, restart, actions }: { hasQuiz: boolean; restart: bool
  *  D-030) it is not a button at all but a settled line — ink and a check, never the dashed "off" look (row 2). A confirm
  *  that comes back `already_confirmed` (another tab got there first) shows that line until the page refreshes.
  *  `attrs` = the state's required-item marks, on its words. */
-function Confirm({ enabled, done, alreadyWords, attrs, describedBy, actions }: {
-  enabled: boolean; done: string | null; alreadyWords: string | null; attrs: Record<string, string>; describedBy: string | undefined;
-  actions: ReadyActions;
+function Confirm({ enabled, done, date, alreadyWords, attrs, describedBy, actions }: {
+  enabled: boolean; done: string | null; date: string | null; alreadyWords: string | null; attrs: Record<string, string>;
+  describedBy: string | undefined; actions: ReadyActions;
 }) {
   const [busy, start] = useTransition();
   const [already, setAlready] = useState<string | null>(null);
@@ -148,7 +148,12 @@ function Confirm({ enabled, done, alreadyWords, attrs, describedBy, actions }: {
     return (
       <p className={s.settled}>
         <IconCheck size={22} aria-hidden="true" />
-        <span {...(done ? attrs : {})}>{words}</span>
+        <span>
+          <span {...(done ? attrs : {})}>{words}</span>
+          {/* the version's date on the same line, quiet — the separate ยืนยันแล้ว line is not drawn in this state
+              (TASK-A-059: one fact, one line) */}
+          {done && date ? <span className={s.settledDate}> · {date}</span> : null}
+        </span>
       </p>
     );
   }
@@ -239,7 +244,9 @@ export function MonoReady({ vm, actions, required }: ReadyPageProps) {
             </li>
           ))}
         </ul>
-        {vm.stuck.count > 0 ? (
+        {/* what is stuck is said once on the page: the gate's reason (a link to ติดอยู่ตรงไหน) when it lists it; this
+            line only if the gate does not (TASK-A-059, R1 met by the gate's reason in the same column) */}
+        {vm.stuck.count > 0 && !links.some((r) => r.code === "stuck") ? (
           <a className={s.stuckLink} href={vm.stuck.href}>
             <StuckIcon />
             <span>{reasonWords.stuck(vm.stuck.count)}</span>
@@ -252,6 +259,7 @@ export function MonoReady({ vm, actions, required }: ReadyPageProps) {
         <Confirm
           enabled={vm.gate.ok}
           done={done}
+          date={vm.version?.dateLabel ?? null}
           alreadyWords={vm.version ? reasonWords.confirmed(vm.version.n) : null}
           attrs={reasonAttrs.get("confirmed") ?? {}}
           describedBy={links.length ? "mono-ready-reasons" : undefined}
@@ -268,7 +276,7 @@ export function MonoReady({ vm, actions, required }: ReadyPageProps) {
             ))}
           </ul>
         ) : null}
-        {vm.version ? <p className={s.version}>{confirmed(vm.version.n, vm.version.dateLabel)}</p> : null}
+        {vm.version && !done ? <p className={s.version}>{confirmed(vm.version.n, vm.version.dateLabel)}</p> : null}
         {vm.version?.changedSince ? <p className={s.changed}>{changedSince(vm.version.n)}</p> : null}
         <div className={s.build}>
           <Button variant="default" radius="md" h={44} className={s.outline} disabled>

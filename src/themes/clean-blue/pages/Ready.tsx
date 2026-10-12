@@ -8,6 +8,7 @@
 import { CheckCircleFilled, MessageOutlined, WarningFilled } from "@ant-design/icons";
 import { Button, Card, Input, Steps, Tag, Typography } from "antd";
 import { useState, useTransition } from "react";
+import { useEdges } from "../parts/useEdges";
 import type { ReadyPageProps } from "@/core/theme/contract";
 import type { ReadyActions, ReadyQuizItemVM } from "@/features/ready/contract";
 import {
@@ -22,7 +23,7 @@ import { KindTile } from "../parts/Tile";
 import p from "./pages.module.css";
 import s from "./ready.module.css";
 
-function AskRow({ hasQuiz, restart, actions }: { hasQuiz: boolean; restart: boolean; actions: ReadyActions }) {
+function AskRow({ hasQuiz, restart, actions, why }: { hasQuiz: boolean; restart: boolean; actions: ReadyActions; why?: string }) {
   const [text, setText] = useState("");
   const [busy, start] = useTransition();
   const send = () => {
@@ -35,14 +36,15 @@ function AskRow({ hasQuiz, restart, actions }: { hasQuiz: boolean; restart: bool
   };
   return (
     <div className={s.askRow}>
-      {(!hasQuiz || restart) && (
+      {/* one way to start (REVIEW-C-004 row 12): the first ถาม starts a quiz; the button is only for starting again */}
+      {hasQuiz && restart && (
         <Button size="large" disabled={busy} onClick={() => start(async () => { await actions.startQuiz(); })}>
-          {hasQuiz ? restartQuiz : startWord}
+          {restartQuiz}
         </Button>
       )}
       <form className={s.askForm} onSubmit={(e) => { e.preventDefault(); send(); }}>
-        <Input size="large" value={text} onChange={(e) => setText(e.target.value)} aria-labelledby="cb-quiz" maxLength={1000} disabled={busy || restart} />
-        <Button size="large" type="primary" htmlType="submit" disabled={busy || restart || !text.trim()}>{askWord}</Button>
+        <Input size="large" value={text} onChange={(e) => setText(e.target.value)} aria-labelledby="cb-quiz" aria-describedby={restart ? why : undefined} maxLength={1000} disabled={busy || restart} />
+        <Button size="large" type="primary" htmlType="submit" aria-describedby={restart ? why : undefined} disabled={busy || restart || !text.trim()}>{askWord}</Button>
       </form>
     </div>
   );
@@ -74,10 +76,13 @@ function Retry({ question, actions }: { question: string; actions: ReadyActions 
   return <Button size="large" disabled={busy} onClick={() => start(async () => { await actions.ask(question); })}>{retryWord}</Button>;
 }
 
-function Confirm({ enabled, actions }: { enabled: boolean; actions: ReadyActions }) {
+// Off is aria-disabled, not disabled: it stays in the Tab order and names its reasons (REVIEW-C-004 row 4)
+function Confirm({ enabled, actions, why }: { enabled: boolean; actions: ReadyActions; why?: string }) {
   const [busy, start] = useTransition();
+  const off = !enabled || busy;
   return (
-    <Button type="primary" size="large" disabled={!enabled || busy} onClick={() => start(async () => { await actions.confirm(); })}>
+    <Button type="primary" size="large" aria-disabled={off} aria-describedby={why} className={off ? s.off : undefined}
+      onClick={() => { if (!off) start(async () => { await actions.confirm(); }); }}>
       {confirmWord}
     </Button>
   );
@@ -86,6 +91,7 @@ function Confirm({ enabled, actions }: { enabled: boolean; actions: ReadyActions
 export function Ready({ vm, actions, required }: ReadyPageProps) {
   const q = vm.quiz;
   const scoreLine = q ? (q.score !== null ? score(q.score, q.marked) : scoreEarly(q.marked)) : null;
+  const stepsRow = useEdges<HTMLDivElement>();
   return (
     <>
       <PageHead page="ready" />
@@ -94,9 +100,9 @@ export function Ready({ vm, actions, required }: ReadyPageProps) {
       <section className={`${p.panel} ${s.summary}`}>
         {vm.steps.length > 0 && (
           // past 7 steps the row scrolls and each title keeps ~120 px, instead of squeezing to two short lines (row 16)
-          <div className={s.stepsRow} tabIndex={vm.steps.length > 7 ? 0 : undefined} role={vm.steps.length > 7 ? "region" : undefined}
-            aria-label={vm.steps.length > 7 ? pageLabel.overview : undefined}>
-            <Steps size="small" current={-1} className={s.steps} style={vm.steps.length > 7 ? { minWidth: vm.steps.length * 120 } : undefined}
+          <div ref={stepsRow} className={s.stepsRow} tabIndex={0} role="region" aria-label={pageLabel.overview}>
+            {/* one scroll row at every width, never Ant's stacked phone form (row 3); its cut edge fades (row 11) */}
+            <Steps size="small" current={-1} responsive={false} className={s.steps} style={{ minWidth: vm.steps.length * 120 }}
               items={vm.steps.map((st) => ({
                 title: st.title,
                 status: st.stuck ? "error" : "wait",
@@ -105,13 +111,13 @@ export function Ready({ vm, actions, required }: ReadyPageProps) {
           </div>
         )}
         <ul className={s.counts}>
-          <li className={s.count}><KindTile kind="screen" size="lg" /><span className={s.countN}>{vm.counts.screens}</span><span>{pageLabel.screens}</span></li>
-          <li className={s.count}><KindTile kind="api" size="lg" /><span className={s.countN}>{vm.counts.apis}</span><span>{pageLabel.api}</span></li>
-          <li className={s.count}><KindTile kind="role" size="lg" /><span className={s.countN}>{vm.counts.people}</span><span>{participantKind.role}</span></li>
+          <li className={s.count}><KindTile kind="screen" size="lg" /><span className={s.countN}>{vm.counts.screens}</span><span className={s.countWord}>{pageLabel.screens}</span></li>
+          <li className={s.count}><KindTile kind="api" size="lg" /><span className={s.countN}>{vm.counts.apis}</span><span className={s.countWord}>{pageLabel.api}</span></li>
+          <li className={s.count}><KindTile kind="role" size="lg" /><span className={s.countN}>{vm.counts.people}</span><span className={s.countWord}>{participantKind.role}</span></li>
         </ul>
         <div className={p.tags}>
           {vm.stuck.count > 0 && <a href={vm.stuck.href} className={s.stuckChip}><WarningFilled aria-hidden />{reasons.stuck(vm.stuck.count)}</a>}
-          {vm.version && <Tag color="blue">{confirmed(vm.version.n, vm.version.dateLabel)}</Tag>}
+          {vm.version && <Tag className={p.tagBlue}>{confirmed(vm.version.n, vm.version.dateLabel)}</Tag>}
           {vm.version?.changedSince && <Tag className={s.tagWrong}>{changedSince(vm.version.n)}</Tag>}
         </div>
       </section>
@@ -121,8 +127,10 @@ export function Ready({ vm, actions, required }: ReadyPageProps) {
         <div className={s.quiz}>
           <h3 id="cb-quiz" className={s.h3}>{quizHeading}</h3>
           <p className={p.muted}>{quizHint}</p>
-          {scoreLine && <p className={s.score}><Req required={required} id={requiredId.readyScore}>{scoreLine}</Req></p>}
-          <AskRow hasQuiz={q !== null} restart={q !== null && (q.stale || q.full)} actions={actions} />
+          {/* a stale score is history, not news: ink-2 and 500, the stale reason leads (row 2) */}
+          {scoreLine && <p role="status" className={q?.stale ? `${s.score} ${s.scoreStale}` : s.score}><Req required={required} id={requiredId.readyScore}>{scoreLine}</Req></p>}
+          <AskRow hasQuiz={q !== null} restart={q !== null && (q.stale || q.full)} actions={actions}
+            why={vm.gate.reasons.some((r) => r.code === "stale") ? "cb-reason-stale" : undefined} />
           {q && q.items.length > 0 && (
             <ol className={s.items}>
               {q.items.map((it) => (
@@ -135,7 +143,7 @@ export function Ready({ vm, actions, required }: ReadyPageProps) {
                     <Typography.Paragraph className={s.answer} ellipsis={{ rows: 2, expandable: true, symbol: showMore }}>{it.answer}</Typography.Paragraph>
                   )}
                   {it.status === "failed" && (
-                    <div className={s.failed}><span>{botFailed}</span><Retry question={it.question} actions={actions} /></div>
+                    <div className={s.failed}><span aria-live="polite">{botFailed}</span><Retry question={it.question} actions={actions} /></div>
                   )}
                   {it.notInSpec && <Tag className={s.tagWrong}>{notInSpec}</Tag>}
                   {it.parts.length > 0 && (
@@ -155,11 +163,11 @@ export function Ready({ vm, actions, required }: ReadyPageProps) {
       {/* the gate (R3) and Build (R5) */}
       <Card>
         <div className={s.gate}>
-          <Confirm enabled={vm.gate.ok} actions={actions} />
+          <Confirm enabled={vm.gate.ok} actions={actions} why={vm.gate.reasons.length ? "cb-reasons" : undefined} />
           {vm.gate.reasons.length > 0 && (
-            <ul className={s.reasons}>
+            <ul id="cb-reasons" className={s.reasons}>
               {vm.gate.reasons.map((r) => (
-                <li key={r.code}>
+                <li key={r.code} id={`cb-reason-${r.code}`}>
                   {/* `confirmed` is a state (TASK-B-020 Q1) and `empty` a next step — the chat (TASK-B-019, C-016): neither is
                       stuck, so the blue tone and no ⚠; each keeps its link */}
                   <a href={r.href} className={r.code === "confirmed" || r.code === "empty" ? `${s.reason} ${s.reasonDone}` : s.reason}>

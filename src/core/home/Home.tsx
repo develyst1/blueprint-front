@@ -4,7 +4,7 @@ import { retryAction } from "@/app/actions";
 import { contentHref, contentId } from "@/core/theme/anchors";
 import { defaultTheme } from "@/core/theme/default";
 import d from "@/core/theme/default/default.module.css"; // the default shell's skip link look — home has no shell
-import { skipToContent } from "@/core/words";
+import { productMark, skipToContent } from "@/core/words";
 import { getTheme, listThemes } from "@/core/theme/registry";
 import { loadHome } from "@/core/model/load";
 import { samplePreview } from "@/core/model/samples";
@@ -28,7 +28,7 @@ export async function Home() {
       <a className={d.skip} href={contentHref}>{skipToContent}</a>
       <main id={contentId} tabIndex={-1} className={s.home}>
         <div className={s.top}>
-          <h1>Blueprint</h1>
+          <h1>{productMark}</h1>
           <NewProject themes={options} />
         </div>
         <ul className={s.grid}>

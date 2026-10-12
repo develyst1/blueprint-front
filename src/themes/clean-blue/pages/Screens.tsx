@@ -35,7 +35,7 @@ export function Screens({ vm, required }: { vm: PageVMs["screens"]; required: Re
               {sc.actions.length > 0 && (
                 <div className={s.group}>
                   <h4 className={s.groupTitle}>{screenGroup.actions}</h4>
-                  <div className={s.tags}>{sc.actions.map((a) => <Tag key={a.name} color="blue">{a.label ?? a.name}</Tag>)}</div>
+                  <div className={s.tags}>{sc.actions.map((a) => <Tag key={a.name} className={s.tagBlue}>{a.label ?? a.name}</Tag>)}</div>
                 </div>
               )}
               {sc.states.length > 0 && (

@@ -255,3 +255,6 @@
 .journey :global(.ant-steps-item-rail),
 .journey :global(.ant-steps-item-rail::before),
 .journey :global(.ant-steps-item-rail::after) { background-color: var(--cb-line) !important; border-color: var(--cb-line) !important; }
+
+/* one blue: the theme's, never Ant's preset `blue` tag (REVIEW-C-004 row 9) */
+.tagBlue { background: var(--cb-blueSoft) !important; color: var(--cb-blue) !important; border-color: transparent !important; }

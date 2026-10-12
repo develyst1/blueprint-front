@@ -6,9 +6,9 @@
 import { useTransition } from "react";
 import type { FrameVM, PageState, RequiredItem } from "../contract";
 import { requiredId } from "../required";
-import { HOME_HREF } from "@/core/model/build/common";
 import { apiDown, backHome, emptyProject, notFound, retry } from "@/core/words";
 import { Mark } from "./Mark";
+import { WayHome } from "./Shell";
 import s from "./default.module.css";
 
 export function State({ frame, state, required }: { frame: FrameVM | null; state: PageState; required: RequiredItem[] }) {
@@ -17,7 +17,7 @@ export function State({ frame, state, required }: { frame: FrameVM | null; state
     <>
       {frame && (
         <header className={s.header}>
-          <a className={s.homeLink} href={HOME_HREF} data-print="screen-only">← {backHome}</a>
+          <WayHome href={frame.homeHref} />
           <h1>{frame.project.name}</h1>
           <span className={frame.readiness.stuckCount > 0 ? `${s.readiness} ${s.readinessStuck}` : s.readiness}>
             <Mark required={required} id={requiredId.readiness}>{frame.readiness.label}</Mark>

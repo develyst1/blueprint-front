@@ -6,8 +6,10 @@
   line-height: 1.6;
   color: #1b1f24;
   background: #f6f7f9;
-  min-height: 100vh;
 }
+/* the full-height canvas belongs to a page frame (a root holding <main>), never to a home card's root — a min-height
+   on every root stretched a default-theme card to 900 px (B-007, again in STUDY-001 § 6; TASK-B-023) */
+.root:has(> main) { min-height: 100vh; }
 
 .root a { color: #1458c4; }
 .root a:focus-visible,
@@ -40,20 +42,20 @@
   box-shadow: 0 1px 3px rgba(27, 31, 36, 0.06);
 }
 .header h1 { font-size: 22px; font-weight: 800; letter-spacing: -0.01em; margin: 0; }
-.homeLink {
+/* the way home (AC-22): the wordmark and โปรเจกต์ทั้งหมด, its own row above the project */
+.wayHome { flex: 1 0 100%; display: flex; align-items: center; gap: 4px; margin: -10px 0 -2px -12px; }
+.wordmark, .homeLink {
   display: inline-flex;
   align-items: center;
-  align-self: center;
   min-height: 44px;
   padding: 4px 12px;
-  margin-left: -12px;
   border-radius: 8px;
-  font-size: 14px;
-  font-weight: 600;
   text-decoration: none;
   transition: background 0.15s ease;
 }
-.homeLink:hover { background: #eef1f5; text-decoration: underline; }
+.root a.wordmark { color: #1b1f24; font-size: 16px; font-weight: 800; letter-spacing: -0.01em; }
+.homeLink { font-size: 14px; font-weight: 600; }
+.wordmark:hover, .homeLink:hover { background: #eef1f5; text-decoration: underline; }
 .readiness {
   padding: 4px 14px;
   border: 1px solid #d5dae1;
@@ -91,14 +93,12 @@
 .root > main:focus { outline: none; }
 .root > main h2 { font-size: 19px; font-weight: 700; margin: 8px 0 12px; }
 .root > main h3 { font-size: 16px; margin: 16px 0 6px; }
-.main { padding: 24px; max-width: 1200px; margin: 0 auto; }
-.main:focus { outline: none; }
-.main h2 { font-size: 19px; font-weight: 700; margin: 8px 0 12px; }
-.main h3 { font-size: 16px; margin: 16px 0 6px; }
 
 /* ---------- lists and tables ---------- */
 .list { padding-left: 20px; margin: 0; }
 .list li { margin: 4px 0; }
+/* a link in a list (the overview's steps) is a 44 px target; the line keeps its look */
+.list a { display: inline-block; padding: 10px 0; margin: -8px 0; }
 .muted { color: #5b6573; }
 .stuckNote { color: #a6460a; }
 .root h4 { margin: 14px 0 6px; font-size: 15px; }
@@ -110,7 +110,7 @@
   border-radius: 6px;
 }
 /* a JSON block is the scroll region itself */
-pre.scroll { margin: 0; padding: 12px 16px; font-size: 13px; line-height: 1.55; }
+pre.scroll { margin: 0; padding: 12px 16px; font-size: 14px; line-height: 1.55; } /* the 14 px floor */
 .table { border-collapse: collapse; font-size: 14px; background: #ffffff; }
 .table th, .table td { border: 1px solid #e2e6eb; padding: 8px 12px; text-align: left; vertical-align: top; }
 .table thead th { background: #f0f2f5; font-weight: 700; }
@@ -122,8 +122,8 @@ pre.scroll { margin: 0; padding: 12px 16px; font-size: 13px; line-height: 1.55; 
 .pills a {
   display: inline-flex;
   align-items: center;
-  min-height: 36px;
-  padding: 4px 14px;
+  min-height: 44px; /* the 44 px target floor */
+  padding: 4px 16px;
   border: 1px solid #d5dae1;
   border-radius: 999px;
   background: #ffffff;
@@ -160,7 +160,7 @@ pre.scroll { margin: 0; padding: 12px 16px; font-size: 13px; line-height: 1.55; 
   background: #ffffff;
   box-shadow: 0 1px 3px rgba(27, 31, 36, 0.05);
 }
-.detail summary { cursor: pointer; font-weight: 600; }
+.detail summary { cursor: pointer; font-weight: 600; padding: 10px 0; } /* 44 px target */
 
 /* ---------- states ---------- */
 .state {
@@ -204,3 +204,8 @@ pre.scroll { margin: 0; padding: 12px 16px; font-size: 13px; line-height: 1.55; 
   transition: background 0.15s ease, border-color 0.15s ease;
 }
 .state a:hover { background: #f0f2f5; border-color: #8a93a0; }
+
+/* motion only for those who want it (rule 9) */
+@media (prefers-reduced-motion: reduce) {
+  .root *, .root *::before, .root *::after { transition: none !important; transform: none !important; }
+}

@@ -99,7 +99,7 @@ export function Web({ vm, required }: { vm: PageVMs["web"]; required: RequiredIt
             <div className={s.decisionBody}>
               <div className={s.detailMeta}>
                 <Tag>{partKind[sel.kind]}</Tag>
-                {sel.stampLabel && <Tag color="blue">{sel.stampLabel}</Tag>}
+                {sel.stampLabel && <Tag className={s.tagBlue}>{sel.stampLabel}</Tag>}
                 <Tag>{sel.cameFrom}</Tag>
                 <Tag>{sel.dateLabel}</Tag>
               </div>

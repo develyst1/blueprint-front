@@ -69,6 +69,9 @@ export function antTheme(fontFamily: string): ThemeConfig {
       boxShadowTertiary: "0 1px 2px rgba(24, 33, 47, 0.06)",
       motionDurationMid: "0.18s",
       controlHeightLG: 44, // every large control is a 44 px target (TASK-B-013 audit)
+      colorTextPlaceholder: color.ink2, // ≥ 4.5:1 on paper and on a filled input (REVIEW-C-004 row 6)
+      controlOutline: "rgba(26, 95, 214, 0.35)", // the theme blue at ~35 % — the focus ring (row 13)
+      controlOutlineWidth: 3,
     },
     components: {
       Card: { headerFontSize: 18, bodyPadding: 20, headerPadding: 20 },
@@ -77,6 +80,8 @@ export function antTheme(fontFamily: string): ThemeConfig {
       Tag: { defaultBg: color.neutralSoft, defaultColor: color.ink },
       Timeline: { tailColor: color.line, dotBg: color.paper },
       Collapse: { headerBg: color.paper, contentBg: color.paper },
+      // a bot failure or an undo refusal is not stuck: paper, line, ink — amber stays for stuck (row 8)
+      Alert: { colorWarningBg: color.paper, colorWarningBorder: color.line, colorWarning: color.ink2 },
       Slider: { handleSize: 18, handleSizeHover: 20, railSize: 6, controlSize: 18 },
     },
   };

@@ -3,10 +3,20 @@ import type { ReactNode } from "react";
 import type { FrameVM, RequiredItem } from "../contract";
 import { contentHref } from "../anchors";
 import { requiredId } from "../required";
-import { HOME_HREF } from "@/core/model/build/common";
-import { backHome, pageNav, skipToContent } from "@/core/words";
+import { allProjects, pageNav, productMark, skipToContent } from "@/core/words";
 import { Mark } from "./Mark";
 import s from "./default.module.css";
+
+/** AC-22 (D-036): the wordmark and โปรเจกต์ทั้งหมด, both real links to the frame's own homeHref — no aria-label, the
+ *  visible words are the names (WCAG 2.5.3). Shared with the default State's frame. */
+export function WayHome({ href }: { href: string }) {
+  return (
+    <span className={s.wayHome} data-print="screen-only">
+      <a className={s.wordmark} href={href}>{productMark}</a>
+      <a className={s.homeLink} href={href}>{allProjects}</a>
+    </span>
+  );
+}
 
 // `tools` (v1.11): the core's controls (ส่งออก PDF) — placed at the header's end, never built here.
 // `data-print="screen-only"` marks what a printed / exported page leaves out (REQ-008 print hooks).
@@ -15,7 +25,7 @@ export function Shell({ frame, required, tools, children }: { frame: FrameVM; re
     <>
       <a className={s.skip} href={contentHref} data-print="screen-only">{skipToContent}</a>
       <header className={s.header}>
-        <a className={s.homeLink} href={HOME_HREF} data-print="screen-only">← {backHome}</a>
+        <WayHome href={frame.homeHref} />
         <h1>{frame.project.name}</h1>
         <span className={s.muted}>{frame.project.createdLabel}</span>
         <span className={frame.readiness.stuckCount > 0 ? `${s.readiness} ${s.readinessStuck}` : s.readiness}>

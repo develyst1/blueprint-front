@@ -43,10 +43,20 @@
 @media (max-width: 640px) {
   .markRow { grid-template-columns: 1fr 1fr; }
   .markRow > :global(.ant-input-affix-wrapper), .markRow > input { grid-column: 1 / -1; grid-row: 1; }
-  .askForm { grid-template-columns: minmax(0, 1fr); }
+  /* B-021 row 3 follow-up: the verdict sooner on a phone — three count tiles in one row, the field and ถาม on one line */
+  .counts { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .count { flex-direction: column; gap: 4px; padding: 10px 6px; text-align: center; }
 }
 
 /* every connector the same, as on ภาพรวม (row 16) */
 .steps :global(.ant-steps-item-rail),
 .steps :global(.ant-steps-item-rail::before),
 .steps :global(.ant-steps-item-rail::after) { background-color: var(--cb-line) !important; border-color: var(--cb-line) !important; }
+
+/* REVIEW-C-004 (TASK-B-021) */
+.scoreStale { color: var(--cb-ink2); font-weight: 500; }              /* row 2 */
+.countWord { white-space: nowrap; }                                     /* row 3 */
+.off { opacity: 0.45; cursor: not-allowed; }                            /* row 4: looks off, stays focusable */
+.stepsRow[data-more="end"] { mask-image: linear-gradient(to right, black calc(100% - 40px), transparent); }   /* row 11 */
+.stepsRow[data-more="start"] { mask-image: linear-gradient(to left, black calc(100% - 40px), transparent); }
+.stepsRow[data-more="both"] { mask-image: linear-gradient(to right, transparent, black 40px, black calc(100% - 40px), transparent); }

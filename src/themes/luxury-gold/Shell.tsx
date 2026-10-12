@@ -5,11 +5,13 @@
 // `tools` (contract v1.11, optional): core-owned controls (today the PDF export) placed beside the readiness — in the
 // spine at 1440, in the top bar at 390; absent → nothing, no gap. Print hooks (v1.11): the skip link, the page list and
 // the tools are `data-print="screen-only"`.
+// The way home (REQ-002 AC-22, D-036, contract v1.12): the wordmark (`productMark`, named by its own text) and a visible
+// `allProjects` link, both to the core's `frame.homeHref`, kept together: stacked in the spine at 1440, side by side
+// opening the top bar at ≤ 640 px (PM 2026-10-12, TASK-C-020 Q1).
 import type { FrameVM, RequiredItem } from "@/core/theme/contract";
 import { contentHref } from "@/core/theme/anchors";
 import { findRequired, requiredId, requiredProps } from "@/core/theme/required";
-import { HOME_HREF } from "@/core/model/build/common";
-import { backHome, skipToContent } from "@/core/words";
+import { allProjects, productMark, skipToContent } from "@/core/words";
 import type { ReactNode } from "react";
 import { NavStrip } from "./client/NavStrip";
 import { Readiness } from "./primitives/Seal";
@@ -24,8 +26,10 @@ export function Shell({ frame, required, tools, children }: { frame: FrameVM; re
         {skipToContent}
       </a>
       <header className="lg-spine">
-        {/* the wordmark is the way back home (the core's HOME_HREF) */}
-        <a className="lg-wordmark" href={HOME_HREF} aria-label={backHome}>Blueprint</a>
+        <div className="lg-way-home">
+          <a className="lg-wordmark" href={frame.homeHref}>{productMark}</a>
+          <a className="lg-home-link" href={frame.homeHref} data-print="screen-only">{allProjects}</a>
+        </div>
         <p className="lg-spine-project">{frame.project.name}</p>
         <div className="lg-spine-readiness">
           <Readiness
