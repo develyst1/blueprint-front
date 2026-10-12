@@ -101,10 +101,19 @@ export function RetryButton({ question, ask }: { question: string; ask: ReadyAct
   );
 }
 
-export function ConfirmButton({ enabled, confirm }: { enabled: boolean; confirm: ReadyActions["confirm"] }) {
+// Off by the gate: aria-disabled, not `disabled`, so it stays a Tab stop and reads out why (`describedBy` = the reasons,
+// TASK-C-022); a press then does nothing. Off while its own action runs: native `disabled`, as every other button.
+export function ConfirmButton({ enabled, confirm, describedBy }: { enabled: boolean; confirm: ReadyActions["confirm"]; describedBy?: string }) {
   const [busy, start] = useTransition();
   return (
-    <button type="button" className={`${s.button} ${s.primary}`} disabled={!enabled || busy} onClick={() => start(async () => { await confirm(); })}>
+    <button
+      type="button"
+      className={`${s.button} ${s.primary}`}
+      disabled={busy}
+      aria-disabled={enabled ? undefined : true}
+      aria-describedby={enabled ? undefined : describedBy}
+      onClick={() => { if (enabled) start(async () => { await confirm(); }); }}
+    >
       {confirmWord}
     </button>
   );

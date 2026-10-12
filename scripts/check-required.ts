@@ -192,8 +192,12 @@ if (extraDir) {
 try {
   const { n, pages, failures } = await check(base, themes);
   for (const f of failures) console.log(`FAIL ${f.theme} · ${f.page} · ${f.item} — ${f.why}`);
+  // A check that looked at nothing proves nothing (TASK-B-027, seen in TASK-B-025 Q1): every project has at least the
+  // shell's readiness item, so 0 items or 0 pages means the back end or the server gave nothing — never "0 failures".
+  const nothing = n === 0 || pages === 0;
+  if (nothing) console.log(`FAIL checked ${n} items on ${pages} pages — the back end or the server gave nothing`);
   console.log(`checked ${n} items on ${pages / themes.length} pages × ${themes.length} themes, ${failures.length} failures`);
-  process.exitCode = failures.length ? 1 : 0;
+  process.exitCode = failures.length || nothing ? 1 : 0;
 } finally {
   cleanup();
 }

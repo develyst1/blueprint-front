@@ -10,5 +10,8 @@ test("every required item is visible on every page × every registered theme (+ 
   const r = spawnSync("bun", ["run", "scripts/check-required.ts"], { encoding: "utf8", env: { ...process.env, CHECK_BASE_URL: base } });
   console.log(r.stdout, r.stderr);
   expect(r.stdout).toMatch(/, 0 failures$/m);
+  // a run that looked at nothing is not a pass (TASK-B-027): the count must be real
+  const checked = Number(/checked (\d+) items/.exec(r.stdout)?.[1] ?? 0);
+  expect(checked, "items checked").toBeGreaterThan(0);
   expect(r.status).toBe(0);
 });

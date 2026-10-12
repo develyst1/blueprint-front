@@ -4,6 +4,7 @@
 // listens yet — so every page starts in the API-down state. This spec then starts its own in-memory back end on 4298
 // (DATABASE_URL=pglite:memory, never SIT), creates the worked example in the default theme, and stops it at the end.
 import { spawn, type ChildProcess } from "node:child_process";
+import { createServer, type Server } from "node:http";
 import path from "node:path";
 import { expect, test } from "@playwright/test";
 
@@ -29,7 +30,21 @@ async function up(): Promise<boolean> {
 
 test.describe.configure({ mode: "serial" });
 
-test.afterAll(() => { back?.kill(); });
+// A stand-in for the LLM gateway, local only (D-003: no live call): a quiz question gets a recorded answer, the model
+// list one entry. Envelope as blueprint-back src/gateway/client.ts reads it.
+const GATEWAY = "http://127.0.0.1:4296";
+let gateway: Server | null = null;
+test.beforeAll(async () => {
+  gateway = createServer((req, res) => {
+    res.setHeader("content-type", "application/json");
+    if (req.url?.startsWith("/models")) return res.end(JSON.stringify({ fake: ["recorded"] }));
+    const content = JSON.stringify({ answer: "ยังไม่ได้ระบุในสเปก", parts: [], notInSpec: false });
+    res.end(JSON.stringify({ success: true, data: { content, provider: "fake", model: "recorded", usage: null } }));
+  });
+  await new Promise<void>((ok) => gateway!.listen(4296, "127.0.0.1", ok));
+});
+
+test.afterAll(() => { back?.kill(); gateway?.close(); });
 
 test("API down: home and all 9 pages say so and offer a retry, within 10 s", async ({ page }) => {
   expect(await up(), `something already listens on ${API} — this spec needs it free`).toBe(false);
@@ -46,7 +61,7 @@ test("retry on home: once the API is back, the projects appear without a reload"
   await page.evaluate(() => { (window as unknown as { noReload: boolean }).noReload = true; });
 
   const backDir = path.resolve(process.cwd(), process.env.BLUEPRINT_BACK || "../blueprint-back");
-  back = spawn("bun", ["run", "src/index.ts"], { cwd: backDir, env: { ...process.env, DATABASE_URL: "pglite:memory", PORT: "4298", GATEWAY_URL: "http://127.0.0.1:9" /* never the live gateway: a dead local port → no model list */ }, stdio: "ignore" });
+  back = spawn("bun", ["run", "src/index.ts"], { cwd: backDir, env: { ...process.env, DATABASE_URL: "pglite:memory", PORT: "4298", GATEWAY_URL: GATEWAY /* never the live gateway: this spec's own stand-in */ }, stdio: "ignore" });
   await expect.poll(up, { timeout: 30_000 }).toBe(true);
   const { meetingRoom } = await import(path.join(backDir, "test/fixtures/meeting-room.ts"));
   const p = await call("POST", "/v1/projects", { name: "จองห้องประชุม", theme: "default" });
@@ -97,12 +112,51 @@ test("home: no card's theme root is taller than its card (a min-height on the de
   await projectIn("no-such-theme", "การ์ดธีม default");
   await projectIn("clean-blue", "การ์ดธีม clean-blue");
   await page.goto("/");
-  const rows = await page.locator("main ul > li").evaluateAll((lis) => lis.map((li) => {
+  const rows = await page.locator("main > ul > li").evaluateAll( // the cards grid only — not the dialog previews' lists
+    (lis) => lis.map((li) => {
     const root = li.querySelector("[data-theme-root]")!;
     return { theme: root.getAttribute("data-theme-root"), root: root.getBoundingClientRect().height, card: root.firstElementChild!.getBoundingClientRect().height };
   }));
   expect(rows.length).toBeGreaterThan(1);
   for (const r of rows) expect(r.root, `${r.theme}: root ${r.root} vs card ${r.card}`).toBeLessThanOrEqual(r.card + 8);
+});
+
+test("default ใยโหนด: node text is at least 14 px and a stuck node carries ⚠, not only a colour (TASK-B-024)", async ({ page }) => {
+  const id = await projectIn("default", "ใยโหนด default");
+  await page.goto(`/p/${id}/web`);
+  const nodes = await page.locator("main svg a text").evaluateAll(
+    (ts) => ts.map((t) => ({ size: parseFloat(getComputedStyle(t).fontSize), stuck: t.getAttribute("fill") === "#a6460a", text: t.textContent ?? "" })));
+  expect(nodes.length).toBeGreaterThan(10);
+  expect(Math.min(...nodes.map((n) => n.size)), "smallest node text (px)").toBeGreaterThanOrEqual(14);
+  const stuck = nodes.filter((n) => n.stuck);
+  expect(stuck.length, "the worked example has stuck nodes").toBeGreaterThan(0);
+  for (const n of stuck) expect(n.text, `stuck node "${n.text}"`).toContain("⚠");
+});
+
+test("default ใยโหนด: nodes are 44 px tiles, the chosen one filled, its edges marked, the box opened on it (TASK-B-025)", async ({ page }) => {
+  const id = await projectIn("default", "ใยโหนด tiles");
+  await page.goto(`/p/${id}/web`);
+  const tiles = await page.locator("main svg a").evaluateAll((as) => as.map((a) => {
+    const r = a.querySelector("rect")!;
+    return { h: a.getBoundingClientRect().height, fill: getComputedStyle(r).fill, href: a.getAttribute("href")! };
+  }));
+  expect(Math.min(...tiles.map((t) => t.h)), "smallest node hit (px)").toBeGreaterThanOrEqual(44);
+  expect(tiles.every((t) => t.fill !== "none"), "every node has a surface").toBe(true);
+  const canvas = await page.locator("main [role=region]").evaluate((e) => getComputedStyle(e).backgroundColor);
+  expect(canvas, "tiles sit on the canvas, a step off the white tile").toBe("rgb(246, 247, 249)");
+
+  await page.goto(tiles[1]!.href);
+  const chosen = await page.locator('main svg a[aria-current="true"] rect').evaluate((r) => getComputedStyle(r).fill);
+  const sibling = await page.locator("main svg a:not([aria-current]) rect").first().evaluate((r) => getComputedStyle(r).fill);
+  expect(chosen).toBe("rgb(20, 88, 196)");
+  expect(sibling).not.toBe(chosen);
+  expect(await page.locator('main svg line[stroke="#1458c4"]').count(), "the chosen node's edges are marked").toBeGreaterThan(0);
+  // the box opens on the chosen node (scroll-initial-target), not at its top-left corner
+  const inView = await page.locator("main [role=region]").evaluate((box) => {
+    const v = box.getBoundingClientRect(), c = box.querySelector('a[aria-current="true"]')!.getBoundingClientRect();
+    return c.left >= v.left && c.right <= v.right && c.top >= v.top && c.bottom <= v.bottom;
+  });
+  expect(inView, "chosen node in view on open").toBe(true);
 });
 
 test("clean-blue chat: the composer is marked out — a 2 px theme-blue border (REVIEW-C-004 row 1)", async ({ page }) => {
@@ -117,7 +171,6 @@ test("clean-blue ready: a stale score is quiet (ink-2, 500) and no Ant preset bl
   const quiz = await call("POST", `/v1/projects/${id}/quizzes`, {});
   for (const q of ["มีกี่ขั้นตอน", "ใครเริ่มงาน", "ใครอนุมัติ", "มีหน้าจอกี่หน้า", "จบงานที่ไหน"]) await call("POST", `/v1/projects/${id}/quizzes/${quiz.id}/questions`, { question: q });
   for (const it of (await call("GET", `/v1/projects/${id}/quizzes/latest`)).items) await call("POST", `/v1/projects/${id}/quizzes/${quiz.id}/items/${it.id}/mark`, { mark: "right" });
-  await call("POST", `/v1/projects/${id}/versions`, { confirmedBy: "operator" }); // a version tag on the page
   const step = (await call("GET", `/v1/projects/${id}`)).parts.find((p: { kind: string }) => p.kind === "step");
   await call("POST", `/v1/projects/${id}/change-sets`, { cause: { kind: "operator" }, changes: [{ op: "part.update", key: step.key, title: `${step.title} (แก้)`, origin: { stamp: "operator", date: "2026-10-12" } }] });
   await page.goto(`/p/${id}/ready`);

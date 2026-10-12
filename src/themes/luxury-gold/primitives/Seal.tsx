@@ -21,6 +21,20 @@ function scallopPath(cx: number, cy: number, r: number, bumps = 12): string {
   return d + "Z";
 }
 
+// The "!" is an icon, drawn as one: a bar and a dot scaled to the seal — not a font glyph, which would read as tiny text
+// and depend on the loaded font (TASK-C-023, PM option 1). The stuck meaning stays in the words beside the seal.
+function markPath(size: number): string {
+  const c = size / 2;
+  const w = size * 0.13;
+  const r = size * 0.075;
+  const dotY = size * 0.71;
+  const n = (v: number) => v.toFixed(2);
+  return (
+    `M${n(c - w / 2)} ${n(size * 0.25)}h${n(w)}v${n(size * 0.33)}h${n(-w)}Z` +
+    `M${n(c - r)} ${n(dotY)}a${n(r)} ${n(r)} 0 1 0 ${n(2 * r)} 0a${n(r)} ${n(r)} 0 1 0 ${n(-2 * r)} 0Z`
+  );
+}
+
 /** The seal alone. `label` is what a screen reader hears (the stuck wording); the seal itself is drawn. */
 export function Seal({ size = 22, label }: { size?: number; label?: string }) {
   const c = size / 2;
@@ -35,17 +49,7 @@ export function Seal({ size = 22, label }: { size?: number; label?: string }) {
       aria-hidden={label ? undefined : true}
     >
       <path d={scallopPath(c, c, c * 0.92)} fill={color.stuck} />
-      <text
-        x={c}
-        y={c + size * 0.2}
-        textAnchor="middle"
-        fontSize={size * 0.58}
-        fontWeight={700}
-        fill={color.onStuck}
-        aria-hidden="true"
-      >
-        !
-      </text>
+      <path d={markPath(size)} fill={color.onStuck} />
     </svg>
   );
 }

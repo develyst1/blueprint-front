@@ -132,6 +132,9 @@ export const backHome = "กลับหน้าโปรเจกต์";
 export const allProjects = "โปรเจกต์ทั้งหมด";
 export const productMark = "Blueprint";
 
+// A stuck node's accessible name on ใยโหนด — a screen reader says which node is stuck, not only "!" (REQ-002 l.92)
+export const stuckNodeName = (title: string): string => `${title} · ยังติดอยู่`;
+
 // The new-project dialog's close button
 export const closeDialog = "ปิด";
 

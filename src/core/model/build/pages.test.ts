@@ -3,7 +3,7 @@ import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { findRequired, requiredId } from "@/core/theme/required";
-import { allProjects, productMark, stuck as words } from "@/core/words";
+import { allProjects, productMark, stuck as words, stuckNodeName } from "@/core/words";
 import type { GateCode } from "@/features/ready/contract";
 import { readyRequiredId } from "@/features/ready/required";
 import {
@@ -328,6 +328,12 @@ describe("v1.12: every frame carries the project list's href, built by the core 
   test("the two words are REQ-002's, verbatim", () => {
     expect(allProjects).toBe("โปรเจกต์ทั้งหมด");
     expect(productMark).toBe("Blueprint");
+  });
+
+  test("a stuck node's accessible name is \"{title} · ยังติดอยู่\" (REQ-002 l.92, TASK-B-026)", () => {
+    expect(stuckNodeName("ขั้นแรก")).toBe("ขั้นแรก · ยังติดอยู่");
+    expect(stuckNodeName("Room")).toBe("Room · ยังติดอยู่");
+    expect(stuckNodeName("")).toBe(" · ยังติดอยู่"); // the core never invents a title; an empty one stays empty
   });
 });
 

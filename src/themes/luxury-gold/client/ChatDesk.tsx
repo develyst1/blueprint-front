@@ -9,7 +9,7 @@
 // One transition for every action: `thinking` while any runs, every control off. Words only from
 // @/core/words, @/features/chat/words and the view model; never typed here.
 import { Alert, Button, TextArea, TextField } from "@heroui/react";
-import { Fragment, useId, useRef, useState, useTransition, type FormEvent, type KeyboardEvent } from "react";
+import { Fragment, useEffect, useId, useRef, useState, useTransition, type FormEvent, type KeyboardEvent } from "react";
 import type { ChatActions, ChatPageProps } from "@/core/theme/contract";
 import {
   actionError, botFailed, cancel, changeCard, chatPlaceholder, chooseFile, enterHint, logName, navChat, originChoices, send as sendWord,
@@ -36,8 +36,12 @@ export function ChatDesk({ vm, actions, required }: ChatPageProps) {
   const chooseRef = useRef<HTMLButtonElement>(null);
   const ids = { hint: useId(), origin: useId() };
 
+  // a refusal answers one undo: any other action, or a new change set, takes it away (TASK-C-018; undo sets it again)
+  useEffect(() => setRefused(null), [vm.lastChange?.changeSetId]);
+
   // fn first, then after: `after?.(await fn())` would skip fn whenever after is absent (optional call short-circuits)
   const run: Run = (fn, after) => start(async () => {
+    setRefused(null);
     const r = await fn();
     after?.(r);
   });
@@ -75,9 +79,8 @@ export function ChatDesk({ vm, actions, required }: ChatPageProps) {
   };
 
   const isFailed = (m: { roundStatus: string | null }) => m.roundStatus === "bot_could_not_answer";
-  const newestBot = [...vm.messages].reverse().find((m) => m.role === "bot");
-  // empty rows (a park-only turn) never get a line; nor does the newest failed reply while its alert says the same
-  const minutes = [...vm.messages].reverse().filter((m) => m.text.trim() !== "" && !(vm.failed && !pending && m.id === newestBot?.id));
+  // empty rows (a park-only turn) never get a line; the newest failed reply is already out of `vm.messages` (TASK-A-056)
+  const minutes = [...vm.messages].reverse().filter((m) => m.text.trim() !== "");
   // the change card goes under the line whose round wrote that change set (TASK-A-053 `changeSetId`, C-013 Q1); a set
   // whose line is not among the newest 50 is shown above the minutes
   const changeAfter = vm.lastChange ? minutes.find((m) => m.changeSetId === vm.lastChange!.changeSetId)?.id ?? null : null;

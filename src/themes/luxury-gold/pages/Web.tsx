@@ -4,7 +4,7 @@
 // Required: the stuck parts' titles (by id).
 import type { RequiredItem, WebVM } from "@/core/theme/contract";
 import { findRequired, requiredId, requiredProps } from "@/core/theme/required";
-import { pageLabel, partKind } from "@/core/words";
+import { pageLabel, partKind, stuckNodeName } from "@/core/words";
 import { CenterOn } from "../client/CenterOn";
 import { DiagramFrame, at } from "../primitives/Diagram";
 import { PartMark } from "../primitives/PartMark";
@@ -59,7 +59,7 @@ export function Web({ vm, required }: { vm: WebVM; required: RequiredItem[] }) {
                   <span className="lg-wnode-title" {...(item ? requiredProps(item) : {})}>
                     {n.title}
                   </span>
-                  {n.stuck && <Seal size={16} />}
+                  {n.stuck && <Seal size={16} label={stuckNodeName(n.title)} />}
                 </a>
               );
             })}

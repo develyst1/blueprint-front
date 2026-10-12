@@ -2,6 +2,7 @@
 // core's default theme: plain HTML + one CSS module, no theme library. Picture first: the steps as a small numbered
 // row, the counts and what is stuck; then the quiz (#quiz); then the gate (Confirm + why not) and Build.
 // Words only from ./words and @/core/words; a word REQ-007 lacks is a question in the TASK, never typed here.
+import { useId } from "react";
 import { pageLabel, participantKind } from "@/core/words";
 import { requiredProps } from "@/core/theme/required";
 import type { ReadyPageProps } from "./contract";
@@ -13,6 +14,8 @@ import {
 import s from "./ready.module.css";
 
 export function DefaultReady({ vm, actions, required }: ReadyPageProps) {
+  // the reasons describe Confirm, the build reason describes Build (TASK-C-022)
+  const ids = { reasons: useId(), build: useId() };
   const req = new Map(required.map((r) => [r.id, r]));
   const props = (id: string) => {
     const item = req.get(id);
@@ -97,9 +100,9 @@ export function DefaultReady({ vm, actions, required }: ReadyPageProps) {
 
       {/* the gate (R3) and Build (R5) */}
       <section className={s.gate}>
-        <ConfirmButton enabled={vm.gate.ok} confirm={actions.confirm} />
+        <ConfirmButton enabled={vm.gate.ok} confirm={actions.confirm} describedBy={vm.gate.reasons.length > 0 ? ids.reasons : undefined} />
         {vm.gate.reasons.length > 0 && (
-          <ul className={s.reasons}>
+          <ul id={ids.reasons} className={s.reasons}>
             {vm.gate.reasons.map((r) => (
               <li key={r.code}>
                 <a href={r.href} {...props(readyRequiredId.reason(r.code))}>
@@ -110,10 +113,10 @@ export function DefaultReady({ vm, actions, required }: ReadyPageProps) {
           </ul>
         )}
         <div className={s.build}>
-          <button type="button" className={s.button} disabled>
+          <button type="button" className={s.button} disabled aria-describedby={ids.build}>
             {buildWord}
           </button>
-          <p className={s.buildReason}>{vm.build.reason}</p>
+          <p id={ids.build} className={s.buildReason}>{vm.build.reason}</p>
         </div>
       </section>
     </div>
