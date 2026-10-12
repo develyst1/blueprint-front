@@ -133,31 +133,13 @@ function AskBox({ hasQuiz, restart, actions }: { hasQuiz: boolean; restart: bool
 }
 
 /** ยืนยัน 100%. Off, it stays a Tab stop that says why (`aria-disabled` + a guarded click + `aria-describedby` → the
- *  reasons; REVIEW-C-003 row 3). When the newest version is confirmed and nothing has changed (gate code `confirmed`,
- *  D-030) it is not a button at all but a settled line — ink and a check, never the dashed "off" look (row 2). A confirm
- *  that comes back `already_confirmed` (another tab got there first) shows that line until the page refreshes.
- *  `attrs` = the state's required-item marks, on its words. */
-function Confirm({ enabled, done, date, alreadyWords, attrs, describedBy, actions }: {
-  enabled: boolean; done: string | null; date: string | null; alreadyWords: string | null; attrs: Record<string, string>;
-  describedBy: string | undefined; actions: ReadyActions;
-}) {
+ *  reasons; REVIEW-C-003 row 3) — in every off state, the confirmed one included: there its reason is the D-030 words,
+ *  listed like any other (D-038). A confirm that comes back `already_confirmed` (another tab got there first) stays
+ *  off; the action's refresh then draws the confirmed state. */
+function Confirm({ enabled, describedBy, actions }: { enabled: boolean; describedBy: string | undefined; actions: ReadyActions }) {
   const [busy, start] = useTransition();
-  const [already, setAlready] = useState<string | null>(null);
-  const words = done ?? already;
-  if (words) {
-    return (
-      <p className={s.settled}>
-        <IconCheck size={22} aria-hidden="true" />
-        <span>
-          <span {...(done ? attrs : {})}>{words}</span>
-          {/* the version's date on the same line, quiet — the separate ยืนยันแล้ว line is not drawn in this state
-              (TASK-A-059: one fact, one line) */}
-          {done && date ? <span className={s.settledDate}> · {date}</span> : null}
-        </span>
-      </p>
-    );
-  }
-  const off = !enabled || busy;
+  const [already, setAlready] = useState(false);
+  const off = !enabled || busy || already;
   return (
     <Button
       variant="default"
@@ -170,7 +152,7 @@ function Confirm({ enabled, done, date, alreadyWords, attrs, describedBy, action
         if (off) return;
         start(async () => {
           const r = await actions.confirm();
-          if (!r.ok && r.code === "already_confirmed") setAlready(alreadyWords);
+          if (!r.ok && r.code === "already_confirmed") setAlready(true);
         });
       }}
     >
@@ -204,11 +186,12 @@ export function MonoReady({ vm, actions, required }: ReadyPageProps) {
   const scoreLine = q ? (q.score !== null ? score(q.score, q.marked) : scoreEarly(q.marked)) : null;
   const scoreAttrs = scoreLine ? picker.take(scoreLine) : {};
   const reasonAttrs = new Map(vm.gate.reasons.map((r) => [r.code, picker.take(r.text)]));
-  // C-016 states: `confirmed` is drawn as the Confirm button's own words (not a link under it); `empty` is the only
-  // reason and leads to the chat, so the quiz is not offered beside it (D-032)
-  const done = vm.gate.reasons.find((r) => r.code === "confirmed")?.text ?? null;
+  // C-016 states: `confirmed` (D-030) — after Confirm the page's status line is the version and its date, drawn
+  // settled (ink + check, D-038); the D-030 words are only the reason under the off Confirm, listed like every reason.
+  // `empty` is the only reason and leads to the chat, so the quiz is not offered beside it (D-032).
+  const settled = vm.gate.reasons.some((r) => r.code === "confirmed");
   const empty = vm.gate.reasons.some((r) => r.code === "empty");
-  const links = vm.gate.reasons.filter((r) => r.code !== "confirmed");
+  const links = vm.gate.reasons;
   // row 4: a new failed answer is said once, politely (the newest item is the one just asked)
   const lastFailed = q?.items.at(-1)?.status === "failed";
   const [stepsRef, stepsScroll] = useScrolls<HTMLOListElement>();
@@ -256,15 +239,13 @@ export function MonoReady({ vm, actions, required }: ReadyPageProps) {
 
       {/* the gate (R3) and Build (R5): the page's answer */}
       <Paper radius="lg" p="lg" className={s.gate} component="section">
-        <Confirm
-          enabled={vm.gate.ok}
-          done={done}
-          date={vm.version?.dateLabel ?? null}
-          alreadyWords={vm.version ? reasonWords.confirmed(vm.version.n) : null}
-          attrs={reasonAttrs.get("confirmed") ?? {}}
-          describedBy={links.length ? "mono-ready-reasons" : undefined}
-          actions={actions}
-        />
+        {settled && vm.version ? (
+          <p className={s.settled}>
+            <IconCheck size={22} aria-hidden="true" />
+            <span>{confirmed(vm.version.n, vm.version.dateLabel)}</span>
+          </p>
+        ) : null}
+        <Confirm enabled={vm.gate.ok} describedBy={links.length ? "mono-ready-reasons" : undefined} actions={actions} />
         {links.length ? (
           <ul id="mono-ready-reasons" className={s.reasons}>
             {links.map((r) => (
@@ -276,7 +257,7 @@ export function MonoReady({ vm, actions, required }: ReadyPageProps) {
             ))}
           </ul>
         ) : null}
-        {vm.version && !done ? <p className={s.version}>{confirmed(vm.version.n, vm.version.dateLabel)}</p> : null}
+        {vm.version && !settled ? <p className={s.version}>{confirmed(vm.version.n, vm.version.dateLabel)}</p> : null}
         {vm.version?.changedSince ? <p className={s.changed}>{changedSince(vm.version.n)}</p> : null}
         <div className={s.build}>
           <Button variant="default" radius="md" h={44} className={s.outline} disabled>

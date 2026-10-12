@@ -8,10 +8,10 @@ import { pageRequired } from "@/core/model/build/required";
 import { defaultPages } from "@/core/theme/default/pages";
 import type { PageId, PageVMs, RequiredItem } from "@/core/theme/contract";
 import { apiDown, emptyProject } from "@/core/words";
-import { loadPrint, type Cover } from "./load";
+import { diagramSize, loadPrint, partsTable, planDiagram, type Cover } from "./load";
 import { ExportButton } from "./ExportButton";
 import { PrintOpen } from "./PrintOpen";
-import { coverLabels, notConfirmed, stuckHeading } from "./words";
+import { coverLabels, notConfirmed, partsTableHeaders, stuckHeading } from "./words";
 import s from "./print.module.css";
 
 function CoverSheet({ cover }: { cover: Cover }) {
@@ -39,6 +39,19 @@ function CoverSheet({ cover }: { cover: Cover }) {
   );
 }
 
+function PartsTable({ rows }: { rows: NonNullable<ReturnType<typeof partsTable>> }) {
+  return (
+    <table className={s.parts} data-print-table="parts">
+      <thead>
+        <tr><th>{partsTableHeaders.part}</th><th>{partsTableHeaders.kind}</th><th>{partsTableHeaders.links}</th></tr>
+      </thead>
+      <tbody>
+        {rows.map((r, i) => <tr key={i}><td>{r.title}</td><td>{r.kind}</td><td>{r.links.join(" · ")}</td></tr>)}
+      </tbody>
+    </table>
+  );
+}
+
 export async function PrintView({ projectId }: { projectId: string }) {
   const res = await loadPrint(projectId);
   if (res.kind === "notFound") notFound();
@@ -62,9 +75,14 @@ export async function PrintView({ projectId }: { projectId: string }) {
       ) : (
         res.sections.map((sec) => {
           const Page = defaultPages[sec.page] as FC<{ vm: PageVMs[PageId]; required: RequiredItem[] }>;
+          // D-040: a diagram whose labels would print under 8 pt in portrait gets its own landscape page
+          const size = diagramSize(sec);
+          const fit = size ? planDiagram(size.w, size.h) : null;
           return (
-            <section key={sec.key} className={s.sheet} data-page={sec.page}>
+            <section key={sec.key} className={fit?.orient === "landscape" ? `${s.sheet} ${s.wide}` : s.sheet} data-page={sec.page}
+              {...(fit ? { "data-label-pt": `${fit.ptPortrait.toFixed(1)}/${fit.ptLandscape.toFixed(1)}`, "data-orient": fit.orient } : {})}>
               <Page vm={sec.vm} required={pageRequired(sec.page, sec.vm as never)} />
+              {fit?.table ? <PartsTable rows={partsTable(sec) ?? []} /> : null}
             </section>
           );
         })

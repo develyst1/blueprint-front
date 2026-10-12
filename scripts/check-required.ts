@@ -128,6 +128,9 @@ async function check(base: string, themes: string[]) {
       for (const p of [...PAGES, ...FEATURES] as Route[]) {
         const query: Record<string, string> = p === "history" && someKey ? { part: someKey } : {};
         const items = await expected(id, p, query);
+        // Every page of a project that exists carries at least the shell's readiness item, so an empty list means the back
+        // end gave nothing to read — one page of a run that otherwise looks fine (TASK-B-030; B-027 only guards a total of 0).
+        if (items.length === 0) failures.push({ theme, page: `${seed}/${p}`, item: "(none)", why: "expected nothing; the back end or the server gave nothing" });
         const qs = new URLSearchParams(query).toString();
         const slug = p === "chat" || p === "ready" ? p : pageSlug(p);
         const res = await page.goto(`${base}/p/${id}/${slug}${qs ? `?${qs}` : ""}`);

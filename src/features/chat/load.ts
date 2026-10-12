@@ -12,8 +12,8 @@ import type { ProjectData } from "@/core/model/build/types";
 import { loadProjectData } from "@/core/model/load";
 import type { FrameVM, RequiredItem } from "@/core/theme/contract";
 import { requiredId } from "@/core/theme/required";
-import type { ChatChangeVM, ChatMessageVM, ChatModelVM, ChatQuestionVM, ChatSourceVM, ChatVM } from "./contract";
-import { acceptPack, botFailed, cawAsks, tierLabel } from "./words";
+import type { ChatChangeVM, ChatContradictionVM, ChatMessageVM, ChatModelVM, ChatQuestionVM, ChatSourceVM, ChatVM } from "./contract";
+import { acceptPack, botFailed, cawAsks, contradiction, tierLabel } from "./words";
 
 // ---------- API shapes not in the generated schema yet (blueprint-back src/http/routes/*.ts, read 2026-10-09) ----------
 export type ApiMessage = {
@@ -111,6 +111,17 @@ export function toPack(data: ProjectData, focus: string | null): ChatQuestionVM[
   }));
 }
 
+/** The stuck contradictions in the chat's words: `สองส่วนนี้ขัดกัน: {ส่วนแรก} กับ {ส่วนที่สอง}` from the two parts' titles;
+ *  a side that is not a part reads as the item's own title and fewer than two sides is the item's title (the note) —
+ *  the core's rule (`core/model/build/common.ts`, SPEC-B-001 v1.13), never a raw key (TASK-A-060 F2). Order = the API's. */
+export function toContradictions(data: ProjectData): ChatContradictionVM[] {
+  const title = new Map(data.parts.map((p) => [p.key, p.title]));
+  return data.stuck.filter((s) => s.kind === "contradiction").map((s) => {
+    const [a, b] = s.between ?? [];
+    return { key: s.key, text: a !== undefined && b !== undefined ? contradiction(title.get(a) ?? s.title, title.get(b) ?? s.title) : s.title };
+  });
+}
+
 /** The newest change set a chat message caused: the newest bot row that names one. */
 export function lastChangeSetId(rows: ApiMessage[]): string | null {
   for (let i = rows.length - 1; i >= 0; i--) if (rows[i]!.role === "bot" && rows[i]!.changeSetId) return rows[i]!.changeSetId;
@@ -128,10 +139,11 @@ export function toSources(rows: ApiSource[]): ChatSourceVM[] {
 }
 
 /** The gateway's list as choices: the three tiers first, then every "<provider>/<model>" (the PATCH's two forms).
- *  Labels are the gateway's own names — no word is written for them. The current model stays in the list. */
+ *  The three tiers are worded (`tierLabel`, D-035); a `provider/model` id keeps the gateway's own name (a product name,
+ *  no word is written for it). The current model stays in the list. */
 export function toModel(current: string, m: ApiModels | null): ChatModelVM | null {
   if (!m) return null;
-  const tierWord = (t: string) => (t in tierLabel ? tierLabel[t as keyof typeof tierLabel] : t);
+  const tierWord = (t: string) => (Object.hasOwn(tierLabel, t) ? tierLabel[t as keyof typeof tierLabel] : t);
   const options = [
     ...m.tiers.map((t) => ({ value: `tier:${t}`, label: tierWord(t) })),
     ...Object.entries(m.models).flatMap(([provider, names]) => names.map((n) => ({ value: `${provider}/${n}`, label: `${provider}/${n}` }))),
@@ -152,6 +164,7 @@ export function buildChatVM(input: {
     // The failed alert already says "บอทตอบไม่ได้ตอนนี้": the newest failed bot row is not shown a second time (older ones stay).
     messages: toMessages(input.messages).filter((m) => !(failed && m.id === newestBot!.id)),
     pack: toPack(data, input.focus),
+    contradictions: toContradictions(data),
     focus: input.focus,
     lastChange: input.change,
     sources: toSources(input.sources),

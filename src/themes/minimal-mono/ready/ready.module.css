@@ -101,7 +101,8 @@
   cursor: default;
 }
 
-/* confirmed and unchanged (D-030): a settled line — ink with a check, no outline, nothing to press */
+/* after Confirm (D-038): the status line ยืนยันแล้ว เวอร์ชัน {N} · {วันที่}, settled — ink with a check, no outline,
+   nothing to press; the off Confirm and its D-030 reason follow it */
 .settled {
   display: flex;
   align-items: center;
@@ -116,13 +117,6 @@
 
 .settled svg {
   flex: none;
-}
-
-/* the confirmed version's date, on the settled line: quiet */
-.settledDate {
-  font-size: 15px;
-  font-weight: 600;
-  color: #5c5c5c;
 }
 
 .strong:hover,

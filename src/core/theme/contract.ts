@@ -8,7 +8,7 @@ export type { ReadyVM, ReadyActions, ReadyPageProps } from "@/features/ready/con
 export type PageId = "overview" | "workOrder" | "flowchart" | "sequence" | "screens" | "api" | "web" | "stuck" | "history";
 export type PartKind = "work" | "step" | "interaction" | "role" | "screen" | "api" | "system" | "data" | "decision" | "question";
 export type ParticipantKind = "role" | "screen" | "api" | "system";
-export type StuckKind = "open_question" | "unlinked_part" | "flow_break" | "unconfirmed_guess" | "screen_without_api";
+export type StuckKind = "open_question" | "unlinked_part" | "flow_break" | "unconfirmed_guess" | "screen_without_api" | "contradiction" /* v1.13 */;
 export type FlowBreakReason = "unreachable" | "dead_end" | "unlabelled_branch" | "no_interactions" | "incomplete_interaction";
 
 /** What must be visible: an element carrying data-required={id} whose visible text contains `text`. */
@@ -89,7 +89,7 @@ export interface Theme {
   preview?: FC<{ sample: PreviewVM }>;
   pages?: { [P in PageId]?: FC<{ vm: PageVMs[P]; required: RequiredItem[] }> };
   /** `required` = the frame's items when a frame exists (readiness on an empty page), else [] (v1.2, Team C). */
-  state?: FC<{ frame: FrameVM | null; state: PageState; required: RequiredItem[] }>;
+  state?: FC<{ frame: FrameVM | null; state: PageState; required: RequiredItem[]; tools?: ReactNode /* v1.13: the core's controls on an empty project (D-038) */ }>;
   chat?: FC<ChatPageProps>;                     // v1.9 — Team A's chat core (REQ-004)
   ready?: FC<ReadyPageProps>;                   // v1.10 — Team C's ready-to-build core (REQ-007)
 }

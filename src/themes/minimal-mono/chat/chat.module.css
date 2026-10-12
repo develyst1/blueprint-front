@@ -185,6 +185,35 @@
   padding: 0 12px;
 }
 
+/* ---------- the stuck contradictions (A-060/061): quiet rows — ink text on white, the 1.5 px line, mono's blue
+   stuck mark (decorative; the words carry it); the root's focus ring when ?q= lands on one ---------- */
+.contradictions {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.contradictions li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1.5px solid #8a8a8a;
+  border-radius: var(--mantine-radius-lg);
+  background: #ffffff;
+  color: #000000;
+  font-size: 16px;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
+.contradictions li svg {
+  margin-top: 3px;
+}
+
 /* ---------- the question pack ---------- */
 .pack {
   display: flex;

@@ -77,6 +77,14 @@
 .sources { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
 .source { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; }
 .sourceName { min-width: 0; overflow-wrap: anywhere; }
+/* the stuck contradictions above the pack (TASK-B-029): amber, with the ⚠ mark */
+.contradictions { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.contradiction {
+  display: flex; align-items: flex-start; gap: 10px; padding: 12px 16px; border-radius: var(--cb-r-tile);
+  background: var(--cb-stuckSoft); color: var(--cb-stuck); font-weight: 500; overflow-wrap: anywhere;
+}
+.contradiction:focus-visible { outline: 3px solid var(--cb-stuck); outline-offset: 2px; }
+.contradictionMark { flex: none; margin-top: 4px; }
 .tagStuck { background: var(--cb-stuckSoft) !important; color: var(--cb-stuck) !important; border-color: transparent !important; }
 .field { display: grid; gap: 6px; }
 .field > label { font-weight: 600; }

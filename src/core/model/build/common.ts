@@ -3,7 +3,7 @@ import type {
   DecisionVM, FrameVM, NavItemVM, PageId, ProjectHeadVM, ReadinessVM, StepVM, StuckItemVM, WorkVM,
 } from "@/core/theme/contract";
 import { formatThaiDate } from "@/core/format/date";
-import { emptyProject, pageLabel, readinessClean, readinessClear, readinessStuck, stuck as stuckWords } from "@/core/words";
+import { contradiction, emptyProject, pageLabel, readinessClean, readinessClear, readinessStuck, stuck as stuckWords } from "@/core/words";
 import type { ApiLink, ApiStuckItem, ProjectData } from "./types";
 
 export const PAGES: PageId[] = ["overview", "workOrder", "flowchart", "sequence", "screens", "api", "web", "stuck", "history"];
@@ -99,7 +99,14 @@ export function stuckItems(data: ProjectData): StuckItemVM[] {
   const targetKey = (item: ApiStuckItem): string => {
     if (item.kind === "open_question") return out(item.key, "about")[0]?.toKey ?? item.key;
     if (item.kind === "unconfirmed_guess" && item.linkId) return linkById.get(item.linkId)?.fromKey ?? item.key;
+    if (item.kind === "contradiction") return (item.between ?? []).find((k) => part.has(k)) ?? item.key; // the first side that is a part
     return item.key; // flow_break (a step) · unconfirmed_guess (a part) · screen_without_api · unlinked_part · a kind added later
+  };
+  // A contradiction is worded by its two sides' titles; a side that is not a part reads as the item's own title (never a
+  // raw key, F-042); fewer than two sides cannot be worded as two → the note itself (v1.13).
+  const contradictionWords = (item: ApiStuckItem): string | undefined => {
+    const [a, b] = item.between ?? [];
+    return a !== undefined && b !== undefined ? contradiction(part.get(a)?.title ?? item.title, part.get(b)?.title ?? item.title) : undefined;
   };
   const targetHref = (item: ApiStuckItem, key: string): string => {
     const p = part.get(key);
@@ -110,7 +117,9 @@ export function stuckItems(data: ProjectData): StuckItemVM[] {
   };
   return data.stuck.map((item) => {
     const key = targetKey(item);
-    const known = item.kind === "flow_break" ? (item.reason ? stuckWords[item.reason] : undefined) : (stuckWords as Record<string, string>)[item.kind];
+    const known = item.kind === "flow_break" ? (item.reason ? stuckWords[item.reason] : undefined)
+      : item.kind === "contradiction" ? contradictionWords(item)
+      : (stuckWords as Record<string, string>)[item.kind];
     const question = item.kind === "open_question" ? part.get(item.key) : undefined;
     const proposed = question?.body.proposedAnswer;
     return {

@@ -50,6 +50,13 @@
   }
 }
 
+/* a diagram that would print under 8 pt in portrait (D-040): its own landscape A4 page, same margins. The named page
+   forces a break before and after; the footer still counts it. Needs `preferCSSPageSize` in page.pdf (pdf.ts). */
+@page wide {
+  size: A4 landscape;
+  margin: 16mm 14mm 18mm;
+}
+
 /* ---------- cover ---------- */
 .cover {
   break-after: page;
@@ -83,9 +90,11 @@
   font-size: 14pt;
 }
 
+/* the marker sits in the list's left padding, right-aligned: room for "100." (a 3-digit count), not just "9." — at 22px
+   the second digit of "10." was clipped and read "0." (TEST-A-006 DEF-2) */
 .stuck ol {
   margin: 0;
-  padding-left: 22px;
+  padding-left: 3.5em;
 }
 
 .stuck li {
@@ -134,8 +143,52 @@
   break-inside: avoid;
 }
 
+.wide {
+  page: wide;
+}
+
+/* landscape content is 176 mm tall; ~23 mm go to the heading and the legend */
+.wide svg {
+  max-height: 153mm;
+}
+
 .sheet [data-print="expand"]:has(> svg) {
   break-inside: avoid;
+}
+
+/* a diagram on a fixed-size canvas (the web's `.webCanvas` carries an inline width/height of its layout, e.g. 1925 ×
+   1808 px) is shrunk to the sheet with it: left at its own size, the svg's `max-width: 100%` was 100% of that wide
+   canvas, so nothing shrank, the drawing ran past the right edge and the box ran on to a blank page (TEST-A-006 DEF-1).
+   The inline size needs !important to give way; the svg's viewBox keeps the picture's proportions. */
+.sheet [data-print="expand"] > div:has(> svg) {
+  width: 100% !important;
+  height: auto !important;
+  margin: 0;
+}
+
+/* the parts table under a diagram whose labels stay under 8 pt (D-040): plain, 10 pt, header repeats across pages */
+.parts {
+  margin-top: 12px;
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 10pt;
+}
+
+.parts th,
+.parts td {
+  border-bottom: 1px solid #bbb;
+  padding: 3px 6px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.parts thead {
+  display: table-header-group;
+}
+
+/* the kind word is one short phrase — it never wraps (การตัดสินใจ) */
+.parts td:nth-child(2) {
+  white-space: nowrap;
 }
 
 .sheet tr,

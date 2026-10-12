@@ -7,7 +7,9 @@
 import { Alert, Button, Card, Input, Select, Slider, Tag, Typography, type RefSelectProps } from "antd";
 import { useEffect, useId, useRef, useState, useTransition, type KeyboardEvent, type ReactNode } from "react";
 import type { ChatPageProps } from "@/core/theme/contract";
-import type { ActionCode, ActionResult, ChatQuestionVM, ChatSourceVM } from "@/features/chat/contract";
+import { WarningFilled } from "@ant-design/icons";
+import type { ActionCode, ActionResult, ChatContradictionVM, ChatQuestionVM, ChatSourceVM } from "@/features/chat/contract";
+import { isTooLarge } from "@/features/chat/limits";
 import {
   acceptAll, acceptPack, actionError, answerOwn, botFailed, botSuggests, cancel, changeCard, chatPlaceholder, chooseFile, creativityLabel,
   enterHint, logName, modelLabel, notNeeded, originChoices, packName, reasonOptional, send as sendWord, sourceFailed, sourceState,
@@ -92,6 +94,27 @@ function Pack({ vm, required, actions, run, busy }: Omit<ChatPageProps, "vm"> & 
   );
 }
 
+/** The stuck contradictions (TEST-A-005 DEF-2): above the pack, each in Team A's words with a ⚠ mark (never colour
+ *  alone), its id = its key so `?q=<key>` lands on it — brought into view and focused, as the pack's cards are. */
+function Contradictions({ items, focus }: { items: ChatContradictionVM[]; focus: string | null }) {
+  const list = useRef<HTMLUListElement>(null);
+  useEffect(() => {
+    const el = focus ? list.current?.querySelector<HTMLElement>(`[data-key="${CSS.escape(focus)}"]`) : null;
+    el?.scrollIntoView({ block: "center" });
+    el?.focus({ preventScroll: true });
+  }, [focus]);
+  return (
+    <ul ref={list} className={s.contradictions}>
+      {items.map((c) => (
+        <li key={c.key} id={c.key} data-key={c.key} tabIndex={-1} className={s.contradiction}>
+          <WarningFilled aria-hidden className={s.contradictionMark} />
+          <span>{c.text}</span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 function SourceRow({ source }: { source: ChatSourceVM }) {
   return (
     <li className={s.source}>
@@ -121,7 +144,7 @@ export function Chat({ vm, actions, required }: ChatPageProps) {
   // a new change set clears an old undo refusal too
   useEffect(() => setRefused(null), [vm.lastChange?.changeSetId]);
 
-  const run: Run = (fn, after) => { setRefused(null); start(async () => { const r = await fn(); after?.(r); }); };
+  const run: Run = (fn, after) => { setRefused(null); setFailure(null); start(async () => { const r = await fn(); after?.(r); }); };
   const send = () => {
     if (!text.trim() || pending) return;
     const said = text;
@@ -130,7 +153,14 @@ export function Chat({ vm, actions, required }: ChatPageProps) {
   const onKey = (e: KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing) { e.preventDefault(); send(); }
   };
+  // a file over 20 MB is refused here, before any request: Next would answer a bigger body with its English error page
+  // (TEST-A-005 DEF-1, features/chat/limits.ts)
+  const take = (f: File) => {
+    if (isTooLarge(f)) { setFailure({ word: actionError.too_large, again: null }); dropFile(); return; }
+    setFailure(null); setFile(f);
+  };
   const upload = (stamp: string, f: File) => {
+    if (isTooLarge(f)) return take(f);
     const form = new FormData();
     form.set("file", f);
     form.set("origin", stamp);
@@ -169,13 +199,13 @@ export function Chat({ vm, actions, required }: ChatPageProps) {
                 onChange={(e) => setText(e.target.value)}
                 onKeyDown={onKey}
                 onDragOver={(e) => e.preventDefault()}
-                onDrop={(e) => { const f = e.dataTransfer.files[0]; if (f) { e.preventDefault(); setFile(f); } }}
+                onDrop={(e) => { const f = e.dataTransfer.files[0]; if (f) { e.preventDefault(); take(f); } }}
               />
               <div className={s.composerRow}>
                 <span id={ids.hint} className={s.hint}>{enterHint}</span>
                 <div className={s.row}>
                   <input ref={fileInput} type="file" className={s.srOnly} tabIndex={-1} aria-hidden="true"
-                    onChange={(e) => { const f = e.target.files?.[0]; if (f) setFile(f); e.target.value = ""; }} />
+                    onChange={(e) => { const f = e.target.files?.[0]; if (f) take(f); e.target.value = ""; }} />
                   <Button ref={chooser} size="large" onClick={() => fileInput.current?.click()}>{chooseFile}</Button>
                   <Button size="large" type="primary" htmlType="submit" disabled={pending || !text.trim()}>{sendWord}</Button>
                 </div>
@@ -214,6 +244,8 @@ export function Chat({ vm, actions, required }: ChatPageProps) {
                 </div>
               } />
           )}
+
+          {vm.contradictions.length > 0 && <Contradictions items={vm.contradictions} focus={vm.focus} />}
 
           {vm.pack.length > 0 && <Pack vm={vm} actions={actions} required={required} run={run} busy={pending} />}
 

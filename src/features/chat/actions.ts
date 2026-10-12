@@ -6,6 +6,7 @@
 import { refresh } from "next/cache";
 import type { ActionCode, ActionResult } from "./contract";
 import type { ProjectData } from "@/core/model/build/types";
+import { isTooLarge } from "./limits";
 import { raw, type RawResult } from "./load";
 
 const json = (body: unknown): RequestInit => ({ method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
@@ -75,6 +76,7 @@ export async function uploadAction(projectId: string, form: FormData): Promise<A
   const file = form.get("file");
   const stamp = String(form.get("origin") ?? "");
   if (!(file instanceof File) || !["operator", "customer-asked"].includes(stamp)) return { ok: false, code: "invalid" };
+  if (isTooLarge(file)) return { ok: false, code: "too_large" }; // defence: a body Next let through; pages check before calling
   const today = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Bangkok" }).format(new Date());
   const body = new FormData();
   body.set("file", file, file.name);

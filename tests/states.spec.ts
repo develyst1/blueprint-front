@@ -121,6 +121,20 @@ test("home: no card's theme root is taller than its card (a min-height on the de
   for (const r of rows) expect(r.root, `${r.theme}: root ${r.root} vs card ${r.card}`).toBeLessThanOrEqual(r.card + 8);
 });
 
+for (const theme of ["default", "clean-blue"]) {
+  test(`${theme}: an empty project's page shows ส่งออก PDF — ≥ 44 px, and it asks for the core's export URL (D-038, TASK-B-028)`, async ({ page }) => {
+    const p = await call("POST", "/v1/projects", { name: `โปรเจกต์ว่าง ${theme}`, theme }); // no change-sets: no live part
+    const exportUrl = `/p/${p.id}/export/pdf`;
+    await page.route(`**${exportUrl}`, (route) => route.fulfill({ status: 503 })); // the URL is what is asserted; no PDF is built here
+    await page.goto(`/p/${p.id}/overview`);
+    const button = page.getByRole("button", { name: "ส่งออก PDF" });
+    await expect(button).toBeVisible();
+    expect((await button.boundingBox())!.height, "button height (px)").toBeGreaterThanOrEqual(44);
+    const [req] = await Promise.all([page.waitForRequest((r) => new URL(r.url()).pathname === exportUrl), button.click()]);
+    expect(new URL(req.url()).pathname).toBe(exportUrl);
+  });
+}
+
 test("default ใยโหนด: node text is at least 14 px and a stuck node carries ⚠, not only a colour (TASK-B-024)", async ({ page }) => {
   const id = await projectIn("default", "ใยโหนด default");
   await page.goto(`/p/${id}/web`);

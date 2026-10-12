@@ -1,6 +1,7 @@
 // Server-side glue for one page of one project (TASK-B-007): loader → the project's theme → Root → shell (with the
 // frame's required items) → <main id="content"> → the theme's page or the default one (with the page's required
 // items). A loader state goes to the theme's `state` (or the default) — never to an empty picture.
+import type { ReactNode } from "react";
 import { notFound } from "next/navigation";
 import { retryAction } from "@/app/actions";
 import { contentId } from "@/core/theme/anchors";
@@ -12,13 +13,13 @@ import { ExportButton } from "@/features/export/ExportButton"; // Team A's (REQ-
 import { pageRequired, shellRequired } from "@/core/model/build/required";
 import { loadPage, loadProjectData, type Query } from "@/core/model/load";
 
-export function StateView({ theme, frame, state }: { theme: Theme; frame: FrameVM | null; state: Parameters<NonNullable<Theme["state"]>>[0]["state"] }) {
+export function StateView({ theme, frame, state, tools }: { theme: Theme; frame: FrameVM | null; state: Parameters<NonNullable<Theme["state"]>>[0]["state"]; tools?: ReactNode }) {
   const { Root } = theme;
   const State = theme.state ?? defaultTheme.state!;
   return (
     <Root>
       <main id={contentId} tabIndex={-1}>
-        <State frame={frame} state={state} required={frame ? shellRequired(frame) : []} />
+        <State frame={frame} state={state} required={frame ? shellRequired(frame) : []} tools={tools} />
       </main>
     </Root>
   );
@@ -39,7 +40,8 @@ export async function ProjectPage({ projectId, page, query }: { projectId: strin
       return <StateView theme={defaultTheme} frame={null} state={{ kind: "unreachable", retry: retryAction }} />;
     }
     const theme = getTheme(data.data.project.theme);
-    return <StateView theme={theme} frame={buildFrame(data.data, page)} state={{ kind: "empty", page }} />;
+    // an empty project can still be exported — the PDF says so itself (D-038, v1.13)
+    return <StateView theme={theme} frame={buildFrame(data.data, page)} state={{ kind: "empty", page }} tools={<ExportButton href={exportHref(projectId)} />} />;
   }
 
   const vm = res.vm as PageVMs[PageId];

@@ -11,6 +11,7 @@
 import { Alert, Button, TextArea, TextField } from "@heroui/react";
 import { Fragment, useEffect, useId, useRef, useState, useTransition, type FormEvent, type KeyboardEvent } from "react";
 import type { ChatActions, ChatPageProps } from "@/core/theme/contract";
+import { isTooLarge } from "@/features/chat/limits";
 import {
   actionError, botFailed, cancel, changeCard, chatPlaceholder, chooseFile, enterHint, logName, navChat, originChoices, send as sendWord,
   speaker, thinking, tryAgain, undoRefused, uploadAsks,
@@ -19,6 +20,21 @@ import { ChatEdge } from "./ChatEdge";
 import { ChatPack } from "./ChatPack";
 
 type Result = Awaited<ReturnType<ChatActions["send"]>>;
+
+/** The stuck contradictions (TASK-A-060, DEF-2): quiet already-worded lines above the pack — not the seal, not the stuck
+ *  tint; each focusable by its key, and `?q=<key>` lands on it. */
+function Contradictions({ items, focus }: { items: ChatPageProps["vm"]["contradictions"]; focus: string | null }) {
+  const list = useRef<HTMLUListElement>(null);
+  useEffect(() => {
+    const el = focus ? list.current?.querySelector<HTMLElement>(`[data-key="${CSS.escape(focus)}"]`) : null;
+    el?.focus();
+  }, [focus]);
+  return (
+    <ul ref={list} className="lg-chat-contradictions">
+      {items.map((c) => <li key={c.key} data-key={c.key} tabIndex={-1}>{c.text}</li>)}
+    </ul>
+  );
+}
 export type Run = (fn: () => Promise<Result>, after?: (r: Result) => void) => void;
 
 /** An action's failure in words (D-020): the codes that have one; the others are prevented or shown elsewhere. */
@@ -55,7 +71,22 @@ export function ChatDesk({ vm, actions, required }: ChatPageProps) {
   const onKey = (e: KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing) send(e as unknown as FormEvent);
   };
+  // over 20 MB: refused where it is taken (A-060 Q1 — at selection and on drop): the origin question never opens, no
+  // request is sent (Next would answer the body with its English error page), focus stays on the choose-file button
+  const refuseBig = (f: File) => {
+    if (!isTooLarge(f)) return false;
+    setFile(null);
+    setFailure({ word: actionError.too_large, again: null });
+    chooseRef.current?.focus();
+    return true;
+  };
+  const take = (f: File) => {
+    if (refuseBig(f)) return;
+    setFailure(null);
+    setFile(f);
+  };
   const upload = (stamp: string, f: File) => {
+    if (refuseBig(f)) return;
     const form = new FormData();
     form.set("file", f);
     form.set("origin", stamp);
@@ -119,7 +150,7 @@ export function ChatDesk({ vm, actions, required }: ChatPageProps) {
               onDragOver={(e) => e.preventDefault()}
               onDrop={(e) => {
                 const f = e.dataTransfer.files[0];
-                if (f) { e.preventDefault(); setFile(f); }
+                if (f) { e.preventDefault(); take(f); }
               }}
             />
           </TextField>
@@ -132,7 +163,7 @@ export function ChatDesk({ vm, actions, required }: ChatPageProps) {
               className="lg-sr-only"
               tabIndex={-1}
               aria-hidden="true"
-              onChange={(e) => { const f = e.target.files?.[0]; if (f) setFile(f); e.target.value = ""; }}
+              onChange={(e) => { const f = e.target.files?.[0]; e.target.value = ""; if (f) take(f); }}
             />
             <Button ref={chooseRef} variant="secondary" isDisabled={pending} onPress={() => fileInput.current?.click()}>{chooseFile}</Button>
             <Button type="submit" variant="primary" isDisabled={pending || !text.trim()}>{sendWord}</Button>
@@ -176,7 +207,12 @@ export function ChatDesk({ vm, actions, required }: ChatPageProps) {
         )}
       </section>
 
-      {vm.pack.length > 0 && <ChatPack pack={vm.pack} focus={vm.focus} required={required} actions={actions} run={run} busy={pending} />}
+      {(vm.contradictions.length > 0 || vm.pack.length > 0) && (
+        <div className="lg-chat-side">
+          {vm.contradictions.length > 0 && <Contradictions items={vm.contradictions} focus={vm.focus} />}
+          {vm.pack.length > 0 && <ChatPack pack={vm.pack} focus={vm.focus} required={required} actions={actions} run={run} busy={pending} />}
+        </div>
+      )}
 
       <section className="lg-chat-log">
         {change && !changeAfter && change}

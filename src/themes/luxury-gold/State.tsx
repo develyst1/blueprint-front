@@ -1,12 +1,13 @@
 // The three page states (AC-14…16), in the exact words of @/core/words, on a plaque.
 // Server-safe: the only interactive part (retry) is its own client file. Inside the shell when there is a frame.
+import type { ReactNode } from "react";
 import type { FrameVM, PageState, RequiredItem } from "@/core/theme/contract";
-import { apiDown, backHome, emptyProject, notFound } from "@/core/words";
+import { apiDown, backHome, emptyProject, notFound, startInChat } from "@/core/words";
 import { Alert } from "@heroui/react";
 import { RetryButton } from "./client/RetryButton";
 import { Shell } from "./Shell";
 
-function Body({ state }: { state: PageState }) {
+function Body({ frame, state }: { frame: FrameVM | null; state: PageState }) {
   if (state.kind === "unreachable") {
     // A system failure, not a stuck point: HeroUI Alert (danger) — never the stuck seal or the stuck tint.
     return (
@@ -20,10 +21,17 @@ function Body({ state }: { state: PageState }) {
     );
   }
   if (state.kind === "empty") {
+    // one sentence and where to start (frontend-finish rule 10, D-032, TASK-C-024) — the chat's href is the frame's own
+    const chat = frame?.nav.find((n) => n.page === "chat");
     return (
-      <div className="lg-state">
+      <div className="lg-state lg-state-empty">
         {/* The page's only heading: these states have no page title of their own. */}
         <h1 className="lg-state-text">{emptyProject}</h1>
+        {chat && (
+          <a className="lg-state-action" href={chat.href}>
+            {startInChat}
+          </a>
+        )}
       </div>
     );
   }
@@ -37,12 +45,13 @@ function Body({ state }: { state: PageState }) {
   );
 }
 
-export function State({ frame, state, required }: { frame: FrameVM | null; state: PageState; required: RequiredItem[] }) {
-  if (!frame) return <Body state={state} />;
-  // `required` = the frame's own items, handed down by the core (contract v1.2 — TASK-C-004 Q1).
+export function State({ frame, state, required, tools }: { frame: FrameVM | null; state: PageState; required: RequiredItem[]; tools?: ReactNode }) {
+  if (!frame) return <Body frame={null} state={state} />;
+  // `required` = the frame's own items, handed down by the core (contract v1.2 — TASK-C-004 Q1); `tools` = the core's
+  // controls on an empty project (v1.13, D-038), placed where every other gold page has them.
   return (
-    <Shell frame={frame} required={required}>
-      <Body state={state} />
+    <Shell frame={frame} required={required} tools={tools}>
+      <Body frame={frame} state={state} />
     </Shell>
   );
 }

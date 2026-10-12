@@ -41,7 +41,8 @@ export const chatPlaceholder = "เล่าเรื่องงานของ
 export const modelLabel = "โมเดล";
 export const creativityLabel = "ความสร้างสรรค์";
 
-export const contradiction = (first: string, second: string) => `สองส่วนนี้ขัดกัน: ${first} กับ ${second}`;
+// the core owns this word (SPEC-B-001 v1.13): one home, re-exported here under the same name
+export { contradiction } from "@/core/words";
 
 export const cawAsks = (text: string) => `ทีมงาน AI ขอแก้ spec: ${text}`;
 

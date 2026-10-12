@@ -5,6 +5,7 @@ import {
   buildChatVM, chatRequired, lastChange, lastChangeSetId, toMessages, toModel, toPack, toSources, MESSAGES, PACK, type ApiMessage,
 } from "./load";
 import * as core from "@/core/words";
+import { isTooLarge, MAX_UPLOAD_BYTES } from "./limits";
 import * as chatWords from "./words";
 import { acceptPack, botFailed, cawAsks, tierLabel } from "./words";
 
@@ -197,7 +198,7 @@ describe("A-034 actions (fixture API; next/cache's refresh stubbed — no Next r
   const fakeApi = (parts: ProjectData["parts"], round = (): Response => Response.json({ status: "applied" })) => {
     const calls: { url: string; body: unknown }[] = [];
     const spy = spyOn(globalThis, "fetch").mockImplementation((async (url: string | URL | Request, init?: RequestInit) => {
-      calls.push({ url: String(url), body: init?.body ? JSON.parse(String(init.body)) : null });
+      calls.push({ url: String(url), body: typeof init?.body === "string" ? JSON.parse(init.body) : null }); // a multipart body (FormData) has no JSON form
       return String(url).endsWith("/rounds") ? round() : Response.json(project(parts));
     }) as typeof fetch);
     return { calls, rounds: () => calls.filter((c) => c.url.endsWith("/rounds")), spy };
@@ -211,6 +212,18 @@ describe("A-034 actions (fixture API; next/cache's refresh stubbed — no Next r
       expect(api.rounds()).toHaveLength(0);
       expect(await acceptAction("p-1", ["Q-001"])).toEqual({ ok: true });
       expect(api.rounds().map((c) => c.body)).toEqual([{ accept: ["Q-001"] }]);
+    } finally { api.spy.mockRestore(); }
+  });
+
+  test("A-060: uploadAction refuses a file over 20 000 000 bytes before any request — too_large; one at the limit goes through", async () => {
+    const { uploadAction } = await import("./actions");
+    const api = fakeApi([]);
+    const form = (bytes: number) => { const f = new FormData(); f.set("file", new File([new Uint8Array(bytes)], "big.pdf", { type: "application/pdf" })); f.set("origin", "operator"); return f; };
+    try {
+      expect(await uploadAction("p-1", form(20_000_001))).toEqual({ ok: false, code: "too_large" });
+      expect(api.calls).toHaveLength(0);
+      expect(await uploadAction("p-1", form(20_000_000))).toEqual({ ok: true });
+      expect(api.calls.map((c) => c.url.replace(/^.*\/v1/, "/v1"))).toEqual(["/v1/projects/p-1/sources"]);
     } finally { api.spy.mockRestore(); }
   });
 
@@ -252,6 +265,58 @@ test("A-039: chatRequired lives in load.ts — each pack question's text, by par
   const vm = buildChatVM({ data: data([question("Q-001"), question("Q-002", { proposedAnswer: undefined })]), messages: [], focus: null,
     change: null, sources: [], models: null });
   expect(chatRequired(vm).map((r) => r.text)).toEqual(["คำถาม Q-001", "คำถาม Q-002"]);
+});
+
+describe("A-060 contradictions in the chat VM (TEST-A-005 DEF-2)", () => {
+  const part = (key: string, kind: "decision" | "step", title: string) => ({ key, kind, title, createdIn: "cs-1", origin, body: {} });
+  const withStuck = (stuck: ProjectData["stuck"], parts: ProjectData["parts"]) => ({ ...data(parts), stuck });
+  const vmOf = (d: ProjectData) => buildChatVM({ data: d, messages: [], focus: null, change: null, sources: [], models: null });
+  const con = (key: string, between?: string[]) => ({ kind: "contradiction" as const, key, title: `ข้อตัดสินใจขัดกับขั้นตอน ${key}`, ...(between ? { between } : {}) });
+
+  test("a contradiction between two parts is worded with their titles, in the API's order; other stuck kinds are not here", () => {
+    const parts = [part("DEC-001", "decision", "ห้องใหญ่ต้องอนุมัติ"), part("STEP-001", "step", "ส่งคำขอจอง")];
+    const vm = vmOf(withStuck([
+      { kind: "open_question", key: "Q-001", title: "คำถาม" }, con("CON-002", ["DEC-001", "STEP-001"]), con("CON-001", ["STEP-001", "DEC-001"]),
+    ], parts));
+    expect(vm.contradictions).toEqual([
+      { key: "CON-002", text: "สองส่วนนี้ขัดกัน: ห้องใหญ่ต้องอนุมัติ กับ ส่งคำขอจอง" },
+      { key: "CON-001", text: "สองส่วนนี้ขัดกัน: ส่งคำขอจอง กับ ห้องใหญ่ต้องอนุมัติ" },
+    ]);
+  });
+
+  test("a side that is not a part reads as the item's own title; fewer than two sides → the item's title; never a raw key; none → []", () => {
+    const parts = [part("DEC-001", "decision", "ห้องใหญ่ต้องอนุมัติ")];
+    const out = vmOf(withStuck([con("CON-001", ["DEC-001", "STEP-404"]), con("CON-002", ["DEC-001"]), con("CON-003"), con("CON-004", ["STEP-404", "STEP-405"])], parts)).contradictions;
+    expect(out).toEqual([
+      { key: "CON-001", text: "สองส่วนนี้ขัดกัน: ห้องใหญ่ต้องอนุมัติ กับ ข้อตัดสินใจขัดกับขั้นตอน CON-001" },
+      { key: "CON-002", text: "ข้อตัดสินใจขัดกับขั้นตอน CON-002" },
+      { key: "CON-003", text: "ข้อตัดสินใจขัดกับขั้นตอน CON-003" },
+      { key: "CON-004", text: "สองส่วนนี้ขัดกัน: ข้อตัดสินใจขัดกับขั้นตอน CON-004 กับ ข้อตัดสินใจขัดกับขั้นตอน CON-004" },
+    ]);
+    // nothing on screen reads like a part key (DEC-… / STEP-… / the item's own CON-…) except what a title itself says
+    for (const c of out.slice(0, 3)) expect(c.text.replace(/ข้อตัดสินใจขัดกับขั้นตอน CON-00\d/g, "")).not.toMatch(/\b(DEC|STEP|CON)-\d+/);
+    expect(vmOf(withStuck([], parts)).contradictions).toEqual([]);
+  });
+});
+
+describe("A-060 the 20 MB guard (TEST-A-005 DEF-1) — one limit, shared with the back end", () => {
+  test("the limit is the back end's 20 000 000 bytes; exactly at it is allowed, one over is not", () => {
+    expect(MAX_UPLOAD_BYTES).toBe(20_000_000);
+    expect(isTooLarge({ size: 20_000_000 } as File)).toBe(false);
+    expect(isTooLarge({ size: 20_000_001 } as File)).toBe(true);
+    expect(isTooLarge({ size: 22_020_105 } as File)).toBe(true);
+    expect(isTooLarge({ size: 0 } as File)).toBe(false);
+  });
+});
+
+test("A-060 (A-056 follow-up): an inherited object key is not a tier word; toModel's own words are exactly the three", () => {
+  const m = toModel("tier:small", { models: {}, tiers: ["toString", "constructor", "small"] })!;
+  expect(m.options.map((o) => o.label)).toEqual(["toString", "constructor", "เร็ว"]);
+});
+
+test("A-060: contradiction's one home is the core's — ours re-exports it", () => {
+  expect(chatWords.contradiction).toBe(core.contradiction);
+  expect(chatWords.contradiction("ก", "ข")).toBe("สองส่วนนี้ขัดกัน: ก กับ ข");
 });
 
 test("A-039: the D-020 words have one home — ours re-export the core's under the old names", () => {

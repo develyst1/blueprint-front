@@ -230,10 +230,40 @@ describe("every stuck kind (invented project)", () => {
   });
 
   test("a stuck kind the contract does not know yet stays in the list, worded by its title", () => {
-    const later = { ...every, stuck: [...every.stuck, { kind: "contradiction", key: "Q-001", title: "สองเรื่องขัดกัน" } as ProjectData["stuck"][number]] };
+    // `contradiction` was the example until v1.13 named it; any kind the back end adds later behaves the same way
+    const later = { ...every, stuck: [...every.stuck, { kind: "brand_new_kind", key: "Q-001", title: "เรื่องใหม่ที่ยังไม่มีคำ" } as unknown as ProjectData["stuck"][number]] };
     const items = vm(buildStuck(later)).items;
     expect(items).toHaveLength(every.stuck.length + 1);
-    expect(items.at(-1)!.wording).toBe("สองเรื่องขัดกัน");
+    expect(items.at(-1)!.wording).toBe("เรื่องใหม่ที่ยังไม่มีคำ");
+  });
+
+  describe("v1.13: a contradiction is worded by its two sides (TEST-A-005 DEF-2, REQ-004 l.61)", () => {
+    const title = (d: ProjectData, key: string) => d.parts.find((p) => p.key === key)!.title;
+    const withContradiction = (between: string[]) => ({
+      ...worked,
+      stuck: [{ kind: "contradiction", key: "CON-001", title: "ห้องใหญ่ไม่ต้องอนุมัติ ตามเอกสาร", between } as unknown as ProjectData["stuck"][number]],
+    });
+
+    test("two part sides → \"สองส่วนนี้ขัดกัน: <first> กับ <second>\"; the target is the first side", () => {
+      const item = vm(buildStuck(withContradiction(["DEC-001", "STEP-001"]))).items[0]!;
+      expect(item.kind).toBe("contradiction");
+      expect(item.wording).toBe(`สองส่วนนี้ขัดกัน: ${title(worked, "DEC-001")} กับ ${title(worked, "STEP-001")}`);
+      expect(item.target.key).toBe("DEC-001");
+    });
+
+    test("a side that is not a part uses the item's own title — never a raw key (F-042)", () => {
+      const item = vm(buildStuck(withContradiction(["NO-SUCH-PART", "STEP-001"]))).items[0]!;
+      expect(item.wording).toBe(`สองส่วนนี้ขัดกัน: ห้องใหญ่ไม่ต้องอนุมัติ ตามเอกสาร กับ ${title(worked, "STEP-001")}`);
+      expect(item.wording).not.toContain("NO-SUCH-PART");
+      expect(item.target.key).toBe("STEP-001"); // the first side that IS a part
+    });
+
+    test("fewer than two sides → the note itself (two sides cannot be worded from one); more than two → the first two", () => {
+      expect(vm(buildStuck(withContradiction([]))).items[0]!.wording).toBe("ห้องใหญ่ไม่ต้องอนุมัติ ตามเอกสาร");
+      expect(vm(buildStuck(withContradiction(["DEC-001"]))).items[0]!.wording).toBe("ห้องใหญ่ไม่ต้องอนุมัติ ตามเอกสาร");
+      const three = vm(buildStuck(withContradiction(["DEC-001", "STEP-001", "STEP-002"]))).items[0]!;
+      expect(three.wording).toBe(`สองส่วนนี้ขัดกัน: ${title(worked, "DEC-001")} กับ ${title(worked, "STEP-001")}`);
+    });
   });
 
   test("history of a part changed twice: both changes, oldest first, with when and why", () => {

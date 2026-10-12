@@ -1,5 +1,6 @@
 // The PDF route's pure parts (SPEC-A-007 § E2, TASK-A-046): the file name, the header, the local-only rule.
 import { describe, expect, test } from "bun:test";
+import { readFileSync } from "node:fs";
 import { contentDisposition, isLocalUrl, pdfFileName } from "./pdf";
 
 describe("file name — {project}-spec-{v<N>|draft}-{YYYY-MM-DD}.pdf (AC-1)", () => {
@@ -33,4 +34,26 @@ test("only this machine is allowed while Chrome prints (R6, AC-5)", () => {
     "http://[::1]:3210/", "ws://localhost:3210/", "file:///etc/hosts", "not a url"]) {
     expect([u, isLocalUrl(u)]).toEqual([u, false]);
   }
+});
+
+// TASK-A-062: two print rules a visual fix depends on (TEST-A-006 DEF-1, DEF-2). Computed in Chrome by
+// ai-worker/tests/harness/export/measure.mjs (web svg 509.3 mm → 181.5 mm); here the rules themselves must not be lost.
+describe("print.module.css keeps the two A-062 fixes", () => {
+  const css = readFileSync(new URL("./print.module.css", import.meta.url), "utf8");
+  const block = (selector: string) => {
+    const i = css.indexOf(`${selector} {`);
+    return i < 0 ? "" : css.slice(i, css.indexOf("}", i));
+  };
+
+  test("a diagram on a fixed-size canvas is shrunk to the sheet with it (inline size needs !important)", () => {
+    const b = block('.sheet [data-print="expand"] > div:has(> svg)');
+    expect(b).toContain("width: 100% !important");
+    expect(b).toContain("height: auto !important");
+  });
+
+  test("the cover list leaves room for a three-digit marker (em, not a fixed 22px)", () => {
+    const b = block(".stuck ol");
+    expect(b).toMatch(/padding-left:\s*3\.5em/);
+    expect(b).not.toContain("22px");
+  });
 });

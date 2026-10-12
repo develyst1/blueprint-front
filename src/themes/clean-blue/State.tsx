@@ -3,7 +3,7 @@
 // clean-blue page states (AC-14…16) with Ant's Result; the empty project is one message and a way in. With a frame (an empty project) the whole shell stays,
 // so the project's name, readiness and pages are still there (v1.2).
 import { Button, Result } from "antd";
-import { useTransition } from "react";
+import { useTransition, type ReactNode } from "react";
 import type { FrameVM, PageState, RequiredItem } from "@/core/theme/contract";
 import { apiDown, backHome, emptyProject, notFound, retry, startInChat } from "@/core/words";
 import { Shell } from "./Shell";
@@ -36,6 +36,7 @@ function Body({ state, frame }: { state: PageState; frame: FrameVM | null }) {
   );
 }
 
-export function State({ frame, state, required }: { frame: FrameVM | null; state: PageState; required: RequiredItem[] }) {
-  return frame ? <Shell frame={frame} required={required}><div><Body state={state} frame={frame} /></div></Shell> : <Body state={state} frame={null} />;
+// `tools` (v1.13): the core's controls on an empty project (ส่งออก PDF, D-038) — the shell's bar places them, as on every page
+export function State({ frame, state, required, tools }: { frame: FrameVM | null; state: PageState; required: RequiredItem[]; tools?: ReactNode }) {
+  return frame ? <Shell frame={frame} required={required} tools={tools}><div><Body state={state} frame={frame} /></div></Shell> : <Body state={state} frame={null} />;
 }

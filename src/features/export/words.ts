@@ -8,3 +8,4 @@ export const notConfirmed = "ยังไม่ยืนยัน";
 export const coverLabels = { project: "โปรเจกต์", version: "เวอร์ชัน", exportDate: "วันที่ส่งออก", readiness: "ความพร้อม" } as const;
 export const stuckHeading = (n: number) => `ยังติดอยู่ ${n} เรื่อง`;
 export const footer = (n: number | string, m: number | string) => `หน้า ${n} จาก ${m}`;
+export const partsTableHeaders = { part: "ส่วน", kind: "ชนิด", links: "เชื่อมกับ" } as const; // REQ-008 l.45; PM 2026-10-12 via Sober (TASK-A-064 Q1)

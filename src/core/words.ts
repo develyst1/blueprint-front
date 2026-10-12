@@ -29,7 +29,8 @@ export const newProjectSteps: [string, string, string] = ["ตั้งชื่
 
 // Stuck rows. `flow_break` has no row of its own in REQ-002: a flow break is shown by its reason
 // (StuckItemVM.reason), so the key is left out rather than given an invented word — TASK-B-003 Q1.
-export const stuck: Record<Exclude<StuckKind, "flow_break"> | FlowBreakReason, string> = {
+// `contradiction` is worded by its two sides (`contradiction` below), so it has no fixed row either (v1.13).
+export const stuck: Record<Exclude<StuckKind, "flow_break" | "contradiction"> | FlowBreakReason, string> = {
   open_question: "ยังมีคำถามที่ยังไม่ได้ตอบ",
   unlinked_part: "ส่วนนี้ยังไม่ได้เชื่อมกับอะไรเลย",
   unreachable: "ไปถึงขั้นนี้จากขั้นแรกไม่ได้",
@@ -40,6 +41,9 @@ export const stuck: Record<Exclude<StuckKind, "flow_break"> | FlowBreakReason, s
   unconfirmed_guess: "บอทเดาไว้ ยังไม่ได้รับการยืนยัน",
   screen_without_api: "หน้าจอนี้แสดงข้อมูล แต่ยังไม่รู้ว่าดึงมาจาก API ไหน",
 };
+
+// Two parts that disagree — worded by the two sides, on ติดอยู่ตรงไหน and in the chat (REQ-004 l.61, v1.13)
+export const contradiction = (first: string, second: string): string => `สองส่วนนี้ขัดกัน: ${first} กับ ${second}`;
 
 // Show long text
 export const showMore = "ดูรายละเอียด";

@@ -12,6 +12,7 @@ import "@mantine/core/styles/Anchor.css";
 import "@mantine/core/styles/Stack.css";
 import { Alert, Anchor, Button, Paper, Stack, Text } from "@mantine/core";
 import { useTransition } from "react";
+import type { ReactNode } from "react";
 import type { FrameVM, PageState, RequiredItem } from "@/core/theme/contract";
 import { apiDown, backHome, emptyProject, notFound, retry } from "@/core/words";
 import { StuckIcon } from "../parts/StuckIcon";
@@ -22,7 +23,8 @@ import s from "./state.module.css";
 // v1.2: `required` = the frame's own items (the readiness label on an empty page). With a frame (an empty project
 // the core can read) the state sits inside the mono Shell — skip link, project name (h1), nav, readiness strip, which
 // claims the readiness item — like every page (REVIEW-C-002 row 25). Without one, the items are short lines.
-export function State({ frame, state, required = [] }: { frame: FrameVM | null; state: PageState; required?: RequiredItem[] }) {
+// v1.13: `tools` = the core's controls on an empty project (D-038, ส่งออก PDF) — placed where the shell places them.
+export function State({ frame, state, required = [], tools }: { frame: FrameVM | null; state: PageState; required?: RequiredItem[]; tools?: ReactNode }) {
   const [pending, start] = useTransition();
 
   if (state.kind === "unreachable") {
@@ -52,7 +54,7 @@ export function State({ frame, state, required = [] }: { frame: FrameVM | null; 
       </Paper>
     );
     return frame ? (
-      <Shell frame={frame} required={required}>
+      <Shell frame={frame} required={required} tools={tools}>
         {panel}
       </Shell>
     ) : (

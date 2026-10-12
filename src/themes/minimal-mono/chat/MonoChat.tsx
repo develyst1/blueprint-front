@@ -23,7 +23,9 @@ import {
   enterHint, logName, modelLabel, notNeeded, originChoices, packName, reasonOptional, send as sendWord, sourceFailed,
   sourceState, speaker, thinking, toSpec, tryAgain, undoRefused, uploadAsks,
 } from "@/features/chat/words";
+import { isTooLarge } from "@/features/chat/limits";
 import { RequiredList, RequiredPicker } from "../parts/Required";
+import { StuckIcon } from "../parts/StuckIcon";
 import s from "./chat.module.css";
 
 // the contract's own types, derived — the theme imports only what the core re-exports
@@ -31,6 +33,7 @@ type ActionResult = Awaited<ReturnType<ChatActions["send"]>>;
 type ActionCode = Extract<ActionResult, { ok: false }>["code"];
 type Question = ChatVM["pack"][number];
 type Source = ChatVM["sources"][number];
+type Contradiction = ChatVM["contradictions"][number];
 type Run = (fn: () => Promise<ActionResult>, after?: (r: ActionResult) => void) => void;
 
 /** Text clamped to 2 lines (AC-8); ดูรายละเอียด appears only when it is actually longer. */
@@ -98,6 +101,26 @@ function OwnAnswer({ q, titleId, actions, run, busy }: { q: Question; titleId: s
         </div>
       )}
     </div>
+  );
+}
+
+/** The stuck contradictions (TASK-A-060/061, TEST-A-005 DEF-2), worded by the core: quiet rows above the pack, each
+ *  with mono's one stuck mark; `?q=<key>` focuses its row, like the pack's cards. */
+function Contradictions({ items, focus }: { items: Contradiction[]; focus: string | null }) {
+  const list = useRef<HTMLUListElement>(null);
+  useEffect(() => {
+    const el = focus ? list.current?.querySelector<HTMLElement>(`[data-key="${CSS.escape(focus)}"]`) : null;
+    el?.focus();
+  }, [focus]);
+  return (
+    <ul ref={list} className={s.contradictions}>
+      {items.map((c) => (
+        <li key={c.key} data-key={c.key} tabIndex={-1}>
+          <StuckIcon size={18} />
+          <span>{c.text}</span>
+        </li>
+      ))}
+    </ul>
   );
 }
 
@@ -211,8 +234,17 @@ export function MonoChat({ vm, actions, required }: ChatPageProps) {
     });
   };
   useEffect(() => setRefused(null), [vm.lastChange?.changeSetId]);
+  // a file over 20 MB is refused here, at selection / drop — before the origin question, with no request (TASK-A-061
+  // part 1, A-060 Q1): the `too_large` word in mono's failure panel, the question never opens, focus back on เลือกไฟล์
   const choose = (f: File) => {
     setRefused(null);
+    if (isTooLarge(f)) {
+      setFile(null);
+      setFailure({ word: actionError.too_large, again: null });
+      fileButton.current?.focus();
+      return;
+    }
+    setFailure(null);
     setFile(f);
   };
 
@@ -334,6 +366,8 @@ export function MonoChat({ vm, actions, required }: ChatPageProps) {
           </div>
         </Paper>
       ) : null}
+
+      {vm.contradictions.length ? <Contradictions items={vm.contradictions} focus={vm.focus} /> : null}
 
       {vm.pack.length ? <Pack pack={vm.pack} focus={vm.focus} marks={marks} actions={actions} run={run} busy={pending} /> : null}
 

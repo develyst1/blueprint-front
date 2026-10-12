@@ -30,6 +30,12 @@ export interface ChatQuestionVM {
   about: { key: string; title: string }[];
 }
 
+/** One stuck contradiction, worded for the chat (TASK-A-060, TEST-A-005 DEF-2). */
+export interface ChatContradictionVM {
+  key: string;
+  text: string;
+}
+
 /** What the newest chat-caused change set did (R3). */
 export interface ChatChangeVM {
   changeSetId: string;
@@ -59,6 +65,10 @@ export interface ChatVM {
   messages: ChatMessageVM[];
   /** every open question, ≤ 5, oldest first (the `focus` one always included) */
   pack: ChatQuestionVM[];
+  /** the stuck contradictions (REQ-003 R6), as the API lists them, each already worded `สองส่วนนี้ขัดกัน: {ส่วนแรก} กับ
+   *  {ส่วนที่สอง}` with the two parts' titles (a side that is not a part, or fewer than two sides → the stuck item's own title).
+   *  A page shows them above the pack, each focusable by its `key` (`?q=<key>`) (TASK-A-060). */
+  contradictions: ChatContradictionVM[];
   /** ?q=<key>: the question to open at (R7) */
   focus: string | null;
   lastChange: ChatChangeVM | null;
@@ -75,7 +85,10 @@ export interface ChatVM {
 export type ActionCode = "undo_refused" | "invalid" | "unreachable" | "too_large" | "unsupported_file" | "already_added";
 export type ActionResult = { ok: true } | { ok: false; code: ActionCode; parts?: string[] };
 
-/** Server actions, bound to the project. Each ends with refresh(); none returns data the page must render.
+/** `upload` is refused by the page itself for a file over `MAX_UPLOAD_BYTES` (`./limits`): call `isTooLarge(file)` first and
+ *  show the `too_large` word — Next rejects a bigger body before the action runs.
+ *
+ *  Server actions, bound to the project. Each ends with refresh(); none returns data the page must render.
  *  An action's failure is shown until the next action: a page clears its last failure (an undo refusal, an error word)
  *  when the user does anything else, and when the change card it belongs to is replaced. */
 export interface ChatActions {

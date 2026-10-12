@@ -59,7 +59,9 @@ export async function renderPdf(url: string, opts: { channel?: string; timeoutMs
     const res = await page.goto(url, { waitUntil: "networkidle", timeout: timeoutMs });
     if (!res || !res.ok()) throw new PdfFailed("page");
     const pdf = await page.pdf({
-      format: "A4", printBackground: true, displayHeaderFooter: true, headerTemplate: "<span></span>", footerTemplate: FOOTER, margin: MARGIN,
+      // `preferCSSPageSize`: the sheet sizes come from the print CSS — A4 portrait, and the named landscape page a big diagram
+      // gets (D-040); `format` alone would make every page portrait.
+      format: "A4", preferCSSPageSize: true, printBackground: true, displayHeaderFooter: true, headerTemplate: "<span></span>", footerTemplate: FOOTER, margin: MARGIN,
     });
     return { pdf, requests };
   })();

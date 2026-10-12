@@ -8,7 +8,8 @@
 import { useEffect, useId, useLayoutEffect, useRef, useState, useTransition, type FormEvent, type KeyboardEvent, type ReactNode } from "react";
 import { requiredProps } from "@/core/theme/required";
 import { proposedAnswer as proposedAnswerWord, showMore } from "@/core/words";
-import type { ActionCode, ActionResult, ChatPageProps, ChatQuestionVM, ChatSourceVM } from "./contract";
+import type { ActionCode, ActionResult, ChatContradictionVM, ChatPageProps, ChatQuestionVM, ChatSourceVM } from "./contract";
+import { isTooLarge } from "./limits";
 import {
   acceptAll, cancel, acceptPack, actionError, answerOwn, botFailed, botSuggests, changeCard, chatPlaceholder, chooseFile, creativityLabel,
   enterHint, logName, modelLabel, notNeeded, originChoices, packName, reasonOptional, send as sendWord, sourceFailed,
@@ -72,6 +73,20 @@ function OwnAnswer({ q, titleId, actions, run, busy }: { q: ChatQuestionVM; titl
         <button type="submit" className={s.textButton} disabled={busy} aria-describedby={titleId}>{notNeeded}</button>
       </form>
     </div>
+  );
+}
+
+/** The stuck contradictions in the chat (TASK-A-060): short quiet items above the pack, each focusable; `?q=<key>` lands on it. */
+function Contradictions({ items, focus }: { items: ChatContradictionVM[]; focus: string | null }) {
+  const list = useRef<HTMLUListElement>(null);
+  useEffect(() => {
+    const el = focus ? list.current?.querySelector<HTMLElement>(`[data-key="${CSS.escape(focus)}"]`) : null;
+    el?.focus();
+  }, [focus]);
+  return (
+    <ul ref={list} className={s.contradictions}>
+      {items.map((c) => <li key={c.key} data-key={c.key} tabIndex={-1}>{c.text}</li>)}
+    </ul>
   );
 }
 
@@ -203,6 +218,19 @@ export function DefaultChat({ vm, actions, required }: ChatPageProps) {
       setFailure(word ? { word, again: !r.ok && r.code === "unreachable" ? () => upload(stamp, f) : null } : null);
     });
   };
+  // A file picked or dropped: over 20 MB it never opens "ไฟล์นี้มาจากใคร" — the `too_large` alert at once, nothing is kept,
+  // focus stays on เลือกไฟล์ (A-060 F1). No request is made either way: Next would answer a bigger body with its English
+  // error page, and the origin question for a file that will be refused is a pointless step.
+  const choose = (f: File) => {
+    if (isTooLarge(f)) {
+      setFile(null);
+      setFailure({ word: actionError.too_large, again: null });
+      fileButton.current?.focus();
+      return;
+    }
+    setFailure(null);
+    setFile(f);
+  };
   // ยกเลิก / Escape on "ไฟล์นี้มาจากใคร" (D-034): the question closes, nothing is uploaded, focus goes back to เลือกไฟล์
   const cancelUpload = () => {
     setFile(null);
@@ -239,7 +267,7 @@ export function DefaultChat({ vm, actions, required }: ChatPageProps) {
           onDragOver={(e) => e.preventDefault()}
           onDrop={(e) => {
             const f = e.dataTransfer.files[0];
-            if (f) { e.preventDefault(); setFile(f); }
+            if (f) { e.preventDefault(); choose(f); }
           }}
         />
         <div className={s.composerRow}>
@@ -253,7 +281,7 @@ export function DefaultChat({ vm, actions, required }: ChatPageProps) {
               className={s.srOnly}
               tabIndex={-1}
               aria-hidden="true"
-              onChange={(e) => { const f = e.target.files?.[0]; if (f) setFile(f); e.target.value = ""; }}
+              onChange={(e) => { const f = e.target.files?.[0]; if (f) choose(f); e.target.value = ""; }}
             />
             <button ref={fileButton} type="button" className={s.secondary} onClick={() => fileInput.current?.click()}>{chooseFile}</button>
             <button type="submit" className={s.primary} disabled={pending || !text.trim()}>{sendWord}</button>
@@ -299,6 +327,7 @@ export function DefaultChat({ vm, actions, required }: ChatPageProps) {
         </div>
       ) : null}
 
+      {vm.contradictions.length ? <Contradictions items={vm.contradictions} focus={vm.focus} /> : null}
       {vm.pack.length ? <Pack pack={vm.pack} focus={vm.focus} required={required} actions={actions} run={run} busy={pending} /> : null}
 
       {vm.lastChange ? (
