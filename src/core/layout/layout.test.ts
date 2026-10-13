@@ -7,7 +7,7 @@ import type { ApiFlowchart, ApiLink, ApiPart, ApiSequence } from "@/core/model/b
 import { FLOW, flowLayout } from "./flow";
 import { sequenceLayout } from "./sequence";
 import { conditionBox, estimateLabel } from "./text";
-import { nodeBox, webLayout } from "./web";
+import { nodeBox, tileBox, TILE_GAP, webCrossings, webLayout, WEB_ASPECT } from "./web";
 
 const fixture = <T>(name: string): T =>
   JSON.parse(readFileSync(path.join(process.cwd(), "tests/fixtures/api", `${name}.json`), "utf8")) as T;
@@ -165,6 +165,89 @@ describe("node web", () => {
       }
     });
   }
+});
+
+describe("node web crossings (REQ-009 AC-4)", () => {
+  const n = (key: string, x: number, y: number) => ({ key, kind: "step" as const, title: key, stuck: false, x, y });
+  const e = (from: string, to: string) => ({ id: `${from}-${to}`, kind: "next", from, to });
+
+  test("the counter: an X is 1; edges that share a node, parallel, touching and collinear ones are 0", () => {
+    const nodes = [n("a", 0, 0), n("b", 10, 10), n("c", 10, 0), n("d", 0, 10), n("e", 20, 0), n("f", 20, 10)];
+    expect(webCrossings({ nodes, edges: [e("a", "b"), e("c", "d")] })).toBe(1); // a–b crosses c–d
+    expect(webCrossings({ nodes, edges: [e("a", "b"), e("a", "d")] })).toBe(0); // they meet at a
+    expect(webCrossings({ nodes, edges: [e("a", "d"), e("c", "b")] })).toBe(0); // parallel
+    expect(webCrossings({ nodes, edges: [e("a", "c"), e("c", "e")] })).toBe(0); // collinear, meeting at c
+    expect(webCrossings({ nodes, edges: [e("a", "c"), e("d", "b")] })).toBe(0); // two sides of a square
+    expect(webCrossings({ nodes, edges: [e("a", "x"), e("c", "d")] })).toBe(0); // an edge to a node that is not there
+  });
+
+  // Measured 2026-10-12 on the ring-by-kind layout this replaces (same fixtures, same counter) — TASK-B-031 DoD 2.
+  const BEFORE = { worked: 233, large: 1149 } as const;
+
+  for (const p of projects) {
+    test(`${p}: fewer crossings than the ring-by-kind layout (${BEFORE[p]}), none of the node boxes overlap`, () => {
+      const spec = fixture<{ parts: ApiPart[]; links: ApiLink[] }>(`${p}-project`);
+      const lay = webLayout(spec.parts.map((x) => ({ key: x.key, kind: x.kind, title: x.title, stuck: false })), spec.links);
+      const after = webCrossings(lay);
+      console.log(`${p}: crossings ${BEFORE[p]} → ${after}`);
+      expect(after).toBeLessThan(BEFORE[p]);
+    });
+  }
+});
+
+// TASK-B-033 (SPEC v1.15): the web is dense and aspect-aware — rows of tiles arranged for a wide box (desktop) or a tall one (phone),
+// spaced by the theme tile box so tiles never touch at any zoom, with no more crossings than the ring layout of TASK-B-031.
+describe("dense web layout (REQ-009 R1/R4, TASK-B-033)", () => {
+  const B031 = { worked: 103, large: 587 } as const; // crossings of the ring layout B-031 shipped, same counter and fixtures
+  const nodesOf = (spec: { parts: ApiPart[] }) => spec.parts.map((x) => ({ key: x.key, kind: x.kind, title: x.title, stuck: false }));
+  const aspects = [["wide", WEB_ASPECT.wide], ["tall", WEB_ASPECT.tall]] as const;
+
+  for (const p of projects) {
+    for (const [name, aspect] of aspects) {
+      const spec = fixture<{ parts: ApiPart[]; links: ApiLink[] }>(`${p}-project`);
+      const lay = webLayout(nodesOf(spec), spec.links, aspect);
+
+      test(`${p} ${name}: no two tile boxes closer than the gap (${TILE_GAP.x} px across, ${TILE_GAP.y} px down), all inside the layout`, () => {
+        const boxes = lay.nodes.map((n) => ({ key: n.key, r: centred({ x: n.x, y: n.y }, tileBox(n)) }));
+        const close: string[] = [];
+        for (const [i, a] of boxes.entries()) for (const b of boxes.slice(i + 1)) {
+          const gx = Math.max(a.r.x, b.r.x) - Math.min(a.r.x + a.r.w, b.r.x + b.r.w);
+          const gy = Math.max(a.r.y, b.r.y) - Math.min(a.r.y + a.r.h, b.r.y + b.r.h);
+          if (gx < TILE_GAP.x && gy < TILE_GAP.y) close.push(`${a.key} × ${b.key} (${Math.round(gx)}, ${Math.round(gy)})`);
+        }
+        expect(close).toEqual([]);
+        for (const b of boxes) {
+          expect(b.r.x).toBeGreaterThanOrEqual(0);
+          expect(b.r.y).toBeGreaterThanOrEqual(0);
+          expect(b.r.x + b.r.w).toBeLessThanOrEqual(lay.width);
+          expect(b.r.y + b.r.h).toBeLessThanOrEqual(lay.height);
+        }
+      });
+
+      test(`${p} ${name}: every part a node, every link an edge, same input → same output`, () => {
+        expect(lay.nodes).toHaveLength(spec.parts.length);
+        expect(lay.edges).toHaveLength(spec.links.length);
+        expect(webLayout(structuredClone(nodesOf(spec)), structuredClone(spec.links), aspect)).toEqual(lay);
+      });
+
+      test(`${p} ${name}: shaped for its box — closer to ${aspect} than to the other aspect`, () => {
+        const own = Math.abs(Math.log(lay.width / lay.height / aspect));
+        const other = Math.abs(Math.log(lay.width / lay.height / (name === "wide" ? WEB_ASPECT.tall : WEB_ASPECT.wide)));
+        expect(own).toBeLessThan(other);
+      });
+
+      test(`${p} ${name}: no more crossings than the ring layout (${B031[p]})`, () => {
+        const c = webCrossings(lay);
+        console.log(`${p} ${name}: crossings ${c} (ring layout ${B031[p]}), ${lay.width}×${lay.height}`);
+        expect(c).toBeLessThanOrEqual(B031[p]);
+      });
+    }
+  }
+
+  test("the default aspect is the wide one", () => {
+    const spec = fixture<{ parts: ApiPart[]; links: ApiLink[] }>("worked-project");
+    expect(webLayout(nodesOf(spec), spec.links)).toEqual(webLayout(nodesOf(spec), spec.links, WEB_ASPECT.wide));
+  });
 });
 
 describe("label size estimate", () => {

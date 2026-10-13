@@ -1,6 +1,6 @@
 // The print view's cover and page plan against fixture data (invented, shaped as blueprint-back answers).
 import { describe, expect, test } from "bun:test";
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import { PAGES } from "@/core/model/build/common";
 import type { ProjectData } from "@/core/model/build/types";
 import { readinessClear, readinessStuck } from "@/core/words";
@@ -149,10 +149,17 @@ describe("diagram fit (D-040)", () => {
     });
   });
 
-  test("LABEL_PX is the smallest label font the core's diagrams draw (pages.tsx: fontSize={14|15}, WEB_PX = 14)", () => {
-    const src = readFileSync(new URL("../../core/theme/default/pages.tsx", import.meta.url), "utf8");
-    const sizes = [...src.matchAll(/fontSize=\{(\d+)\}/g)].map((m) => Number(m[1]));
-    sizes.push(Number(/const WEB_PX = (\d+);/.exec(src)![1]));
+  // every .tsx of the default theme is read (a directory listing, not a fixed name): the web drawing moved from pages.tsx
+  // to WebView.tsx once (TASK-A-068), and a test pinned to one file broke without the PDF rule being wrong.
+  const DEFAULT_THEME = new URL("../../core/theme/default/", import.meta.url);
+  const labelSizes = (files: string[]) => files.flatMap((f) => {
+    const src = readFileSync(new URL(f, DEFAULT_THEME), "utf8");
+    return [...src.matchAll(/fontSize=\{(\d+)\}/g), ...src.matchAll(/const WEB_PX = (\d+);/g)].map((m) => Number(m[1]));
+  });
+
+  test("LABEL_PX is the smallest label font the core's default diagrams draw (any .tsx there: fontSize={N}, const WEB_PX = N)", () => {
+    const sizes = labelSizes(readdirSync(DEFAULT_THEME).filter((f) => f.endsWith(".tsx")));
+    if (sizes.length === 0) throw new Error("no label font size found in core/theme/default/*.tsx — the drawing moved or its size is no longer a literal; LABEL_PX cannot be checked");
     expect(Math.min(...sizes)).toBe(LABEL_PX);
   });
 });

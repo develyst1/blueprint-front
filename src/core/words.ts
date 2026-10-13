@@ -139,6 +139,13 @@ export const productMark = "Blueprint";
 // A stuck node's accessible name on ใยโหนด — a screen reader says which node is stuck, not only "!" (REQ-002 l.92)
 export const stuckNodeName = (title: string): string => `${title} · ยังติดอยู่`;
 
+// ใยโหนด opens on the whole picture, then zooms (REQ-009, D-041): back to the whole web · the zoom buttons' accessible
+// names (the buttons themselves show + and −) · the side list's heading for a chosen node
+export const webAll = "ดูทั้งหมด";
+export const zoomIn = "ซูมเข้า";
+export const zoomOut = "ซูมออก";
+export const linkedWith = "เชื่อมกับ";
+
 // The new-project dialog's close button
 export const closeDialog = "ปิด";
 

@@ -5,6 +5,7 @@ import type {
   ProjectCardVM, ScreenVM, ScreensVM, SequenceVM, StuckVM, WebVM, WorkOrderVM,
 } from "@/core/theme/contract";
 import { formatThaiDate } from "@/core/format/date";
+import { WEB_ASPECT } from "@/core/layout/web";
 import { historyCause, historyWhat, linkKind, stamp } from "@/core/words";
 import {
   decisions, frame, href, index, isEmpty, pickWork, readiness, stuckItems, stuckTargets, stuckWordings, webHref, workLinks, works,
@@ -137,7 +138,8 @@ export function buildApis(data: ProjectData): Built<ApisVM> {
 export function buildWeb(data: ProjectData, layouts: Layouts, selectedKey?: string, selectedHistory?: ApiHistoryEntry[]): Built<WebVM> {
   if (isEmpty(data)) return empty("web");
   const { part } = index(data);
-  const stuckKeys = new Set(stuckItems(data).flatMap((i) => [i.key, i.target.key]));
+  // v1.15: a node is marked stuck exactly when the stuck list points at it (the header's count), not also the item's own part
+  const stuckKeys = stuckTargets(data);
   const nodes = data.parts.map((p) => ({ key: p.key, kind: p.kind, title: p.title, stuck: stuckKeys.has(p.key) }));
   const sel = selectedKey ? part.get(selectedKey) : undefined;
   let selected: PartDetailVM | null = null;
@@ -165,9 +167,12 @@ export function buildWeb(data: ProjectData, layouts: Layouts, selectedKey?: stri
         }),
     };
   }
-  const layout = layouts.web(nodes, data.links);
-  const withHref = { ...layout, nodes: layout.nodes.map((n) => ({ ...n, href: href(data.project.id, "web", { part: n.key }) })) };
-  return { ok: true, vm: { frame: frame(data, "web"), layout: withHref, selected } };
+  // the same web twice: `layout` shaped for a wide box (desktop), `tall` for a portrait one (phone); useWebView picks by the box (v1.15)
+  const withHrefs = (l: ReturnType<Layouts["web"]>) => ({ ...l, nodes: l.nodes.map((n) => ({ ...n, href: href(data.project.id, "web", { part: n.key }) })) });
+  const layout = withHrefs(layouts.web(nodes, data.links, WEB_ASPECT.wide));
+  const tall = withHrefs(layouts.web(nodes, data.links, WEB_ASPECT.tall));
+  // allHref: this page with nothing chosen — ดูทั้งหมด and clearing a chosen node go there (v1.14, REQ-009)
+  return { ok: true, vm: { frame: frame(data, "web"), layout, tall, selected, allHref: href(data.project.id, "web") } };
 }
 
 // ---------- ติดอยู่ตรงไหน ----------

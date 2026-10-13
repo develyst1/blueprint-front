@@ -3,15 +3,15 @@ import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { findRequired, requiredId } from "@/core/theme/required";
-import { allProjects, productMark, stuck as words, stuckNodeName } from "@/core/words";
+import { allProjects, linkedWith, productMark, stuck as words, stuckNodeName, webAll, zoomIn, zoomOut } from "@/core/words";
 import type { GateCode } from "@/features/ready/contract";
 import { readyRequiredId } from "@/features/ready/required";
 import {
   buildApis, buildCard, buildFlowchart, buildHistory, buildOverview, buildScreens, buildSequence, buildStuck, buildWeb,
   buildWorkOrder,
 } from "./pages";
-import { sampleFrame, sampleHistory } from "@/core/model/samples";
-import { confirmedOf, exportHref, frame, readiness } from "./common";
+import { sampleFrame, sampleHistory, sampleWeb } from "@/core/model/samples";
+import { confirmedOf, exportHref, frame, readiness, stuckTargets } from "./common";
 import { pageRequired, shellRequired } from "./required";
 import { sampleLayouts as L } from "./sample-layouts";
 import type { ApiFlowchart, ApiHistoryEntry, ApiSequence, ApiSwimlane, Built, ProjectData } from "./types";
@@ -343,6 +343,19 @@ describe("TASK-B-015: the ready page's required ids come from Team C's own modul
   });
 });
 
+describe("v1.14: the web carries the href of itself with nothing chosen, built by the core (REQ-009)", () => {
+  test("allHref = /p/<id>/web — with or without a chosen part; the sample has it too", () => {
+    const id = worked.project.id;
+    expect(vm(buildWeb(worked, L)).allHref).toBe(`/p/${id}/web`);
+    expect(vm(buildWeb(worked, L, "DEC-001", fixture<ApiHistoryEntry[]>("worked-history-DEC-001"))).allHref).toBe(`/p/${id}/web`);
+    expect(sampleWeb.allHref).toMatch(/^\/p\/[0-9a-f-]{36}\/web$/);
+  });
+
+  test("the four words are REQ-009's, verbatim", () => {
+    expect([webAll, zoomIn, zoomOut, linkedWith]).toEqual(["ดูทั้งหมด", "ซูมเข้า", "ซูมออก", "เชื่อมกับ"]);
+  });
+});
+
 describe("v1.12: every frame carries the project list's href, built by the core (AC-22, D-036)", () => {
   test("homeHref is \"/\" on real frames of every seed, on the chat / ready frames, and on the sample", () => {
     for (const d of [worked, every, empty]) {
@@ -451,5 +464,30 @@ describe("empty project", () => {
     expect(buildApis(empty).ok).toBe(false);
     expect(buildWeb(empty, L).ok).toBe(false);
     expect(buildHistory(empty).ok).toBe(false);
+  });
+});
+
+describe("v1.15: the web marks exactly the stuck list's parts, and carries a tall layout for a phone (REQ-009, TASK-B-033)", () => {
+  test("worked: the nodes marked stuck are stuckTargets(data) — as many as the header counts (the web used to mark the question too)", () => {
+    const v = vm(buildWeb(worked, L));
+    const marked = v.layout.nodes.filter((n) => n.stuck).map((n) => n.key).sort();
+    expect(marked).toEqual([...stuckTargets(worked)].sort());
+    expect(marked).toHaveLength(1);
+    expect(marked).toHaveLength(v.frame.readiness.stuckCount);
+  });
+
+  test("every-stuck-kind: the marked nodes are stuckTargets(data), on the tall layout too", () => {
+    const v = vm(buildWeb(every, L));
+    const want = [...stuckTargets(every)].sort();
+    expect(v.layout.nodes.filter((n) => n.stuck).map((n) => n.key).sort()).toEqual(want);
+    expect(v.tall.nodes.filter((n) => n.stuck).map((n) => n.key).sort()).toEqual(want);
+  });
+
+  test("tall has the same parts, links and hrefs as layout (a part's href is the core's), and the sample has it too", () => {
+    const v = vm(buildWeb(worked, L));
+    expect(v.tall.nodes.map((n) => [n.key, n.href]).sort()).toEqual(v.layout.nodes.map((n) => [n.key, n.href]).sort());
+    expect(v.tall.edges.map((e) => e.id).sort()).toEqual(v.layout.edges.map((e) => e.id).sort());
+    expect(v.tall.nodes.every((n) => n.href === `/p/${worked.project.id}/web?part=${n.key}`)).toBe(true);
+    expect(sampleWeb.tall.nodes.length).toBe(sampleWeb.layout.nodes.length);
   });
 });

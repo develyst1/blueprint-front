@@ -7,8 +7,8 @@ import {
   apiDetail, apiGroup, decisionPart, emptyList, historyPick, linkKind, pageLabel, partKind, participantKind, proposedAnswer,
   screenGroup, showMore, stepEnds,
 } from "@/core/words";
-import { estimateLabel } from "@/core/layout/text";
 import { Mark, markAttrs } from "./Mark";
+import { WebView } from "./WebView";
 import s from "./default.module.css";
 
 type P<K extends keyof PageVMs> = { vm: PageVMs[K]; required: RequiredItem[] };
@@ -220,77 +220,9 @@ export function Api({ vm, required }: P<"api">) {
 }
 
 // ---------- ใยโหนด ----------
-// Each node a white tile on the canvas with its kind's mark (a shape, named in the legend by the core's kind words);
-// the chosen node filled blue and its edges drawn blue; a stuck node amber with ⚠ (TASK-B-024). Tiles are 44 px tall
-// (the target floor) and sized for 14 px text (TASK-B-025).
-const WEB_PX = 14;
-const MARK = 10, MARK_GAP = 6, PAD_X = 10, TILE_H = 44; // the large web's closest tiles clear each other at these
-const markOf = (k: string) => (k === "work" || k === "step" || k === "interaction" ? k : ["role", "screen", "api", "system"].includes(k) ? "actor" : "other");
-function KindMark({ kind, x, y, fill }: { kind: string; x: number; y: number; fill: string }) {
-  const h = MARK / 2, m = markOf(kind);
-  if (m === "step") return <circle cx={x} cy={y} r={h} fill={fill} />;
-  if (m === "interaction") return <path d={`M${x} ${y - h - 1}L${x + h + 1} ${y}L${x} ${y + h + 1}L${x - h - 1} ${y}Z`} fill={fill} />;
-  if (m === "actor") return <rect x={x - h + 1} y={y - h + 1} width={MARK - 2} height={MARK - 2} fill="none" stroke={fill} strokeWidth={2} />;
-  if (m === "other") return <circle cx={x} cy={y} r={h - 1} fill="none" stroke={fill} strokeWidth={2} />;
-  return <rect x={x - h} y={y - h} width={MARK} height={MARK} rx={2} fill={fill} />;
-}
-
+// Interactive (zoom, pan, focus — REQ-009), so it is a client component of its own (WebView.tsx); this page stays a server module.
 export function Web({ vm, required }: P<"web">) {
-  const l = vm.layout;
-  const at = new Map(l.nodes.map((n) => [n.key, n]));
-  const sel = vm.selected?.key;
-  const lit = (e: { from: string; to: string }) => !!sel && (e.from === sel || e.to === sel);
-  // the box opens on the chosen node, or on the work at the web's centre — full size, never shrunk (REVIEW-A-004 row 10)
-  const focus = (sel && at.get(sel)) || l.nodes.find((n) => n.kind === "work") || l.nodes[0];
-  const kinds = [...new Set(l.nodes.map((n) => n.kind))];
-  return (
-    <>
-      <h2>{pageLabel.web}</h2>
-      <ul className={s.webLegend} aria-hidden>
-        {kinds.map((k) => (
-          <li key={k}><svg width={14} height={14}><KindMark kind={k} x={7} y={7} fill="#5b6573" /></svg>{partKind[k] ?? k}</li>
-        ))}
-      </ul>
-      <div className={`${s.scroll} ${s.web}`} tabIndex={0} role="region" aria-label={pageLabel.web} style={{ maxHeight: "70vh" }} data-print="expand">
-        <div className={s.webCanvas} style={{ width: l.width, height: l.height }}>
-          <svg width={l.width} height={l.height} viewBox={`0 0 ${l.width} ${l.height}`}>
-            {[...l.edges].sort((a, b) => Number(lit(a)) - Number(lit(b))).map((e) => {
-              const a = at.get(e.from), b = at.get(e.to);
-              return a && b ? <line key={e.id} x1={a.x} y1={a.y} x2={b.x} y2={b.y} stroke={lit(e) ? "#1458c4" : "#aeb6c1"} strokeWidth={lit(e) ? 2.5 : 1.25} /> : null;
-            })}
-            {l.nodes.map((n) => {
-              const current = sel === n.key;
-              const w = estimateLabel(`${n.stuck ? "⚠ " : ""}${n.title}`, WEB_PX).w + 2 * PAD_X + MARK + MARK_GAP;
-              const x0 = n.x - w / 2;
-              return (
-                <a key={n.key} href={n.href} className={s.webNode} aria-current={current ? "true" : undefined}>
-                  <rect x={x0} y={n.y - TILE_H / 2} width={w} height={TILE_H} rx={10}
-                    fill={current ? "#1458c4" : n.stuck ? "#fdf1e7" : "#ffffff"}
-                    stroke={current ? "#1458c4" : n.stuck ? "#e8c3a5" : "#d5dae1"} />
-                  <KindMark kind={n.kind} x={x0 + PAD_X + MARK / 2} y={n.y} fill={current ? "#ffffff" : n.stuck ? "#a6460a" : "#5b6573"} />
-                  {/* 14 px is the desk's text floor (TASK-B-024); a stuck node carries ⚠ so colour is never its only sign */}
-                  <text x={x0 + PAD_X + MARK + MARK_GAP} y={n.y + 5} fontSize={WEB_PX} fontWeight={current ? 700 : 500}
-                    fill={current ? "#ffffff" : n.stuck ? "#a6460a" : "#1b1f24"} {...markAttrs(required, requiredId.part(n.key))}>
-                    {n.stuck ? "⚠ " : null}{n.title}
-                  </text>
-                </a>
-              );
-            })}
-          </svg>
-          {focus && <span className={s.webFocus} style={{ left: focus.x, top: focus.y }} aria-hidden />}
-        </div>
-      </div>
-      {vm.selected && (
-        <section className={s.detail}>
-          <h3>{vm.selected.title}</h3>
-          <p className={s.muted}>{partKind[vm.selected.kind] ?? vm.selected.kind} · {vm.selected.cameFrom} · {vm.selected.stampLabel} · {vm.selected.dateLabel}</p>
-          <ul className={s.list}>
-            {vm.selected.links.map((x, i) => <li key={i}>{x.label && <>{x.label} </>}<a href={x.href}>{x.title}</a></li>)}
-          </ul>
-        </section>
-      )}
-    </>
-  );
+  return <WebView vm={vm} required={required} />;
 }
 
 // ---------- ติดอยู่ตรงไหน ----------

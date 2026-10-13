@@ -132,24 +132,161 @@
   stroke-dasharray: 3 3;
 }
 
-/* ---- node web (TASK-A-021) ---- */
-/* the web is larger than its window at every width: its right and bottom edges fade, so a label at the window's
-   edge reads as "the web continues" rather than as a cut word (TASK-A-021 R1) */
-.webScroll {
-  max-height: 640px;
-  overflow: auto;
-  mask-image: linear-gradient(to right, #000 calc(100% - 40px), transparent), linear-gradient(to bottom, #000 calc(100% - 40px), transparent);
-  mask-composite: intersect;
+/* ---- node web (TASK-A-021 → TASK-A-066, REQ-009) ---- */
+/* The view is the core's useWebView: a fixed-height box that clips (the web zooms and pans inside it, never scrolls),
+   touch-action none so drag / pinch reach the hook. The frame holds the controls: a right-aligned row above the box at
+   every width — never over the drawing (A-067). */
+.webFrame {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
-.webScroll:focus-within,
-.webScroll:focus {
-  mask-image: none;
+.webView {
+  position: relative;
+  height: 640px;
+  overflow: hidden;
+  touch-action: none;
+  cursor: grab;
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: var(--mantine-radius-lg);
 }
 
-/* a 44 px hit circle under every node, invisible */
-.hit {
+.webViewDragging {
+  cursor: grabbing;
+}
+
+/* D-042: a phone's whole-web view — kind marks and the stuck mark only; the tiles and names return from the first
+   zoom-in step. A-067: each node is then its kind mark alone (twice the tile's), not an empty bordered tile; it keeps
+   its hit box, accessible name (aria-label) and the name card on hover / focus. */
+.webMarkOnly {
+  display: none;
+}
+
+.webView[data-names="off"] .webMarkOnly {
+  display: inline;
+}
+
+.webView[data-names="off"] .webTileGroup {
+  display: none;
+}
+
+/* the node's hit area on the phone's whole view: the tile's box, invisible */
+.webHitBox {
   fill: transparent;
+  stroke: none;
+}
+
+.webStuckDisc {
+  fill: #000000;
+}
+
+.webSvg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  font-family: var(--mantine-font-family);
+}
+
+.webControls {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+/* quiet outline buttons: white, 1.5 px grey line, ink, 44 px; the root's ring on focus */
+.webControl {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1.5px solid #8a8a8a;
+  border-radius: var(--mantine-radius-md);
+  background: #ffffff;
+  color: #000000;
+  font: inherit;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.webAll {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.webControl:hover {
+  background: #f2f2f2;
+}
+
+/* a node tile: white with the ink line; a chosen one heavier; a stuck one the solid black block (R5) */
+.webTile {
+  fill: #ffffff;
+  stroke: #000000;
+  stroke-width: 1.5;
+}
+
+.webTileSelected {
+  fill: #ffffff;
+  stroke: #000000;
+  stroke-width: 3;
+}
+
+.webTileStuck {
+  fill: #000000;
+  stroke: #000000;
+  stroke-width: 1.5;
+}
+
+.nodeLink:hover .webTile {
+  stroke-width: 2.5;
+}
+
+/* the kind shape on a black tile: its outline in white (the fill stays black) */
+.webMarkOnStuck * {
+  fill: #000000;
+  stroke: #ffffff;
+}
+
+/* a chosen node: everything that is not it, its links or its neighbours, recedes (R3) — grey by opacity, no colour */
+.webFaded {
+  opacity: 0.4;
+}
+
+/* a chosen stuck tile: the chosen ring outside its black */
+.webStuckRing {
+  fill: none;
+  stroke: #000000;
+  stroke-width: 3;
+}
+
+/* the name card: the hovered / focused node's full name at a readable 14 px, above it, outside the scaled web */
+.webName {
+  position: absolute;
+  z-index: 2;
+  transform: translate(-50%, calc(-100% - 6px));
+  max-width: min(360px, 90%);
+  padding: 6px 10px;
+  border: 1px solid #000000;
+  border-radius: var(--mantine-radius-md);
+  background: #ffffff;
+  color: #000000;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+  pointer-events: none;
+  overflow-wrap: anywhere;
+}
+
+.webNameStuck {
+  background: #000000;
+  color: #ffffff;
 }
 
 /* on a phone: a right-edge fade says the diagram continues; the web box leaves room for the panel below */
@@ -163,8 +300,8 @@
     mask-image: none;
   }
 
-  .webScroll {
-    max-height: 60vh;
+  .webView {
+    height: 60vh;
   }
 }
 
@@ -183,26 +320,12 @@
   font-size: 14px;
   font-weight: 500;
   fill: #000000;
-  paint-order: stroke;
-  stroke: #ffffff;
-  stroke-width: 4px;
-  stroke-linejoin: round;
 }
 
 .webLabelStuck {
   font-size: 14px;
   font-weight: 800;
-  fill: #000000;
-  paint-order: stroke;
-  stroke: #ffffff;
-  stroke-width: 4px;
-  stroke-linejoin: round;
-}
-
-.selectedRing {
-  fill: none;
-  stroke: #000000;
-  stroke-width: 3;
+  fill: #ffffff;
 }
 
 .plaque rect {

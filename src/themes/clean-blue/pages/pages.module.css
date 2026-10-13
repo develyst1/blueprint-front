@@ -130,8 +130,44 @@
 /* ---------- web ---------- */
 .webLayout { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 20px; align-items: start; }
 @media (max-width: 1100px) { .webLayout { grid-template-columns: minmax(0, 1fr); } }
-.webNode { cursor: pointer; }
+.webNode { cursor: pointer; transition: opacity 0.15s ease; }
 .webNode:focus-visible rect { stroke: var(--cb-blue); stroke-width: 3; }
+/* REQ-009 (TASK-B-032): the whole web in a fixed box the core's useWebView zooms and pans; the controls above it */
+.webHead { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "stuck stuck" "legend bar"; align-items: center; gap: 16px 12px; }
+.webStuck { grid-area: stuck; justify-self: start; }
+.webLegend { grid-area: legend; }
+.webHead > .webBar { grid-area: bar; }
+.webHead:not(:has(.webStuck)) { grid-template-areas: "legend bar"; } /* no empty chip row (and no gap) when nothing is stuck */
+.webPanel { position: relative; }
+@media (max-width: 640px) {
+  /* TASK-B-034: at 390 the header and dock end at ~310 and the page heading at 354, so the box can start by 422 only if the
+     panel's own rows shrink to one: the controls go up beside the page heading (the frame's 20 px gap above this panel, 44 px
+     heading = 44 px buttons), the stuck chip is left to the header's chip and the dock's ⚠ tab (both on screen just above),
+     the legend is one sideways row with a fade, and the panel drops its card (the box keeps its own border) */
+  .panel.webPanel { padding: 0; border: 0; background: transparent; gap: 8px; } /* over the later ≤ 640 .panel padding */
+  .webHead { grid-template-columns: minmax(0, 1fr); grid-template-areas: "legend"; gap: 8px; }
+  .webStuck { display: none; }
+  /* −(20 px gap + 44 px heading); grid-area auto, or the section's own grid places it by the name "bar" */
+  .webHead > .webBar { grid-area: auto; position: absolute; right: 0; top: -64px; flex-wrap: nowrap; }
+  .webLegend { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 2px; scrollbar-width: none; }
+  .webLegend > * { flex: none; }
+  .webLegend[data-more="end"] { mask-image: linear-gradient(to right, black calc(100% - 40px), transparent); }
+  .webLegend[data-more="start"] { mask-image: linear-gradient(to left, black calc(100% - 40px), transparent); }
+  .webLegend[data-more="both"] { mask-image: linear-gradient(to right, transparent, black 40px, black calc(100% - 40px), transparent); }
+}
+.webBar { display: flex; flex-wrap: wrap; gap: 8px; }
+.webBtn { min-width: 44px; font-size: 20px; line-height: 1; }
+.webViewport {
+  position: relative; height: clamp(360px, calc(100vh - 380px), 720px); overflow: hidden; touch-action: none; cursor: grab;
+  border: 1px solid var(--cb-line); border-radius: var(--cb-r-tile); background: var(--cb-canvas);
+}
+.webViewport:focus-visible { outline: 3px solid var(--cb-blue); outline-offset: 2px; }
+.webDragging { cursor: grabbing; }
+.webStage { position: absolute; left: 0; top: 0; }
+.webStage svg { display: block; }
+.linkedWith { display: grid; gap: 8px; }
+.linkedHead { margin: 0; font-size: 16px; font-weight: 700; }
+@media (prefers-reduced-motion: reduce) { .webNode { transition: none; } }
 .detailMeta { display: flex; flex-wrap: wrap; gap: 8px; }
 .linkList { display: grid; gap: 8px; }
 .linkRow { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }

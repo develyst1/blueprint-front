@@ -65,7 +65,7 @@ export function plan(data: ProjectData): { page: PageId; query: Query; subtitle:
 // there, its parts are also listed as a plain table." Decided from numbers the core already hands us — the layout's
 // width/height (px) and the smallest label font the core draws — so a page without JavaScript prints the same.
 export const MIN_LABEL_PT = 8;
-/** the smallest label font in the core's diagrams (`core/theme/default/pages.tsx`: fontSize 14/15, WEB_PX 14) — a test reads the file */
+/** the smallest label font in the core's diagrams (`core/theme/default/*.tsx`: fontSize 14/15, WEB_PX 14) — a test reads the theme's diagram files */
 export const LABEL_PX = 14;
 /** The content box of each sheet in mm: A4 minus the 14 mm side and 16/18 mm top/bottom margins; the height keeps ~23 mm
  *  for the page's heading and legend (portrait: the print CSS's `max-height: 240mm` of 263; landscape: 153 of 176). */

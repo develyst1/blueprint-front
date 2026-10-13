@@ -272,7 +272,7 @@ const selectedPart: PartDetailVM = {
     };
   }),
 };
-export const sampleWeb: WebVM = { frame: sampleFrame("web"), layout: sampleWebLayout(), selected: selectedPart };
+export const sampleWeb: WebVM = { frame: sampleFrame("web"), layout: sampleWebLayout(), tall: sampleWebLayout(), selected: selectedPart, allHref: href("web") };
 
 export const sampleStuck: StuckVM = {
   frame: sampleFrame("stuck"),
