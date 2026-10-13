@@ -129,8 +129,21 @@ export function buildReadyVM(input: { data: ProjectData; quiz: ApiQuiz | null; v
     quiz,
     gate: gate(data, quiz, version),
     version,
-    build: { enabled: false, label: build, reason: buildNotReady },
+    build: buildLink(id, version),
   };
+}
+
+/** CAW's base (D-050). Bun loads `.env`, where an unset value arrives as "", so `||`, never `??` (SYSTEM-FACTS). Read when
+ *  the page is built, not when the module loads, so a test can set it. */
+const cawUrl = () => process.env.CAW_URL || "http://127.0.0.1:3500";
+
+/** Build (D-050): on only for a confirmed version with nothing changed since — then CAW's start page for this project and
+ *  version; otherwise off with REQ-007's reason. */
+function buildLink(id: string, version: ReadyVM["version"]): ReadyVM["build"] {
+  const enabled = !!version && !version.changedSince;
+  return enabled
+    ? { enabled, label: build, reason: "", href: `${cawUrl()}/start?project=${encodeURIComponent(id)}&version=${version!.n}` }
+    : { enabled, label: build, reason: buildNotReady, href: null };
 }
 
 /** The ids live in the pure ./required (TASK-C-014); re-exported here because DefaultReady still imports them from load. */

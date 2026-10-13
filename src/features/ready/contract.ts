@@ -43,7 +43,9 @@ export interface ReadyVM {
   gate: { ok: boolean; reasons: { code: GateCode; text: string; href: string }[] };
   /** the newest confirmed version */
   version: null | { n: number; dateLabel: string; changedSince: boolean };
-  build: { enabled: false; label: string; reason: string };
+  /** Build (D-050): enabled ⇔ a confirmed version exists and nothing changed since; then `href` opens CAW's start page
+   *  for this project + version and `reason` is "". Otherwise disabled, `href` null, `reason` says why. */
+  build: { enabled: boolean; label: string; reason: string; href: string | null };
 }
 
 export type ActionCode = "stale" | "full" | "closed" | "already_marked" | "invalid" | "blocked" | "already_confirmed" | "unreachable";

@@ -97,11 +97,18 @@ export function Ready({ vm, actions, required }: ReadyPageProps) {
         {/* under a lead the version lines are a footnote — the lead already says it (critique C-016 P2-b) */}
         {vm.version && <p className="lg-ready-version" data-quiet={lead ? true : undefined}>{confirmed(vm.version.n, vm.version.dateLabel)}</p>}
         {vm.version?.changedSince && <p className="lg-ready-changed" data-quiet={lead ? true : undefined}>{changedSince(vm.version.n)}</p>}
+        {/* Build (D-050): a real link to CAW once the newest version is confirmed and unchanged; otherwise off, with why */}
         <div className="lg-ready-build">
-          <button type="button" className="lg-ready-build-button" disabled aria-describedby={ids.build}>
-            {buildWord}
-          </button>
-          <p id={ids.build}>{vm.build.reason}</p>
+          {vm.build.enabled && vm.build.href ? (
+            <a className="lg-ready-build-link" href={vm.build.href}>
+              {buildWord}
+            </a>
+          ) : (
+            <button type="button" className="lg-ready-build-button" disabled aria-describedby={ids.build}>
+              {buildWord}
+            </button>
+          )}
+          {vm.build.reason && <p id={ids.build}>{vm.build.reason}</p>}
         </div>
       </aside>
 

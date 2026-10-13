@@ -125,13 +125,38 @@
   background: #f2f2f2;
 }
 
+/* ส่งไปสร้างที่ CAW once the version is confirmed and unchanged (D-050): the page's next action, the one filled control
+   on the page — ink ground, white words; the root's focus ring. No transition (mono has none). */
+.go {
+  background: #000000;
+  color: #ffffff;
+  border: 2px solid #000000;
+  font-weight: 700;
+}
+
+.go:hover {
+  background: #333333;
+  border-color: #333333;
+  color: #ffffff;
+}
+
+.go:active {
+  background: #5c5c5c;
+  border-color: #5c5c5c;
+}
+
 .confirm[aria-disabled="true"],
+.outline[aria-disabled="true"],
 .outline:disabled,
 .strong:disabled {
   background: #ffffff;
   color: #5c5c5c;
   border-color: #8a8a8a;
   border-style: dashed;
+}
+
+.outline[aria-disabled="true"] {
+  cursor: default;
 }
 
 .textButton {

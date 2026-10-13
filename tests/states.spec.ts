@@ -276,6 +276,22 @@ test("clean-blue ready: a stale score is quiet (ink-2, 500) and no Ant preset bl
   expect(preset).toBe(0);
 });
 
+test("clean-blue ready: with a confirmed, unchanged version Build is the primary link to the core's CAW href, ยืนยัน no longer primary (TASK-B-044)", async ({ page }) => {
+  const id = await largeIn("clean-blue", "สร้างที่ CAW clean-blue"); // the large seed has nothing stuck
+  await page.goto(`/p/${id}/ready`);
+  await expect(page.locator("[data-build]")).toBeDisabled(); // before: off, with its reason
+  const quiz = await call("POST", `/v1/projects/${id}/quizzes`, {});
+  for (const q of ["มีกี่ขั้นตอน", "ใครเริ่มงาน", "ใครอนุมัติ", "มีหน้าจอกี่หน้า", "จบงานที่ไหน"]) await call("POST", `/v1/projects/${id}/quizzes/${quiz.id}/questions`, { question: q });
+  for (const it of (await call("GET", `/v1/projects/${id}/quizzes/latest`)).items) await call("POST", `/v1/projects/${id}/quizzes/${quiz.id}/items/${it.id}/mark`, { mark: "right" });
+  const v = await call("POST", `/v1/projects/${id}/versions`, { confirmedBy: "operator" });
+  await page.goto(`/p/${id}/ready`);
+  const build = page.locator("a[data-build]");
+  await expect(build).toHaveAttribute("href", new RegExp(`/start\\?project=${id}&version=${v.version}$`));
+  await expect(build).toHaveClass(/ant-btn-primary/);
+  // the gate card's one primary is now Build: ยืนยัน 100% steps down (the quiz's own ถาม keeps its look — not this TASK's)
+  await expect(page.getByRole("button", { name: "ยืนยัน 100%" })).not.toHaveClass(/ant-btn-primary/);
+});
+
 // ---------- REQ-009 R1, TASK-B-033 (SPEC v1.15, D-042): the web reads at the fit view, on a desktop and a phone ----------
 const largeIn = async (theme: string, name: string) => {
   const p = await call("POST", "/v1/projects", { name, theme });

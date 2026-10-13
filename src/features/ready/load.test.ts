@@ -120,8 +120,37 @@ describe("summary, version, build", () => {
     expect(buildReadyVM({ data: data(), quiz: null, versions, changedSinceLatest: false }).version!.changedSince).toBe(false);
   });
 
-  test("build is always off, with REQ-007's words", () => {
-    expect(buildReadyVM({ data: data(), quiz: null, versions: [] }).build).toEqual({ enabled: false, label: build, reason: buildNotReady });
+});
+
+describe("build → CAW (D-050, TASK-C-033)", () => {
+  const v2 = [version(1, "2026-10-08T03:00:00.000Z"), version(2, "2026-10-09T03:00:00.000Z")];
+  const withEnv = (value: string | undefined, fn: () => void) => {
+    const was = process.env.CAW_URL;
+    if (value === undefined) delete process.env.CAW_URL;
+    else process.env.CAW_URL = value;
+    try { fn(); } finally { if (was === undefined) delete process.env.CAW_URL; else process.env.CAW_URL = was; }
+  };
+
+  test("(a) nothing confirmed → off, no href, REQ-007's reason", () => withEnv(undefined, () => {
+    expect(buildReadyVM({ data: data(), quiz: null, versions: [] }).build).toEqual({ enabled: false, label: build, reason: buildNotReady, href: null });
+  }));
+
+  test("(b) confirmed and unchanged since → on, CAW's start page for this project + version, no reason", () => withEnv(undefined, () => {
+    expect(buildReadyVM({ data: data(), quiz: null, versions: v2, changedSinceLatest: false }).build)
+      .toEqual({ enabled: true, label: build, reason: "", href: "http://127.0.0.1:3500/start?project=p-1&version=2" });
+  }));
+
+  test("(c) confirmed but changed since → off", () => withEnv(undefined, () => {
+    expect(buildReadyVM({ data: data(), quiz: null, versions: v2, changedSinceLatest: true }).build).toEqual({ enabled: false, label: build, reason: buildNotReady, href: null });
+  }));
+
+  test("CAW_URL set → that base; an empty one falls back (|| not ??)", () => {
+    withEnv("https://caw.example.test", () => {
+      expect(buildReadyVM({ data: data(), quiz: null, versions: v2 }).build.href).toBe("https://caw.example.test/start?project=p-1&version=2");
+    });
+    withEnv("", () => {
+      expect(buildReadyVM({ data: data(), quiz: null, versions: v2 }).build.href).toBe("http://127.0.0.1:3500/start?project=p-1&version=2");
+    });
   });
 });
 

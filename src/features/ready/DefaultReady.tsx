@@ -112,11 +112,18 @@ export function DefaultReady({ vm, actions, required }: ReadyPageProps) {
             ))}
           </ul>
         )}
+        {/* Build (D-050): a real link to CAW once the newest version is confirmed and unchanged; otherwise off, with why */}
         <div className={s.build}>
-          <button type="button" className={s.button} disabled aria-describedby={ids.build}>
-            {buildWord}
-          </button>
-          <p id={ids.build} className={s.buildReason}>{vm.build.reason}</p>
+          {vm.build.enabled && vm.build.href ? (
+            <a className={`${s.button} ${s.primary} ${s.buildLink}`} href={vm.build.href}>
+              {buildWord}
+            </a>
+          ) : (
+            <button type="button" className={s.button} disabled aria-describedby={ids.build}>
+              {buildWord}
+            </button>
+          )}
+          {vm.build.reason && <p id={ids.build} className={s.buildReason}>{vm.build.reason}</p>}
         </div>
       </section>
     </div>

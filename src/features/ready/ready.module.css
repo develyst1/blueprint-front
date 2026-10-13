@@ -322,6 +322,15 @@
   border-top: 1px solid #767676;
 }
 
+/* Build on (D-050, TASK-C-033): the page's primary look on a link — the button's box, no underline, and white ink: the
+   default theme's `.root a` blue (0,1,1) would beat `.primary` (0,1,0) and sit on #111 at about 3:1 */
+.button.buildLink {
+  display: inline-flex;
+  align-items: center;
+  color: #ffffff;
+  text-decoration: none;
+}
+
 /* Reduced motion (frontend-finish rule 9, TASK-C-019): no transition on the field or the buttons, and a pressed button
    does not move. */
 @media (prefers-reduced-motion: reduce) {

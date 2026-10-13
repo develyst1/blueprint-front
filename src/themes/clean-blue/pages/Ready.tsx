@@ -77,11 +77,11 @@ function Retry({ question, actions }: { question: string; actions: ReadyActions 
 }
 
 // Off is aria-disabled, not disabled: it stays in the Tab order and names its reasons (REVIEW-C-004 row 4)
-function Confirm({ enabled, actions, why }: { enabled: boolean; actions: ReadyActions; why?: string }) {
+function Confirm({ enabled, actions, why, primary }: { enabled: boolean; actions: ReadyActions; why?: string; primary: boolean }) {
   const [busy, start] = useTransition();
   const off = !enabled || busy;
   return (
-    <Button type="primary" size="large" aria-disabled={off} aria-describedby={why} className={off ? s.off : undefined}
+    <Button type={primary ? "primary" : "default"} size="large" aria-disabled={off} aria-describedby={why} className={off ? s.off : undefined}
       onClick={() => { if (!off) start(async () => { await actions.confirm(); }); }}>
       {confirmWord}
     </Button>
@@ -92,6 +92,7 @@ export function Ready({ vm, actions, required }: ReadyPageProps) {
   const q = vm.quiz;
   const scoreLine = q ? (q.score !== null ? score(q.score, q.marked) : scoreEarly(q.marked)) : null;
   const stepsRow = useEdges<HTMLDivElement>();
+  const buildOpen = vm.build.enabled && vm.build.href !== null;
   return (
     <>
       <PageHead page="ready" />
@@ -163,7 +164,8 @@ export function Ready({ vm, actions, required }: ReadyPageProps) {
       {/* the gate (R3) and Build (R5) */}
       <Card>
         <div className={s.gate}>
-          <Confirm enabled={vm.gate.ok} actions={actions} why={vm.gate.reasons.length ? "cb-reasons" : undefined} />
+          {/* one primary on screen: ยืนยัน 100% until there is a confirmed, unchanged version — then Build is the next action (TASK-B-044) */}
+          <Confirm enabled={vm.gate.ok} actions={actions} why={vm.gate.reasons.length ? "cb-reasons" : undefined} primary={!buildOpen} />
           {vm.gate.reasons.length > 0 && (
             <ul id="cb-reasons" className={s.reasons}>
               {vm.gate.reasons.map((r) => (
@@ -179,8 +181,11 @@ export function Ready({ vm, actions, required }: ReadyPageProps) {
             </ul>
           )}
           <div className={s.build}>
-            <Button size="large" disabled>{buildWord}</Button>
-            <span className={p.muted}>{vm.build.reason}</span>
+            {/* Build opens CAW's start page for this project + version (REQ-011 R1, D-050): a real link to the core's `href`, its
+                label the core's — the theme builds no URL. Off: today's disabled button and the core's reason */}
+            {buildOpen
+              ? <Button size="large" type="primary" href={vm.build.href!} data-build>{vm.build.label}</Button>
+              : <><Button size="large" disabled data-build>{vm.build.label || buildWord}</Button><span className={p.muted}>{vm.build.reason}</span></>}
           </div>
         </div>
       </Card>

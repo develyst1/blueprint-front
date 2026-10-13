@@ -2,9 +2,10 @@
 
 // พร้อมสร้างหรือยัง (screen ④) in minimal mono (TASK-A-044, REQ-007). Reading order: the work as a picture (steps,
 // three counts by shape, what is stuck) → the gate, which answers the page's question (ยืนยัน 100% · every reason as
-// a link · the version · the build button off with its reason) → the quiz (score, start, ask, each answer to mark).
-// From 64em the gate is a right column. Mono's rules: weight is the hierarchy (actions are ink outlines; solid black
-// is only the stuck step / the shell's stuck strip), nothing under 14 px, 44 px targets, the root's focus ring.
+// a link · the version · ส่งไปสร้างที่ CAW, a link when ready or off with its reason) → the quiz (score, start, ask, each
+// answer to mark). From 64em the gate is a right column. Mono's rules: weight is the hierarchy (actions are ink outlines;
+// solid black is the stuck step / the shell's stuck strip, and the one next action — the ready build link, TASK-A-075),
+// nothing under 14 px, 44 px targets, the root's focus ring.
 // Score and gate come from the VM — never recomputed here. Words: @/core/words and @/features/ready/words only.
 import "@mantine/core/styles/UnstyledButton.css";
 import "@mantine/core/styles/Button.css";
@@ -259,11 +260,29 @@ export function MonoReady({ vm, actions, required }: ReadyPageProps) {
         ) : null}
         {vm.version && !settled ? <p className={s.version}>{confirmed(vm.version.n, vm.version.dateLabel)}</p> : null}
         {vm.version?.changedSince ? <p className={s.changed}>{changedSince(vm.version.n)}</p> : null}
+        {/* Build (D-050): with the version confirmed and unchanged it is the page's next action — a link to CAW's start
+            page (the core's href), same tab, filled ink. Otherwise the off look as a Tab stop that says why (as Confirm). */}
         <div className={s.build}>
-          <Button variant="default" radius="md" h={44} className={s.outline} disabled>
-            {buildWord}
-          </Button>
-          <p className={s.buildReason}>{vm.build.reason}</p>
+          {vm.build.enabled && vm.build.href ? (
+            <Button component="a" href={vm.build.href} variant="default" radius="md" h={44} className={s.go}>
+              {vm.build.label || buildWord}
+            </Button>
+          ) : (
+            <>
+              <Button
+                variant="default"
+                radius="md"
+                h={44}
+                className={s.outline}
+                aria-disabled="true"
+                data-disabled
+                aria-describedby="mono-ready-build-reason"
+              >
+                {vm.build.label || buildWord}
+              </Button>
+              <p id="mono-ready-build-reason" className={s.buildReason}>{vm.build.reason}</p>
+            </>
+          )}
         </div>
       </Paper>
 
