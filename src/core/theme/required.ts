@@ -18,6 +18,8 @@ export const requiredId = {
   screen: (key: string) => `screen:${key}`,
   api: (key: string) => `api:${key}`,
   part: (key: string) => `part:${key}`,
+  role: (key: string) => `role:${key}`, // REQ-017: the brief's ใครเกี่ยวข้อง
+  goal: (workKey: string) => `goal:${workKey}`, // REQ-017: the brief's understanding paragraph, when the spec has one
   stuck: (item: Pick<StuckItemVM, "key" | "kind" | "reason">) => `stuck:${item.key}:${item.reason ?? item.kind}`,
   readyReason: readyRequiredId.reason, // screen ④: one gate reason (Team C, TASK-B-015)
   readyScore: readyRequiredId.score, //   screen ④: the score line

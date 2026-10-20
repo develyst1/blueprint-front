@@ -208,7 +208,7 @@ button.lg-medallion:hover,
 .lg-skip:focus-visible, .lg-skip:focus { transform: none; }
 .lg-shell { position: relative; }
 
-/* ---------- shell (TASK-C-004): spine at 1440, sticky top bar at ≤ 640 ---------- */
+/* ---------- shell (TASK-C-004): sticky spine at 1440, a top bar that scrolls away at ≤ 640 (D-111) ---------- */
 .lg-shell { display: grid; grid-template-columns: 248px minmax(0, 1fr); min-height: 100dvh; }
 .lg-spine {
   position: sticky; top: 0; align-self: start; height: 100dvh; overflow-y: auto;
@@ -252,14 +252,37 @@ button.lg-medallion:hover,
 }
 [data-theme-root="luxury-gold"] .lg-shell-tools button:hover { border-color: var(--lg-navy); }
 [data-theme-root="luxury-gold"] .lg-shell-tools button:disabled { color: var(--lg-ink-2); border-style: dashed; cursor: progress; }
+/* แชต (REQ-017): the same quiet pill as the tools, a link; on the chat page itself it takes the navy fill of a current page */
+.lg-shell-tools { flex-wrap: wrap; gap: 8px; }
+.lg-chat-button {
+  display: inline-flex; align-items: center; min-height: 44px; padding: 0 18px; font-size: 15px; font-weight: 600;
+  color: var(--lg-navy); text-decoration: none; background: var(--lg-surface); border: 1px solid var(--lg-card-edge); border-radius: 999px;
+}
+.lg-chat-button:hover { border-color: var(--lg-navy); }
+.lg-chat-button[aria-current="page"] { background: var(--lg-navy); border-color: var(--lg-navy); color: var(--lg-gold-light); }
+/* the two rooms (REQ-017): framed serif tabs above the page list — the current room is ringed in navy, its current page
+   filled in navy, so the room reads as the place and the page as the spot in it */
+.lg-rooms { display: grid; gap: 8px; padding-top: 20px; border-top: 1px solid var(--lg-gold-line); }
+.lg-room {
+  display: grid; gap: 2px; align-content: center; min-height: 52px; padding: 8px 14px;
+  color: var(--lg-ink-2); text-decoration: none; border: 1px solid var(--lg-card-edge); border-radius: var(--lg-r-card);
+}
+.lg-room:hover { color: var(--lg-ink); background: var(--lg-paper); border-color: var(--lg-navy); }
+.lg-room[aria-current="true"] { color: var(--lg-navy); background: var(--lg-paper); border: 2px solid var(--lg-navy); padding: 7px 13px; }
+.lg-room-label { font-family: var(--font-serif); font-size: 17px; font-weight: 600; line-height: 1.35; }
+.lg-room-count { font-size: 14px; font-weight: 500; color: var(--lg-ink-2); }
+/* the current room's pages sit just under the rooms, stepped in */
+.lg-rooms + .lg-nav { margin-top: -12px; }
+.lg-rooms + .lg-nav .lg-nav-list { padding-left: 17px; }
 
 @media (max-width: 640px) {
   .lg-shell { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto 1fr; align-content: start; }
   /* The top bar is a wrapping row, in DOM (= Tab) order: the wordmark + the way home, then the seal · the project, the
      whole width so the name is not cut · the tools (v1.11), when given, then the page strip. `order` only moves the
-     project under row 1; nothing focusable is reordered. */
+     project under row 1; nothing focusable is reordered. Not sticky (D-111): with the rooms row it is 217 px, and a
+     quarter of a phone lost on every scroll is worse than scrolling back up. */
   .lg-spine {
-    height: auto; overflow: visible; z-index: var(--lg-z-bar);
+    position: static; height: auto; overflow: visible; z-index: var(--lg-z-bar);
     display: flex; flex-direction: row; flex-wrap: wrap; gap: 8px 12px; align-items: center;
     min-width: 0; /* the page strip scrolls, not the bar */
     padding: 10px 16px 0; border-right: 0; border-bottom: 1px solid var(--lg-card-edge);
@@ -271,19 +294,24 @@ button.lg-medallion:hover,
   .lg-way-home .lg-wordmark { align-self: auto; font-size: 17px; padding-bottom: 0; border-bottom: 0; }
   .lg-spine-readiness { display: contents; }
   .lg-readiness { order: 1; flex: none; max-width: 100%; }
-  .lg-spine-project { order: 2; flex: 1 1 100%; min-width: 0; font-size: 17px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  /* row 2: the project, then แชต and the tools at its end (REQ-017) — a long name ends in "…", the buttons never move */
+  .lg-spine-project { order: 2; flex: 1 1 40%; min-width: 0; font-size: 17px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .lg-spine-required { order: 3; flex: 1 1 100%; }
-  .lg-shell-tools { order: 4; flex: none; padding-bottom: 8px; }
-  .lg-nav { order: 5; flex: 1 1 calc(100% + 32px); min-width: 0; margin: 0 -16px; }
-  .lg-spine:has(.lg-shell-tools) .lg-nav { flex: 1 1 0; margin: 0 -16px 0 0; }
-  .lg-spine:has(.lg-shell-tools) .lg-nav-list { padding-left: 5px; }
-  .lg-nav-list { display: flex; gap: 4px; padding: 5px 16px 8px; width: max-content; }
+  .lg-shell-tools { order: 4; flex: none; flex-wrap: nowrap; }
+  /* row 3: the two rooms side by side; row 4: the current room's pages, one strip edge to edge with gold's fade */
+  .lg-rooms { order: 5; flex: 1 1 100%; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; padding-top: 0; border-top: 0; }
+  .lg-room { min-height: 44px; gap: 0; padding: 3px 12px; line-height: 1.25; }
+  .lg-room[aria-current="true"] { padding: 2px 11px; }
+  .lg-room-label { font-size: 15px; line-height: 1.3; }
+  .lg-nav { order: 6; flex: 1 1 calc(100% + 32px); min-width: 0; margin: 0 -16px; }
+  .lg-rooms + .lg-nav { margin-top: -8px; }
+  .lg-nav-list, .lg-rooms + .lg-nav .lg-nav-list { display: flex; gap: 4px; padding: 5px 16px 8px; width: max-content; }
   .lg-nav-link { white-space: nowrap; }
   .lg-stage { padding: 20px 16px 40px; }
-  /* the top bar is sticky: a web control or node focused by Tab under it is scrolled clear of it, never left hidden
-     (WCAG 2.4.11, REQ-009 R7 DEF-2, TASK-C-028) — the bar's own height at 390 (≈ 152 px) and a little air. On the
-     controls, not as scroll-padding on <html>: a theme never styles the document (scope-to-theme-root moves it) */
-  .lg-web-tool, .lg-web-all, .lg-wnode { scroll-margin-top: 168px; }
+  /* the top bar scrolls away (D-111), so nothing covers a web control or node focused by Tab (WCAG 2.4.11, REQ-009 R7
+     DEF-2, TASK-C-028): only a little air above it. On the controls, not as scroll-padding on <html>: a theme never
+     styles the document (scope-to-theme-root moves it) */
+  .lg-web-tool, .lg-web-all, .lg-wnode { scroll-margin-top: 16px; }
 }
 
 /* ---------- project card + preview (TASK-C-004) ---------- */
@@ -338,7 +366,8 @@ button.lg-medallion:hover,
 }
 
 /* ---------- list pages (TASK-C-006): stage + plaque ---------- */
-.lg-page { display: grid; gap: 28px; max-width: 1180px; }
+/* centred in the stage, so the space beside the spine is even on both sides (REQ-017 P1, TASK-C-046) */
+.lg-page { display: grid; gap: 28px; max-width: 1180px; margin-inline: auto; }
 .lg-page-split { grid-template-columns: minmax(0, 8fr) minmax(0, 4fr); align-items: start; gap: 32px; }
 .lg-page-stage { display: grid; grid-template-columns: minmax(0, 1fr); gap: 28px; min-width: 0; }
 .lg-page-title {
@@ -358,6 +387,47 @@ button.lg-medallion:hover,
 .lg-step-card:hover { border-color: var(--lg-navy); }
 .lg-step-card[data-stuck] { background: var(--lg-stuck-tint); border-color: var(--lg-stuck); }
 .lg-step-card .lg-medallion { border: 0; padding: 0; }
+
+/* the brief (REQ-017, comp A): the goal set as the page's statement in serif, then the sections; the plaque beside */
+.lg-brief { grid-template-columns: minmax(0, 1fr) 320px; }
+.lg-goal { display: grid; gap: 8px; }
+.lg-goal-text { font-family: var(--font-serif); font-size: 24px; font-weight: 600; line-height: 1.6; color: var(--lg-ink); max-width: 40em; }
+.lg-goal-source { font-size: 15px; color: var(--lg-ink-2); }
+.lg-roles { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+.lg-role {
+  display: grid; gap: 4px; align-content: start; padding: 16px 20px;
+  background: var(--lg-surface); border: 1px solid var(--lg-card-edge); border-radius: var(--lg-r-card);
+}
+.lg-role-title { font-family: var(--font-serif); font-size: 18px; font-weight: 600; line-height: 1.4; }
+.lg-role-duty { font-size: 15px; color: var(--lg-ink-2); line-height: 1.6; }
+.lg-brief-path { display: grid; gap: 14px; }
+.lg-brief-path + .lg-brief-path { padding-top: 20px; border-top: 1px solid var(--lg-gold-line); }
+.lg-brief-path-work { font-family: var(--font-serif); font-size: 19px; font-weight: 600; line-height: 1.4; }
+/* the endings: where the path stops — "จบแบบที่ n —", then the step as a link */
+.lg-endings { display: grid; gap: 8px; }
+.lg-endings li { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; }
+.lg-ending-n { font-size: 15px; font-weight: 600; color: var(--lg-ink-2); }
+.lg-ending-link, .lg-question {
+  display: inline-flex; align-items: center; min-height: 44px; color: var(--lg-navy); font-weight: 600;
+  text-decoration: underline; text-decoration-color: var(--lg-gold-line); text-underline-offset: 5px;
+}
+.lg-ending-link:hover, .lg-question:hover { text-decoration-color: var(--lg-navy); }
+.lg-rules { display: grid; gap: 20px; padding: 20px 24px; background: var(--lg-surface); border: 1px solid var(--lg-card-edge); border-radius: var(--lg-r-card); }
+.lg-decision-title { font-family: var(--font-serif); font-size: 19px; font-weight: 600; line-height: 1.45; }
+.lg-questions { display: grid; gap: 2px; }
+/* the plaque: what the system needs behind the brief; each count a row into the back room, the missing ones said plainly */
+.lg-rail { position: sticky; top: 24px; }
+.lg-rail-ready { font-size: 16px; font-weight: 600; padding-bottom: 16px; border-bottom: 1px solid var(--lg-gold-line); }
+.lg-rail-ready[data-stuck] { color: var(--lg-stuck); }
+.lg-rail-counts { display: grid; }
+.lg-rail-row {
+  display: flex; justify-content: space-between; align-items: center; gap: 12px; min-height: 44px;
+  color: var(--lg-ink); text-decoration: none; border-bottom: 1px solid var(--lg-paper);
+}
+a.lg-rail-row:hover { color: var(--lg-navy); text-decoration: underline; text-decoration-color: var(--lg-gold-line); text-underline-offset: 5px; }
+.lg-rail-n { font-family: var(--font-serif); font-size: 20px; font-weight: 600; color: var(--lg-navy); }
+.lg-rail-not-yet { font-size: 14px; color: var(--lg-ink-2); padding: 0 10px; border: 1px dashed var(--lg-card-edge); border-radius: 999px; }
+.lg-rail-row[data-not-yet] { color: var(--lg-ink-2); }
 
 /* decisions plaque */
 .lg-decisions { gap: 24px; }
@@ -467,7 +537,8 @@ a.lg-chip-link:hover { border-color: var(--lg-navy); }
 /* one line per stuck wording, never one run-on sentence (REVIEW-A-002 row 2) */
 .lg-stuck-line { display: block; text-wrap: pretty; }
 ul.lg-item-stuck { display: grid; gap: 2px; }
-.lg-plaque-step { font-weight: 600; color: var(--lg-ink); }
+/* a link to the stuck step: a 44 px target (found by the C-046 walk, 26 px before) */
+.lg-plaque-step { display: inline-flex; align-items: center; min-height: 44px; font-weight: 600; color: var(--lg-ink); }
 [data-theme-root="luxury-gold"] .lg-method { font-size: 14px; }
 .lg-io-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; color: var(--lg-ink-2); }
 .lg-io-mark { flex: none; }
@@ -476,6 +547,7 @@ ul.lg-item-stuck { display: grid; gap: 2px; }
 
 @media (max-width: 900px) {
   .lg-page-split { grid-template-columns: minmax(0, 1fr); }
+  .lg-rail { position: static; }
   .lg-cards { grid-template-columns: minmax(0, 1fr); }
   .lg-part-scroll { max-height: 280px; }
 }

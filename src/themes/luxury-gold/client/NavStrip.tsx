@@ -1,6 +1,6 @@
 "use client";
 
-// The page list: links from frame.nav (labels and hrefs from the view model — never typed here).
+// The page list: links from the current room's pages (labels and hrefs from the view model — never typed here).
 // 1440: a vertical list in the spine. 390: one horizontal strip in a ScrollShadow; every link is a normal
 // tab stop, and the current page is scrolled into view when the strip overflows.
 import { ScrollShadow } from "@heroui/react";

@@ -12,6 +12,7 @@ import { pageLabel } from "@/core/words";
 import { color } from "../tokens";
 import { Choose, PageHead } from "../parts/PageHead";
 import { reqAttrs } from "../parts/Req";
+import { useEdges } from "../parts/useEdges";
 import s from "./pages.module.css";
 
 const HEAD = 44; // participant box height; the core's message y values start below it
@@ -33,6 +34,7 @@ function wrap(text: string, room: number): string[] {
 export function Sequence({ vm, required }: { vm: PageVMs["sequence"]; required: RequiredItem[] }) {
   const l = vm.layout;
   const arrow = useId().replace(/:/g, "");
+  const box = useEdges<HTMLDivElement>(); // a diagram wider than a phone fades its edge with more (C-047 walk)
   const x = (k: string | null) => l.participants.find((p) => p.key === k)?.x ?? null;
   const boxW = (t: string) => Math.max(88, t.length * 8 + 28);
   return (
@@ -54,7 +56,7 @@ export function Sequence({ vm, required }: { vm: PageVMs["sequence"]; required: 
           <h3>{vm.step.title}</h3>
         </div>
         {vm.step.stuckWordings.map((t, i) => <p key={i} className={s.stuckNote}><WarningFilled aria-hidden />{t}</p>)}
-        <div className={s.scroll} tabIndex={0} role="region" aria-label={pageLabel.sequence} data-print="expand">
+        <div ref={box} className={`${s.scroll} ${s.edgeFade}`} tabIndex={0} role="region" aria-label={pageLabel.sequence} data-print="expand">
           <svg width={l.width} height={l.height} viewBox={`0 0 ${l.width} ${l.height}`}>
             <defs>
               <marker id={arrow} viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">

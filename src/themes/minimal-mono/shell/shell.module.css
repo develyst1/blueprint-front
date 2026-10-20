@@ -130,6 +130,88 @@
   gap: 2px;
 }
 
+/* the two rooms (REQ-017): outlined tabs above the page list — the current room ringed in ink, its current page
+   filled in ink, so the room reads as the place and the page as the spot in it */
+.rooms {
+  display: grid;
+  gap: 6px;
+  padding-bottom: 12px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.room {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 52px;
+  padding: 6px 12px;
+  border: 1px solid #e0e0e0;
+  border-radius: var(--mantine-radius-md);
+  color: #000000;
+  font-weight: 700;
+  line-height: 1.35;
+  text-decoration: none;
+}
+
+.room:hover {
+  background: #f2f2f2;
+}
+
+.room[aria-current="true"] {
+  border: 2px solid #000000;
+  padding: 5px 11px;
+}
+
+.roomCount {
+  color: #5c5c5c;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* แชต (REQ-017): the same quiet outlined button as the tools; on the chat page itself it is filled in ink */
+.chatButton {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 16px;
+  border: 1px solid #000000;
+  border-radius: var(--mantine-radius-md);
+  background: #ffffff;
+  color: #000000;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.chatButton:hover {
+  background: #f2f2f2;
+}
+
+.chatButton[aria-current="page"] {
+  background: #000000;
+  color: #ffffff;
+}
+
+/* the phone's navigation (< 48em): the rooms side by side, then the room's page strip */
+.phoneNav {
+  display: none;
+  background: #ffffff;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.phoneNav .rooms {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  padding: 10px var(--mantine-spacing-md) 0;
+  margin: 0;
+  border-bottom: 0;
+}
+
+.phoneNav .room {
+  min-height: 44px;
+  font-size: 15px;
+}
+
 .navLink {
   min-height: 44px;
   border-radius: var(--mantine-radius-md);
@@ -148,16 +230,16 @@
   min-width: 0;
 }
 
+/* the content column: at most 1232 px, centred beside the navbar — no dead band on one side (REQ-017 P1) */
 .content {
+  max-width: 1232px;
+  margin-inline: auto;
   padding: var(--mantine-spacing-xl);
 }
 
-/* The small-screen strip — hidden where the navbar shows (≥ 48em, Mantine's "sm"). A native scroller, its
+/* The small-screen strip — in .phoneNav, hidden where the navbar shows (≥ 48em, Mantine's "sm"). A native scroller, its
    scrollbar always drawn (thin, ink on light grey) as the cue that there is more to the right. */
 .strip {
-  display: none;
-  background: #ffffff;
-  border-bottom: 1px solid #e0e0e0;
   overflow-x: scroll;
   overscroll-behavior-x: contain;
   scrollbar-width: thin;
@@ -202,7 +284,7 @@
 }
 
 @media (max-width: 47.99em) {
-  .strip {
+  .phoneNav {
     display: block;
   }
 

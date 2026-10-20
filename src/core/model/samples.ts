@@ -7,7 +7,7 @@ import type {
   ScreensVM, SeqLayout, SequenceVM, StepVM, StuckVM, SwimLayout, WebLayout, WebVM, WorkOrderVM, WorkVM,
 } from "@/core/theme/contract";
 import { formatThaiDate } from "@/core/format/date";
-import { HOME_HREF, nav, pageSlug } from "@/core/model/build/common";
+import { chatHref, HOME_HREF, pageSlug, rooms } from "@/core/model/build/common";
 import { requiredId } from "@/core/theme/required";
 import { realLayouts } from "@/core/layout";
 import type { ApiFlowchart, ApiLink, ApiPart } from "@/core/model/build/types";
@@ -156,7 +156,8 @@ const STUCK_COUNT = 1; // GET …/stuck → 1 item (Q-001)
 const readiness: ReadinessVM = { stuckCount: STUCK_COUNT, label: readinessStuck(STUCK_COUNT), ready: false };
 
 export function sampleFrame(page: PageId): FrameVM {
-  return { project, readiness, nav: nav(PROJECT_ID, page), page, homeHref: HOME_HREF }; // the core's own strip (TASK-B-011 Q1)
+  // the core's own rooms (REQ-017)
+  return { project, readiness, page, homeHref: HOME_HREF, rooms: rooms(PROJECT_ID, page), chatHref: chatHref(PROJECT_ID) };
 }
 
 const steps: StepVM[] = STEPS.map(([key, title, ends], i) => ({
@@ -192,7 +193,7 @@ const flowDiagram: ApiFlowchart = {
 };
 
 const swimLayout: SwimLayout = {
-  lanes: realLayouts.swimLanes(PARTICIPANTS),
+  ...realLayouts.swimLanes(PARTICIPANTS),
   rows: steps.map((step) => ({
     step,
     lanes: STEP_LANES[step.key],
@@ -223,7 +224,20 @@ function sampleWebLayout(): WebLayout {
 }
 
 // ---------- one sample per page ----------
-export const sampleOverview: OverviewVM = { frame: sampleFrame("overview"), works: [work], decisions: [decision] };
+// REQ-017: the brief of an older spec — no goal, no duties; its one open question; the back room's counts
+const kindCount = (kind: PartKind) => PARTS.filter((p) => p.kind === kind).length;
+export const sampleOverview: OverviewVM = {
+  frame: sampleFrame("overview"),
+  works: [{ ...work, goal: null }],
+  decisions: [decision],
+  roles: PARTICIPANTS.filter((p) => p.kind === "role").map((p) => ({ key: p.key, title: p.title, duty: null })),
+  questions: [{
+    kind: "open_question", reason: null, key: QUESTION.key, title: QUESTION.title, wording: stuckWords.open_question,
+    proposedAnswer: QUESTION.proposedAnswer, target: { key: QUESTION.about, title: titleOf(QUESTION.about), href: stepOf(QUESTION.about).href },
+  }],
+  back: { screens: kindCount("screen"), apis: kindCount("api"), systems: kindCount("system"), data: kindCount("data"), interactions: kindCount("interaction") },
+  version: null,
+};
 
 export const sampleWorkOrder: WorkOrderVM = { frame: sampleFrame("workOrder"), works: workLinks("workOrder"), work, layout: swimLayout };
 

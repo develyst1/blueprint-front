@@ -8,7 +8,7 @@ import type { ReactNode } from "react";
 import type { FrameVM, RequiredItem } from "@/core/theme/contract";
 import { contentHref } from "@/core/theme/anchors";
 import { requiredId } from "@/core/theme/required";
-import { allProjects, pageNav, productMark, skipToContent } from "@/core/words";
+import { allProjects, pageLabel, pageNav, productMark, roomViews, skipToContent } from "@/core/words";
 import { ReadinessStrip } from "../parts/ReadinessStrip";
 import { RequiredList, RequiredPicker } from "../parts/Required";
 import { StripScroll } from "./StripScroll";
@@ -22,9 +22,23 @@ export function Shell({ frame, required = [], tools, children }: { frame: FrameV
   const picker = new RequiredPicker(required);
   const stripAttrs = picker.takeId(requiredId.readiness);
   const rest = picker.rest();
-  // The strip leads to ติดอยู่ตรงไหน (the core's own nav href) — except on that page, where it would lead nowhere.
-  const stuckNav = frame.nav.find((item) => item.page === "stuck" && !item.current);
+  // The strip leads to ติดอยู่ตรงไหน (the core's own href) — except on that page, where it would lead nowhere.
+  const pages = frame.rooms.flatMap((r) => r.pages);
+  const stuckNav = pages.find((item) => item.page === "stuck" && !item.current);
   const strip = <ReadinessStrip readiness={frame.readiness} requiredAttrs={stripAttrs} />;
+  // REQ-017: the two rooms, then only the current room's pages; the chat is the one page in no room
+  const roomPages = frame.rooms.filter((r) => r.current).flatMap((r) => r.pages);
+  const chatCurrent = !pages.some((p) => p.current);
+  const rooms = (
+    <div className={s.rooms}>
+      {frame.rooms.map((r) => (
+        <a key={r.id} href={r.href} className={s.room} aria-current={r.current ? "true" : undefined}>
+          {r.label}
+          {r.id === "back" && <span className={s.roomCount}>{roomViews(r.pages.length)}</span>}
+        </a>
+      ))}
+    </div>
+  );
   return (
     <AppShell
       mode="static"
@@ -60,6 +74,10 @@ export function Shell({ frame, required = [], tools, children }: { frame: FrameV
           ) : (
             strip
           )}
+          {/* the chat is not a room: a header button (REQ-017, comp A) */}
+          <a href={frame.chatHref} className={s.chatButton} aria-current={chatCurrent ? "page" : undefined} data-print="screen-only">
+            {pageLabel.chat}
+          </a>
           {tools && (
             <div className={s.tools} data-print="screen-only">
               {tools}
@@ -71,8 +89,9 @@ export function Shell({ frame, required = [], tools, children }: { frame: FrameV
       {/* Mantine's AppShellNavbar is itself a <nav>: it carries the name, and the list inside is a plain div — a
           named nav inside an unnamed one was two landmarks for one list (TASK-A-042) */}
       <AppShellNavbar className={s.navbar} p="md" aria-label={pageNav}>
+        {rooms}
         <div className={s.navList}>
-          {frame.nav.map((item) => (
+          {roomPages.map((item) => (
             <NavLink
               key={item.page}
               component="a"
@@ -91,17 +110,20 @@ export function Shell({ frame, required = [], tools, children }: { frame: FrameV
       {/* a div, not <main>: the core's own <main id="content"> arrives as children — one <main> per page */}
       <AppShellMain component="div" className={s.main}>
         {/* Below 768 px the navbar is removed (not just moved off-screen, so it leaves the tab order) and the same
-            page names become one row of real links that scrolls, with the browser's own scrollbar kept visible
-            as the cue that the row is wider than the screen. */}
-        <StripScroll className={s.strip} edge={48}>
-          <nav className={s.stripRow} aria-label={pageNav}>
-            {frame.nav.map((item) => (
-              <a key={item.page} href={item.href} aria-current={item.current ? "page" : undefined} className={s.stripLink}>
-                {item.label}
-              </a>
-            ))}
-          </nav>
-        </StripScroll>
+            rooms sit side by side over the room's page names as one row of real links that scrolls, with the
+            browser's own scrollbar kept visible as the cue that the row is wider than the screen. */}
+        <nav className={s.phoneNav} aria-label={pageNav}>
+          {rooms}
+          <StripScroll className={s.strip} edge={48}>
+            <div className={s.stripRow}>
+              {roomPages.map((item) => (
+                <a key={item.page} href={item.href} aria-current={item.current ? "page" : undefined} className={s.stripLink}>
+                  {item.label}
+                </a>
+              ))}
+            </div>
+          </StripScroll>
+        </nav>
         <div className={s.content}>
           <RequiredList items={rest} />
           {children}

@@ -3,6 +3,7 @@
 // a circle with the work in the middle. Good enough to draw; not tuned for readability.
 import type { PartKind, ParticipantVM, Point } from "@/core/theme/contract";
 import type { ApiFlowchart, Layouts } from "./types";
+import { swimLanes } from "@/core/layout/swim";
 
 function flow(diagram: ApiFlowchart, direction: "LR" | "TB") {
   const keys = diagram.nodes.map((n) => n.key);
@@ -32,9 +33,7 @@ function flow(diagram: ApiFlowchart, direction: "LR" | "TB") {
   return { direction, width, height, nodes, edges };
 }
 
-function swimLanes(lanes: ParticipantVM[]) {
-  return lanes.map((p, index) => ({ ...p, index }));
-}
+// swimLanes: the real one (lanes by kind, D-112) — a lane order is not a position, so the sample has no reason to differ
 
 function sequence(participants: ParticipantVM[], messages: Parameters<Layouts["sequence"]>[1]) {
   return {

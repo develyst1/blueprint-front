@@ -1,12 +1,19 @@
 // Pieces every page builder shares: hrefs, the frame, steps, works, stuck items. Pure — no fetch, no clock.
 import type {
-  DecisionVM, FrameVM, NavItemVM, PageId, ProjectHeadVM, ReadinessVM, StepVM, StuckItemVM, WorkVM,
+  BackCountsVM, BriefRoleVM, DecisionVM, FrameVM, NavItemVM, PageId, ProjectHeadVM, ReadinessVM, RoomId, RoomVM, StepVM, StuckItemVM,
+  WorkVM,
 } from "@/core/theme/contract";
 import { formatThaiDate } from "@/core/format/date";
-import { contradiction, emptyProject, pageLabel, readinessClean, readinessClear, readinessStuck, stuck as stuckWords } from "@/core/words";
+import { contradiction, emptyProject, pageLabel, readinessClean, readinessClear, readinessStuck, roomLabel, stuck as stuckWords } from "@/core/words";
 import type { ApiLink, ApiStuckItem, ProjectData } from "./types";
 
 export const PAGES: PageId[] = ["overview", "workOrder", "flowchart", "sequence", "screens", "api", "web", "stuck", "history"];
+/** REQ-017 (SPEC-C-006 § 3, D-107): the two rooms and their pages in sub-nav order — the one place. A room lands on its first
+ *  page. The chat is not a room (a header button); a route outside every room (the chat) counts as `front`. */
+export const ROOMS: { id: RoomId; pages: NavItemVM["page"][] }[] = [
+  { id: "front", pages: ["overview", "flowchart", "stuck", "ready"] },
+  { id: "back", pages: ["workOrder", "sequence", "screens", "api", "web", "history"] },
+];
 export const HOME_HREF = "/";
 
 // ---------- hrefs: the only place a URL is built ----------
@@ -71,23 +78,31 @@ export const confirmedOf = (feed: { latest: unknown; changedSinceLatest: boolean
 
 /** A project as the core's loader returns it: the spec, its stuck list and whether its latest version is confirmed and
  *  unchanged (TASK-B-017). Optional, so data built elsewhere (fixtures, other teams' tests) still fits — and then the
- *  seal never claims พร้อมสร้าง. */
-export type ProjectWithSeal = ProjectData & { confirmed?: boolean };
+ *  seal never claims พร้อมสร้าง. `latestVersion` (REQ-017): the newest confirmed version's number, for the brief. */
+export type ProjectWithSeal = ProjectData & { confirmed?: boolean; latestVersion?: number | null };
 
-/** A project's page strip: chat first, the 9 spec pages, screen ④ last (SPEC-B-001 v1.9 / v1.10). Samples use it too. */
-export function nav(projectId: string, current: NavItemVM["page"]): NavItemVM[] {
-  const entry = (p: NavItemVM["page"], to: string): NavItemVM => ({ page: p, label: pageLabel[p], href: to, current: p === current });
-  return [entry("chat", chatHref(projectId)), ...PAGES.map((p) => entry(p, href(projectId, p))), entry("ready", readyHref(projectId))];
+/** REQ-017: the two rooms (they replace the 11-page strip, R-3). The current room holds `current`; a route in no room
+ *  (the chat) keeps `front`. Samples use it too. */
+export function rooms(projectId: string, current: NavItemVM["page"]): RoomVM[] {
+  const entry = (p: NavItemVM["page"]): NavItemVM => ({
+    page: p, label: pageLabel[p], href: p === "ready" ? readyHref(projectId) : href(projectId, p as PageId), current: p === current,
+  });
+  const home = ROOMS.find((r) => r.pages.includes(current))?.id ?? "front";
+  return ROOMS.map((r) => {
+    const pages = r.pages.map(entry);
+    return { id: r.id, label: roomLabel[r.id], href: pages[0]!.href, current: r.id === home, pages };
+  });
 }
 
-/** `current` = the nav entry to mark: the page itself, or "chat" / "ready" on those routes (their loaders pass it). */
+/** `current` = the room page to mark: the page itself, or "chat" / "ready" on those routes (their loaders pass it). */
 export function frame(data: ProjectWithSeal, page: PageId, current: NavItemVM["page"] = page): FrameVM {
   return {
     project: projectHead(data),
     readiness: readiness(data.stuck.length, isEmpty(data), data.confirmed === true),
-    nav: nav(data.project.id, current),
     page,
     homeHref: HOME_HREF, // the project list — a theme never builds a URL (v1.12, AC-22)
+    rooms: rooms(data.project.id, current),
+    chatHref: chatHref(data.project.id),
   };
 }
 
@@ -199,3 +214,22 @@ export function decisions(data: ProjectData): DecisionVM[] {
     }));
 }
 
+// ---------- the brief (REQ-017, SPEC-C-006 § 3) ----------
+const text = (v: unknown): string | null => (typeof v === "string" && v.trim() ? v.trim() : null);
+
+/** Each work with what we understood it is for (`work.body.goal`, written by the spec agent — null in an older spec). */
+export function briefWorks(data: ProjectData): (WorkVM & { goal: string | null })[] {
+  const goals = new Map(data.parts.filter((p) => p.kind === "work").map((p) => [p.key, text(p.body.goal)]));
+  return works(data).map((w) => ({ ...w, goal: goals.get(w.key) ?? null }));
+}
+
+/** Who is involved: every role part, with its duty in this work (`role.body.duty`; null → the theme shows the title alone). */
+export function briefRoles(data: ProjectData): BriefRoleVM[] {
+  return data.parts.filter((p) => p.kind === "role").map((p) => ({ key: p.key, title: p.title, duty: text(p.body.duty) }));
+}
+
+/** The back room's counts for the brief's side rail. */
+export function backCounts(data: ProjectData): BackCountsVM {
+  const n = (kind: string) => data.parts.filter((p) => p.kind === kind).length;
+  return { screens: n("screen"), apis: n("api"), systems: n("system"), data: n("data"), interactions: n("interaction") };
+}

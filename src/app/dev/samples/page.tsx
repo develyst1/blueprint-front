@@ -34,7 +34,7 @@ export default function Page() {
 
         <ul data-probe="frames">
           {frames.map((f) => (
-            <li key={f.page}>{f.nav.find((n) => n.current)?.label} · {f.project.name} · {f.readiness.label}</li>
+            <li key={f.page}>{f.rooms.flatMap((r) => r.pages).find((n) => n.current)?.label} · {f.project.name} · {f.readiness.label}</li>
           ))}
         </ul>
 

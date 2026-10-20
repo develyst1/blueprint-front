@@ -14,7 +14,12 @@ export function pageRequired<P extends PageId>(page: P, vm: PageVMs[P]): Require
   switch (page) {
     case "overview": {
       const v = vm as PageVMs["overview"];
-      return v.works.flatMap((w) => steps(w.steps));
+      // REQ-017 (the brief): each work's goal when it has one, every role's title, then the steps
+      return [
+        ...v.works.filter((w) => w.goal).map((w) => ({ id: requiredId.goal(w.key), text: w.goal! })),
+        ...v.roles.map((r) => ({ id: requiredId.role(r.key), text: r.title })),
+        ...v.works.flatMap((w) => steps(w.steps)),
+      ];
     }
     case "workOrder": {
       const v = vm as PageVMs["workOrder"];

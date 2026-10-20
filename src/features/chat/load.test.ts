@@ -180,13 +180,17 @@ test("A-056 row 7: when the bot failed, the newest failed bot row is left out (t
     .toEqual(["m-1", "m-2", "m-3", "m-4"]);
 });
 
-test("buildChatVM: failed from the newest bot row, the nav marks แชต current (A-039), ดู spec → overview", () => {
+test("buildChatVM: failed from the newest bot row, แชต is current — no room page is (A-039), ดู spec → overview", () => {
   const vm = buildChatVM({
     data: data([question("Q-001")]), messages: [msg(1, "user"), msg(2, "bot", { roundStatus: "bot_could_not_answer", content: "" })],
     focus: null, change: null, sources: [], models: null,
   });
   expect(vm.failed).toBe(true);
-  expect(vm.frame.nav.filter((n) => n.current).map((n) => [n.page, n.label])).toEqual([["chat", "แชต"]]);
+  expect(vm.frame.rooms.flatMap((r) => r.pages).filter((n) => n.current)).toEqual([]); // the chat is in no room
+  expect(vm.frame.chatHref).toBe("/p/p-1/chat");
+  // REQ-017: the chat is not a room; its frame keeps the front room current (SPEC-C-006 § 3)
+  expect(vm.frame.rooms.filter((r) => r.current).map((r) => r.id)).toEqual(["front"]);
+  expect(vm.frame.chatHref).toBe("/p/p-1/chat");
   expect(vm.specHref).toBe("/p/p-1/overview");
   expect(vm.model).toBeNull();
   expect(vm.creativity).toBe(0.7);

@@ -31,7 +31,7 @@ export type Built<T> = { ok: true; vm: T } | { ok: false; state: { kind: "empty"
  */
 export interface Layouts {
   flow(diagram: ApiFlowchart, direction: "LR" | "TB"): FlowLayout;
-  swimLanes(lanes: ParticipantVM[]): SwimLayout["lanes"];
+  swimLanes(lanes: ParticipantVM[]): Pick<SwimLayout, "lanes" | "groups">;
   sequence(participants: ParticipantVM[], messages: ApiSequence["messages"]): SeqLayout;
   web(nodes: { key: string; kind: ApiPart["kind"]; title: string; stuck: boolean }[], links: ApiLink[], aspect?: number): UrlFreeWebLayout;
 }

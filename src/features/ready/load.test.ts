@@ -100,7 +100,10 @@ describe("summary, version, build", () => {
     expect(vm.stuck).toEqual({ count: 2, href: "/p/p-1/stuck" });
     expect(vm.gate.ok).toBe(false);
     // this page's own nav entry is the current one (SPEC-B-001 v1.10, TASK-C-012 A1)
-    expect(vm.frame.nav.filter((n) => n.current).map((n) => [n.page, n.href])).toEqual([["ready", "/p/p-1/ready"]]);
+    expect(vm.frame.rooms.flatMap((r) => r.pages).filter((n) => n.current).map((n) => [n.page, n.href])).toEqual([["ready", "/p/p-1/ready"]]);
+    // REQ-017: ④ sits in the front room, as its last page (SPEC-C-006 § 3)
+    expect(vm.frame.rooms.filter((r) => r.current).map((r) => r.id)).toEqual(["front"]);
+    expect(vm.frame.rooms[0]!.pages.filter((p) => p.current).map((p) => p.page)).toEqual(["ready"]);
   });
 
   test("version = the last of `versions`, date by formatThaiDate; changedSince false until Team A's field", () => {

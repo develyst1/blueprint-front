@@ -8,10 +8,12 @@
 // The way home (REQ-002 AC-22, D-036, contract v1.12): the wordmark (`productMark`, named by its own text) and a visible
 // `allProjects` link, both to the core's `frame.homeHref`, kept together: stacked in the spine at 1440, side by side
 // opening the top bar at ≤ 640 px (PM 2026-10-12, TASK-C-020 Q1).
+// The two rooms (REQ-017, TASK-C-046): two framed tabs under the readiness, then only the current room's pages in the
+// page list. แชต is not a room: a quiet pill beside the tools, at every width.
 import type { FrameVM, RequiredItem } from "@/core/theme/contract";
 import { contentHref } from "@/core/theme/anchors";
 import { findRequired, requiredId, requiredProps } from "@/core/theme/required";
-import { allProjects, productMark, skipToContent } from "@/core/words";
+import { allProjects, pageLabel, pageNav, productMark, roomViews, skipToContent } from "@/core/words";
 import type { ReactNode } from "react";
 import { NavStrip } from "./client/NavStrip";
 import { Readiness } from "./primitives/Seal";
@@ -19,6 +21,8 @@ import { Readiness } from "./primitives/Seal";
 export function Shell({ frame, required, tools, children }: { frame: FrameVM; required: RequiredItem[]; tools?: ReactNode; children: ReactNode }) {
   const readinessItem = findRequired(required, requiredId.readiness); // by id, never by text (contract v1.3)
   const others = required.filter((r) => r !== readinessItem);
+  // the chat is the one page in no room, so "no room page is current" = the chat is
+  const chatCurrent = !frame.rooms.some((r) => r.pages.some((p) => p.current));
   return (
     <div className="lg-shell">
       {/* First focusable element: jump past the page list to the core's <main id="content"> (SPEC-B-001 § Skip link). */}
@@ -43,9 +47,20 @@ export function Shell({ frame, required, tools, children }: { frame: FrameVM; re
               {r.text}
             </span>
           ))}
-          {tools ? <div className="lg-shell-tools" data-print="screen-only">{tools}</div> : null}
+          <div className="lg-shell-tools" data-print="screen-only">
+            <a className="lg-chat-button" href={frame.chatHref} aria-current={chatCurrent ? "page" : undefined}>{pageLabel.chat}</a>
+            {tools}
+          </div>
         </div>
-        <NavStrip nav={frame.nav} />
+        <nav className="lg-rooms" aria-label={pageNav} data-print="screen-only">
+          {frame.rooms.map((r) => (
+            <a key={r.id} className="lg-room" href={r.href} aria-current={r.current ? "true" : undefined}>
+              <span className="lg-room-label">{r.label}</span>
+              {r.id === "back" && <span className="lg-room-count">{roomViews(r.pages.length)}</span>}
+            </a>
+          ))}
+        </nav>
+        <NavStrip nav={frame.rooms.filter((r) => r.current).flatMap((r) => r.pages)} />
       </header>
       {/* The core passes <main id="content"> as children (SPEC-B-001 § Skip link) — a div here, never a second main. */}
       <div className="lg-stage">{children}</div>

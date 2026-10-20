@@ -6,6 +6,7 @@ import type { FlowLayout, ParticipantVM, Point } from "@/core/theme/contract";
 import type { ApiFlowchart, ApiLink, ApiPart, ApiSequence } from "@/core/model/build/types";
 import { FLOW, flowLayout } from "./flow";
 import { sequenceLayout } from "./sequence";
+import { swimLanes } from "./swim";
 import { conditionBox, estimateLabel } from "./text";
 import { nodeBox, tileBox, TILE_GAP, webCrossings, webLayout, WEB_ASPECT } from "./web";
 
@@ -276,5 +277,33 @@ describe("TB height (TASK-B-010: a layer gap is what its labels need)", () => {
   test("worked < 1000 px and large < 3000 px tall top-to-bottom (were 1624 / 5404)", () => {
     expect(flowLayout(fixture<ApiFlowchart>("worked-flowchart-WRK-001"), "TB").height).toBeLessThan(1000);
     expect(flowLayout(fixture<ApiFlowchart>("large-flowchart-WRK-001"), "TB").height).toBeLessThan(3000);
+  });
+});
+
+describe("swim lanes by kind (TASK-C-047, D-112)", () => {
+  const P = (key: string, kind: ParticipantVM["kind"]): ParticipantVM => ({ key, kind, title: key });
+  // the API's order, kinds mixed (as the c047 seed lists them)
+  const mixed = [P("S1", "screen"), P("A1", "api"), P("R1", "role"), P("Y1", "system"), P("S2", "screen"), P("A2", "api"), P("R2", "role")];
+
+  test("role → screen → api → system; the API's order kept inside each kind; index = the new position", () => {
+    const { lanes } = swimLanes(mixed);
+    expect(lanes.map((l) => l.key)).toEqual(["R1", "R2", "S1", "S2", "A1", "A2", "Y1"]);
+    expect(lanes.map((l) => l.index)).toEqual([0, 1, 2, 3, 4, 5, 6]);
+  });
+
+  test("groups: consecutive, one per kind present, labelled from participantKind, with counts", () => {
+    expect(swimLanes(mixed).groups).toEqual([
+      { kind: "role", label: "คน", count: 2 },
+      { kind: "screen", label: "หน้าจอ", count: 2 },
+      { kind: "api", label: "API", count: 2 },
+      { kind: "system", label: "ระบบ", count: 1 },
+    ]);
+  });
+
+  test("one kind only → one group; an empty spec → no lanes, no groups", () => {
+    const one = swimLanes([P("A2", "api"), P("A1", "api")]);
+    expect(one.groups).toEqual([{ kind: "api", label: "API", count: 2 }]);
+    expect(one.lanes.map((l) => l.key)).toEqual(["A2", "A1"]);
+    expect(swimLanes([])).toEqual({ lanes: [], groups: [] });
   });
 });

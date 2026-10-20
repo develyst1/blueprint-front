@@ -42,7 +42,7 @@ describe("worked example (จองห้องประชุม)", () => {
     expect(v.frame.readiness).toEqual({ stuckCount: 1, label: "ยังติดอยู่ 1 จุด", ready: false });
     expect(v.frame.project.createdLabel).toMatch(/^\d{1,2} ต\.ค\. 2569$/);
     expect(v.decisions[0]!.open).toBe("ห้องพอดี 10 คน");
-    expect(v.frame.nav.find((n) => n.current)?.href).toBe(`/p/${worked.project.id}/overview`);
+    expect(v.frame.rooms.flatMap((r) => r.pages).find((n) => n.current)?.href).toBe(`/p/${worked.project.id}/overview`);
   });
 
   test("flowchart: 6 nodes, 6 arrows, 4 condition labels", () => {
@@ -128,7 +128,8 @@ describe("worked example (จองห้องประชุม)", () => {
     const v = vm(buildOverview(worked));
     expect(shellRequired(v.frame)).toEqual([{ id: "readiness", text: "ยังติดอยู่ 1 จุด" }]);
     const req = pageRequired("overview", v);
-    expect(req.map((r) => r.id)).toEqual(["STEP-001", "STEP-002", "STEP-003", "STEP-004", "STEP-005", "STEP-006"].map((k) => `step:${k}`));
+    // REQ-017: the roles join the steps (no goal in this old spec, so no goal item)
+    expect(req.map((r) => r.id)).toEqual(["role:ROLE-001", "role:ROLE-002", ...["STEP-001", "STEP-002", "STEP-003", "STEP-004", "STEP-005", "STEP-006"].map((k) => `step:${k}`)]);
     expect(req.some((r) => r.id === "readiness")).toBe(false);
   });
 
@@ -151,7 +152,7 @@ describe("worked example (จองห้องประชุม)", () => {
       history: vm(buildHistory(worked, "DEC-001", fixture<ApiHistoryEntry[]>("worked-history-DEC-001"))),
     };
     const expected = {
-      overview: pages.overview.works[0]!.steps.map((s) => requiredId.step(s.key)),
+      overview: [...pages.overview.roles.map((r) => requiredId.role(r.key)), ...pages.overview.works[0]!.steps.map((s) => requiredId.step(s.key))],
       workOrder: [...pages.workOrder.work.steps.map((s) => requiredId.step(s.key)), ...pages.workOrder.layout.lanes.map((l) => requiredId.lane(l.key))],
       flowchart: [...pages.flowchart.work.steps.map((s) => requiredId.step(s.key)), ...pages.flowchart.layouts.LR.edges.filter((e) => e.label).map((e) => requiredId.branch(e.from, e.to))],
       sequence: pages.sequence.layout.messages.map((m) => requiredId.message(m.key)),
@@ -311,21 +312,22 @@ describe("v1.9 + v1.10: chat first and ready-to-build last in every frame's nav"
     vm(buildWeb(worked, L)).frame,
   ];
 
-  test("nav = แชต · the 9 pages · พร้อมสร้างหรือยัง, with core-built hrefs", () => {
+  test("rooms hold the 9 pages + พร้อมสร้างหรือยัง with core-built hrefs; แชต is the frame's chatHref, in no room (R-3)", () => {
     for (const f of frames) {
-      expect(f.nav).toHaveLength(11);
-      expect(f.nav[0]).toMatchObject({ page: "chat", label: "แชต", href: `/p/${id}/chat` });
-      expect(f.nav.at(-1)).toMatchObject({ page: "ready", label: "พร้อมสร้างหรือยัง", href: `/p/${id}/ready` });
-      expect(f.nav.slice(1, -1).map((n) => n.page)).toEqual(["overview", "workOrder", "flowchart", "sequence", "screens", "api", "web", "stuck", "history"]);
+      const pages = f.rooms.flatMap((r) => r.pages);
+      expect(pages).toHaveLength(10);
+      expect(pages.find((n) => n.page === "ready")).toMatchObject({ label: "พร้อมสร้างหรือยัง", href: `/p/${id}/ready` });
+      expect(pages.map((n) => n.page).sort()).toEqual(["api", "flowchart", "history", "overview", "ready", "screens", "sequence", "stuck", "web", "workOrder"]);
+      expect(f.chatHref).toBe(`/p/${id}/chat`);
+      expect("nav" in f).toBe(false);
     }
   });
 
-  test("on a page, only that page is current; the chat / ready routes mark their own entry", () => {
-    expect(frames[0]!.nav.filter((n) => n.current).map((n) => n.page)).toEqual(["overview"]);
-    for (const which of ["chat", "ready"] as const) {
-      const f = frame(worked, "overview", which);
-      expect(f.nav.filter((n) => n.current).map((n) => n.page)).toEqual([which]);
-    }
+  test("on a page, only that page is current; ready marks its own entry, the chat none", () => {
+    const current = (f: { rooms: { pages: { page: string; current: boolean }[] }[] }) => f.rooms.flatMap((r) => r.pages).filter((n) => n.current).map((n) => n.page);
+    expect(current(frames[0]!)).toEqual(["overview"]);
+    expect(current(frame(worked, "overview", "ready"))).toEqual(["ready"]);
+    expect(current(frame(worked, "overview", "chat"))).toEqual([]);
   });
 
   test("stuck targets: open_question → the chat at that question; other kinds keep theirs", () => {
@@ -489,5 +491,84 @@ describe("v1.15: the web marks exactly the stuck list's parts, and carries a tal
     expect(v.tall.edges.map((e) => e.id).sort()).toEqual(v.layout.edges.map((e) => e.id).sort());
     expect(v.tall.nodes.every((n) => n.href === `/p/${worked.project.id}/web?part=${n.key}`)).toBe(true);
     expect(sampleWeb.tall.nodes.length).toBe(sampleWeb.layout.nodes.length);
+  });
+});
+
+// ---------- REQ-017 (SPEC-C-006, TASK-C-045): two rooms in the frame, the brief on the overview ----------
+describe("REQ-017: the frame's two rooms", () => {
+  const id = worked.project.id;
+
+  test("2 rooms in order, each with its pages in sub-nav order and core-built hrefs; the chat link beside them", () => {
+    const f = vm(buildOverview(worked)).frame;
+    expect(f.rooms.map((r) => [r.id, r.label])).toEqual([["front", "สิ่งที่เราเข้าใจ"], ["back", "เบื้องหลังเทคนิค"]]);
+    expect(f.rooms[0]!.pages.map((p) => p.page)).toEqual(["overview", "flowchart", "stuck", "ready"]);
+    expect(f.rooms[1]!.pages.map((p) => p.page)).toEqual(["workOrder", "sequence", "screens", "api", "web", "history"]);
+    expect(f.rooms[0]!.href).toBe(`/p/${id}/overview`);
+    expect(f.rooms[1]!.href).toBe(`/p/${id}/work-order`);
+    expect(f.rooms[0]!.pages.at(-1)).toMatchObject({ page: "ready", href: `/p/${id}/ready`, label: "พร้อมสร้างหรือยัง" });
+    expect(f.chatHref).toBe(`/p/${id}/chat`);
+  });
+
+  test("the current room holds the current page — the 9 pages, chat and ready; one current page inside it", () => {
+    const front = ["overview", "flowchart", "stuck"] as const;
+    const back = ["workOrder", "sequence", "screens", "api", "web", "history"] as const;
+    for (const p of [...front, ...back]) {
+      const f = frame(worked, p);
+      expect(f.rooms.filter((r) => r.current).map((r) => r.id)).toEqual([(front as readonly string[]).includes(p) ? "front" : "back"]);
+      expect(f.rooms.flatMap((r) => r.pages).filter((x) => x.current).map((x) => x.page)).toEqual([p]);
+    }
+    for (const which of ["chat", "ready"] as const) {
+      const f = frame(worked, "overview", which);
+      expect(f.rooms.filter((r) => r.current).map((r) => r.id)).toEqual(["front"]);
+    }
+    expect(frame(worked, "overview", "ready").rooms[0]!.pages.filter((x) => x.current).map((x) => x.page)).toEqual(["ready"]);
+    expect(frame(worked, "overview", "chat").rooms.flatMap((r) => r.pages).filter((x) => x.current)).toEqual([]);
+  });
+
+});
+
+describe("REQ-017: the brief (overview VM)", () => {
+  test("the worked example (an old spec, no goal / duty): goal null, roles by title, 6 steps with 2 endings, the counts", () => {
+    const v = vm(buildOverview(worked));
+    expect(v.works.map((w) => w.goal)).toEqual([null]);
+    expect(v.roles).toEqual([{ key: "ROLE-001", title: "พนักงาน", duty: null }, { key: "ROLE-002", title: "ผู้ดูแลห้อง", duty: null }]);
+    expect(v.works[0]!.steps).toHaveLength(6);
+    expect(v.works[0]!.steps.filter((s) => s.ends)).toHaveLength(2);
+    expect(v.back).toEqual({ screens: 3, apis: 3, systems: 1, data: 2, interactions: 14 });
+    expect(v.questions.map((q) => [q.kind, q.key])).toEqual([["open_question", "Q-001"]]);
+    expect(v.version).toBeNull();
+  });
+
+  test("a spec with goal + duty → both present; a blank one counts as none", () => {
+    const withBodies: ProjectData = {
+      ...worked,
+      parts: worked.parts.map((p) =>
+        p.kind === "work" ? { ...p, body: { ...p.body, goal: "พนักงานจองห้องประชุมได้เอง" } }
+        : p.key === "ROLE-001" ? { ...p, body: { ...p.body, duty: "หาห้อง จอง และรอผล" } }
+        : p.key === "ROLE-002" ? { ...p, body: { ...p.body, duty: "   " } }
+        : p),
+    };
+    const v = vm(buildOverview({ ...withBodies, latestVersion: 4 }));
+    expect(v.works[0]!.goal).toBe("พนักงานจองห้องประชุมได้เอง");
+    expect(v.roles.map((r) => r.duty)).toEqual(["หาห้อง จอง และรอผล", null]);
+    expect(v.version).toBe(4);
+  });
+
+  test("no open question → an empty list (the theme says ไม่มี ทุกคำถามตอบแล้ว)", () => {
+    expect(vm(buildOverview({ ...worked, stuck: [] })).questions).toEqual([]);
+  });
+
+  test("the overview's required list: each goal (when there is one) and every role title, then the steps (C-046)", () => {
+    expect(requiredId.role("ROLE-001")).toBe("role:ROLE-001");
+    expect(requiredId.goal("WRK-001")).toBe("goal:WRK-001");
+    const goal = { ...worked, parts: worked.parts.map((p) => (p.kind === "work" ? { ...p, body: { ...p.body, goal: "เป้าหมาย" } } : p)) };
+    const ids = (d: ProjectData) => pageRequired("overview", vm(buildOverview(d))).filter((r) => /^(role|goal):/.test(r.id));
+    expect(ids(goal)).toEqual([
+      { id: "goal:WRK-001", text: "เป้าหมาย" },
+      { id: "role:ROLE-001", text: "พนักงาน" },
+      { id: "role:ROLE-002", text: "ผู้ดูแลห้อง" },
+    ]);
+    // no goal → no goal item (the theme draws none); the roles stay
+    expect(ids(worked).map((r) => r.id)).toEqual(["role:ROLE-001", "role:ROLE-002"]);
   });
 });

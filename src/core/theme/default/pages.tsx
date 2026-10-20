@@ -4,8 +4,8 @@
 import type { PageVMs, RequiredItem } from "../contract";
 import { requiredId } from "../required";
 import {
-  apiDetail, apiGroup, decisionPart, emptyList, historyPick, linkKind, pageLabel, partKind, participantKind, proposedAnswer,
-  screenGroup, showMore, stepEnds,
+  apiDetail, apiGroup, brief, decisionPart, emptyList, historyPick, linkKind, pageLabel, partKind, participantKind, proposedAnswer,
+  screenGroup, showMore,
 } from "@/core/words";
 import { Mark, markAttrs } from "./Mark";
 import { WebView } from "./WebView";
@@ -29,34 +29,113 @@ function WorkLinks({ works, current }: { works: { key: string; title: string; hr
 
 // ---------- ภาพรวม ----------
 export function Overview({ vm, required }: P<"overview">) {
+  // REQ-017 (comp A): the brief — what we understood, who is involved, the path and its endings, the rules agreed, what still
+  // waits for you; beside it, the readiness and what the system needs behind it, each count a link into the back room
+  const back = new Map((vm.frame.rooms.find((r) => r.id === "back")?.pages ?? []).map((p) => [p.page, p.href]));
+  const counts: { label: string; n: number; href: string | undefined }[] = [
+    { label: brief.rail.screens, n: vm.back.screens, href: back.get("screens") },
+    { label: brief.rail.apis, n: vm.back.apis, href: back.get("api") },
+    { label: brief.rail.systems, n: vm.back.systems, href: back.get("web") },
+    { label: brief.rail.data, n: vm.back.data, href: back.get("web") },
+  ];
   return (
-    <>
-      <h2>{pageLabel.overview}</h2>
-      {vm.works.map((w) => (
-        <section key={w.key}>
-          <h3>{w.title}</h3>
-          <ol className={s.list}>
-            {w.steps.map((st) => (
-              <li key={st.key}>
-                {st.number} <a href={st.href}><Mark required={required} id={requiredId.step(st.key)}>{st.title}</Mark></a>
-                {st.ends && <span className={s.muted}> · {stepEnds}</span>}
-                {st.stuckWordings.map((w2, i) => <span key={i} className={s.stuckNote}> · {w2}</span>)}
+    <div className={s.brief}>
+      <div className={s.briefMain}>
+        {vm.works.filter((w) => w.goal).map((w) => (
+          <section key={w.key} className={s.goal}>
+            <p className={s.goalText}><Mark required={required} id={requiredId.goal(w.key)}>{w.goal}</Mark></p>
+            <p className={s.muted}>{brief.source(vm.version)}</p>
+          </section>
+        ))}
+
+        <section>
+          <h2>{brief.roles}</h2>
+          <ul className={s.roles}>
+            {vm.roles.map((r) => (
+              <li key={r.key} className={s.roleCard}>
+                <strong><Mark required={required} id={requiredId.role(r.key)}>{r.title}</Mark></strong>
+                {r.duty && <span className={s.muted}>{r.duty}</span>}
               </li>
             ))}
-          </ol>
+          </ul>
         </section>
-      ))}
-      {vm.decisions.map((d) => (
-        <details key={d.key} className={s.detail}>
-          <summary>{d.title} — {showMore}</summary>
-          <p><strong>{decisionPart.rule}</strong> {d.rule}</p>
-          <p><strong>{decisionPart.cases}</strong></p>
-          <ul className={s.list}>{d.cases.map((c, i) => <li key={i}>{c}</li>)}</ul>
-          {d.open && <p><strong>{decisionPart.open}</strong> {d.open}</p>}
-          {d.covers.length > 0 && <p className={s.muted}>{linkKind.covers!.out} <Refs refs={d.covers} /></p>}
-        </details>
-      ))}
-    </>
+
+        <section>
+          <h2>{brief.path}</h2>
+          {vm.works.map((w) => {
+            const endings = w.steps.filter((st) => st.ends);
+            return (
+              <div key={w.key}>
+                {vm.works.length > 1 && <h3>{w.title}</h3>}
+                <ol className={s.path}>
+                  {w.steps.filter((st) => !st.ends).map((st) => (
+                    <li key={st.key}>
+                      <span className={s.stepNo}>{st.number}</span>
+                      <span>
+                        <a href={st.href}><Mark required={required} id={requiredId.step(st.key)}>{st.title}</Mark></a>
+                        {st.stuckWordings.map((w2, i) => <span key={i} className={s.stuckNote}> · {w2}</span>)}
+                      </span>
+                    </li>
+                  ))}
+                </ol>
+                {endings.length > 0 && (
+                  <ul className={s.endings}>
+                    {endings.map((st, i) => (
+                      <li key={st.key}>
+                        {brief.ending(i + 1, "")}<a href={st.href}><Mark required={required} id={requiredId.step(st.key)}>{st.title}</Mark></a>
+                        {st.stuckWordings.map((w2, j) => <span key={j} className={s.stuckNote}> · {w2}</span>)}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            );
+          })}
+        </section>
+
+        {vm.decisions.length > 0 && (
+          <section>
+            <h2>{brief.rules}</h2>
+            {vm.decisions.map((d) => (
+              <details key={d.key} className={s.detail}>
+                <summary>{d.title} — {showMore}</summary>
+                <p><strong>{decisionPart.rule}</strong> {d.rule}</p>
+                <p><strong>{decisionPart.cases}</strong></p>
+                <ul className={s.list}>{d.cases.map((c, i) => <li key={i}>{c}</li>)}</ul>
+                {d.open && <p><strong>{decisionPart.open}</strong> {d.open}</p>}
+                {d.covers.length > 0 && <p className={s.muted}>{linkKind.covers!.out} <Refs refs={d.covers} /></p>}
+              </details>
+            ))}
+          </section>
+        )}
+
+        <section>
+          <h2>{brief.waiting}</h2>
+          {vm.questions.length > 0 ? (
+            <ul className={s.list}>{vm.questions.map((q) => <li key={q.key}><a href={q.target.href}>{q.title}</a></li>)}</ul>
+          ) : (
+            <p className={s.muted}>{brief.noQuestions}</p>
+          )}
+        </section>
+      </div>
+
+      <aside className={s.rail}>
+        <div className={s.railCard}>
+          <strong>{vm.frame.readiness.label}</strong>
+        </div>
+        <div className={s.railCard}>
+          <h2>{brief.rail.title}</h2>
+          <ul className={s.counts}>
+            {counts.map((c) => (
+              <li key={c.label}><a href={c.href}><span>{c.label}</span><span>{c.n}</span></a></li>
+            ))}
+            <li><a href={back.get("sequence")}><span>{brief.rail.interactions(vm.back.interactions)}</span></a></li>
+            <li><span>{brief.rail.er}</span><span className={s.notYet}>{brief.rail.notYet}</span></li>
+            <li><span>{brief.rail.services}</span><span className={s.notYet}>{brief.rail.notYet}</span></li>
+          </ul>
+        </div>
+      </aside>
+    </div>
   );
 }
 

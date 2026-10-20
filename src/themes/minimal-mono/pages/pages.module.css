@@ -14,11 +14,159 @@
   margin: 0;
 }
 
-/* ---------- overview: decisions + the stuck panel ---------- */
-.lower {
-  margin-top: 0;
+/* ---------- overview: the brief (REQ-017, comp A) ---------- */
+.brief {
+  margin: 0;
 }
 
+.muted {
+  color: #5c5c5c;
+  margin: 0;
+}
+
+.goal {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-bottom: var(--mantine-spacing-lg);
+  border-bottom: 2px solid #000000;
+}
+
+.goalText {
+  margin: 0;
+  max-width: 40em;
+}
+
+.subheading {
+  font-size: 17px;
+  line-height: 1.4;
+  font-weight: 700;
+  margin: 0;
+}
+
+.role {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  background: #ffffff;
+  color: #000000;
+  border: 1.5px solid #8a8a8a;
+}
+
+.path {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mantine-spacing-md);
+}
+
+.path + .path {
+  padding-top: var(--mantine-spacing-md);
+  border-top: 1.5px solid #8a8a8a;
+}
+
+.endings,
+.questions {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.endings li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+}
+
+.endingLink {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: #000000;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.endingLink:hover {
+  text-decoration-thickness: 2px;
+}
+
+.stuckWords {
+  font-weight: 700;
+}
+
+/* the panel beside the brief: an ink outline, rows divided by the meaning line; the missing ones dashed ("off") */
+.rail {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mantine-spacing-sm);
+  padding: var(--mantine-spacing-lg);
+  background: #ffffff;
+  border: 2px solid #000000;
+  border-radius: var(--mantine-radius-lg);
+}
+
+.railReady {
+  padding-bottom: var(--mantine-spacing-sm);
+  border-bottom: 1.5px solid #8a8a8a;
+}
+
+.railReady p {
+  margin: 0;
+}
+
+.railTitle {
+  font-size: 18px;
+  line-height: 1.4;
+  font-weight: 700;
+  margin: 0;
+}
+
+.counts {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.railRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  color: #000000;
+  text-decoration: none;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.countLabel {
+  flex: 1;
+}
+
+.railRow b {
+  font-size: 20px;
+  font-weight: 800;
+}
+
+a.railRow:hover .countLabel {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+li.railRow {
+  color: #5c5c5c;
+}
+
+.notYet {
+  padding: 0 10px;
+  border: 1.5px dashed #8a8a8a;
+  border-radius: 999px;
+  font-size: 14px;
+}
+
+/* ---------- overview: decisions ---------- */
 .decision {
   background: #ffffff;
   color: #000000;
@@ -96,17 +244,6 @@
 }
 
 .chip:hover {
-  color: #000000;
-}
-
-.stuckPanel {
-  background: #ffffff;
-  color: #000000;
-  border: 2px solid #000000;
-}
-
-.quietPanel {
-  background: #ffffff;
   color: #000000;
 }
 

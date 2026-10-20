@@ -34,7 +34,8 @@ export async function loadProjectData(projectId: string): Promise<ApiResult<Proj
   if (!spec.ok) return spec;
   if (!stuck.ok) return stuck;
   const confirmed = versions.ok && confirmedOf(versions.data);
-  return { ok: true, data: { project: spec.data.project, parts: spec.data.parts, links: spec.data.links, stuck: stuck.data.items, confirmed } };
+  const latestVersion = versions.ok ? versions.data.latest?.version ?? null : null; // REQ-017: the brief's "spec เวอร์ชัน {v}"
+  return { ok: true, data: { project: spec.data.project, parts: spec.data.parts, links: spec.data.links, stuck: stuck.data.items, confirmed, latestVersion } };
 }
 
 function diagram<T>(projectId: string, kind: "flowchart" | "swimlane" | "sequence", key: string) {

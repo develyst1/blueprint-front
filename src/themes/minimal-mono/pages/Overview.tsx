@@ -12,12 +12,13 @@ import "@mantine/core/styles/Stack.css";
 import "@mantine/core/styles/Group.css";
 import "@mantine/core/styles/Text.css";
 import "@mantine/core/styles/Title.css";
-import { Button, Card, Collapse, Grid, GridCol, Group, Paper, SimpleGrid, Stack, Text, Title } from "@mantine/core";
+import { Button, Card, Collapse, Grid, GridCol, Group, SimpleGrid, Stack, Text, Title } from "@mantine/core";
 import { IconChevronDown } from "@tabler/icons-react";
 import { useId, useState } from "react";
 import type { DecisionVM, OverviewVM, RequiredItem } from "@/core/theme/contract";
 import { requiredId } from "@/core/theme/required";
-import { decisionPart, pageLabel, showMore } from "@/core/words";
+import { brief, decisionPart, showMore } from "@/core/words";
+import { KindMark } from "../parts/KindMark";
 import { StepCard } from "../parts/StepCard";
 import { RequiredList, RequiredPicker } from "../parts/Required";
 import { StuckIcon } from "../parts/StuckIcon";
@@ -86,56 +87,178 @@ function DecisionCard({ decision }: { decision: DecisionVM }) {
   );
 }
 
-// The page: each work's steps as numbered cards (6 / 3 / 1 across); below them the decisions, with the
-// "ติดอยู่ตรงไหน" panel beside them (and first on a phone) holding every required item the steps do not show.
+// The page — the brief (REQ-017, comp A), top-down as an analyst hands it back: what we understood (each work's goal) →
+// ใครเกี่ยวข้อง → เส้นทางของงาน (the steps as numbered cards, then the endings) → กติกาที่ตกลงกันแล้ว → ยังรอคำตอบจากคุณ.
+// Beside it (under it on a phone), an outlined panel: the readiness and what the system needs behind it, each count a
+// link into the back room. Weight is the hierarchy: the stuck step stays the page's only solid block.
 export function Overview({ vm, required }: { vm: OverviewVM; required: RequiredItem[] }) {
   const picker = new RequiredPicker(required);
+  const back = new Map((vm.frame.rooms.find((r) => r.id === "back")?.pages ?? []).map((p) => [p.page, p.href]));
+  const counts = [
+    { kind: "screen", label: brief.rail.screens, n: vm.back.screens, href: back.get("screens") },
+    { kind: "api", label: brief.rail.apis, n: vm.back.apis, href: back.get("api") },
+    { kind: "system", label: brief.rail.systems, n: vm.back.systems, href: back.get("web") },
+    { kind: "data", label: brief.rail.data, n: vm.back.data, href: back.get("web") },
+  ] as const;
 
-  const works = vm.works.map((work) => (
-    <section key={work.key} aria-labelledby={`work-${work.key}`} className={s.section}>
-      <Title order={2} id={`work-${work.key}`} className={s.heading}>
-        {work.title}
-      </Title>
-      <SimpleGrid cols={{ base: 2, sm: 3, lg: 6 }} spacing={{ base: "sm", sm: "md" }}>
-        {work.steps.map((step) => (
-          <StepCard key={step.key} step={step} requiredAttrs={picker.takeId(requiredId.step(step.key))} />
-        ))}
-      </SimpleGrid>
+  const goals = vm.works.filter((w) => w.goal).map((w) => (
+    <section key={w.key} className={s.goal}>
+      <Text component="p" fz={24} fw={700} lh={1.55} className={s.goalText} {...picker.takeId(requiredId.goal(w.key))}>
+        {w.goal}
+      </Text>
+      <Text component="p" fz="md" className={s.muted}>
+        {brief.source(vm.version)}
+      </Text>
     </section>
   ));
 
-  // Fallback only (v1.1: an overview's required list holds just its steps, which the cards claim). If a list
-  // ever carries more — e.g. the v1 samples' readiness + stuck items — they still show, in this panel.
+  const path = vm.works.map((work) => {
+    const endings = work.steps.filter((st) => st.ends);
+    return (
+      <div key={work.key} className={s.path}>
+        {vm.works.length > 1 ? (
+          <Title order={3} className={s.subheading}>
+            {work.title}
+          </Title>
+        ) : null}
+        <SimpleGrid cols={{ base: 2, sm: 3, lg: 4 }} spacing={{ base: "sm", sm: "md" }}>
+          {work.steps.filter((st) => !st.ends).map((step) => (
+            <StepCard key={step.key} step={step} requiredAttrs={picker.takeId(requiredId.step(step.key))} />
+          ))}
+        </SimpleGrid>
+        {endings.length ? (
+          <ul className={s.endings}>
+            {endings.map((st, i) => (
+              <li key={st.key}>
+                <span className={s.muted}>{brief.ending(i + 1, "")}</span>
+                <a href={st.href} className={s.endingLink}>
+                  <span {...picker.takeId(requiredId.step(st.key))}>{st.title}</span>
+                </a>
+                {st.stuck ? <StuckIcon size={18} /> : null}
+                {st.stuckWordings.map((t, j) => (
+                  <span key={j} className={s.stuckWords}>
+                    {t}
+                  </span>
+                ))}
+              </li>
+            ))}
+          </ul>
+        ) : null}
+      </div>
+    );
+  });
+
+  const roles = vm.roles.map((r) => (
+    <Card key={r.key} padding="md" radius="lg" className={s.role}>
+      <Text component="span" fz="md" fw={700} {...picker.takeId(requiredId.role(r.key))}>
+        {r.title}
+      </Text>
+      {r.duty ? (
+        <Text component="span" fz="md" className={s.muted}>
+          {r.duty}
+        </Text>
+      ) : null}
+    </Card>
+  ));
+
+  // Fallback only: every item an overview carries (goals, roles, steps) is claimed above; anything else still shows.
   const left = picker.rest();
-  const anyStuck = !vm.frame.readiness.ready;
+  const stuck = vm.frame.readiness.stuckCount > 0;
 
   return (
-    <Stack gap="xl">
-      {works}
-      <Grid gap="lg" className={s.lower}>
-        {left.length ? (
-          <GridCol span={{ base: 12, md: 4 }} order={{ base: 1, md: 2 }}>
-            <Paper radius="lg" p="lg" className={anyStuck ? s.stuckPanel : s.quietPanel}>
-              <Stack gap="sm">
-                <Group gap="sm" wrap="nowrap">
-                  {anyStuck ? <StuckIcon /> : null}
-                  <Title order={2} className={s.heading}>
-                    {pageLabel.stuck}
-                  </Title>
-                </Group>
-                <RequiredList items={left} />
-              </Stack>
-            </Paper>
-          </GridCol>
-        ) : null}
-        <GridCol span={{ base: 12, md: left.length ? 8 : 12 }} order={{ base: 2, md: 1 }}>
-          <SimpleGrid cols={{ base: 1, sm: 2, lg: left.length ? 2 : 3 }} spacing="md">
-            {vm.decisions.map((d) => (
-              <DecisionCard key={d.key} decision={d} />
+    <Grid gap="xl" className={s.brief}>
+      <GridCol span={{ base: 12, md: 8 }}>
+        <Stack gap="xl">
+          {goals}
+          <section aria-labelledby="brief-roles" className={s.section}>
+            <Title order={2} id="brief-roles" className={s.heading}>
+              {brief.roles}
+            </Title>
+            <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
+              {roles}
+            </SimpleGrid>
+          </section>
+          <section aria-labelledby="brief-path" className={s.section}>
+            <Title order={2} id="brief-path" className={s.heading}>
+              {brief.path}
+            </Title>
+            {path}
+          </section>
+          {vm.decisions.length ? (
+            <section aria-labelledby="brief-rules" className={s.section}>
+              <Title order={2} id="brief-rules" className={s.heading}>
+                {brief.rules}
+              </Title>
+              <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
+                {vm.decisions.map((d) => (
+                  <DecisionCard key={d.key} decision={d} />
+                ))}
+              </SimpleGrid>
+            </section>
+          ) : null}
+          <section aria-labelledby="brief-waiting" className={s.section}>
+            <Title order={2} id="brief-waiting" className={s.heading}>
+              {brief.waiting}
+            </Title>
+            {vm.questions.length ? (
+              <ul className={s.questions}>
+                {vm.questions.map((q) => (
+                  <li key={q.key}>
+                    <a href={q.target.href} className={s.endingLink}>
+                      {q.title}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <Text component="p" fz="md" className={s.muted}>
+                {brief.noQuestions}
+              </Text>
+            )}
+          </section>
+        </Stack>
+      </GridCol>
+      <GridCol span={{ base: 12, md: 4 }}>
+        <aside className={s.rail}>
+          <Group gap="sm" wrap="nowrap" className={s.railReady}>
+            {stuck ? <StuckIcon size={20} /> : null}
+            <Text component="p" fz="md" fw={700}>
+              {vm.frame.readiness.label}
+            </Text>
+          </Group>
+          <Title order={2} className={s.railTitle}>
+            {brief.rail.title}
+          </Title>
+          <ul className={s.counts}>
+            {counts.map((c) => (
+              <li key={c.label}>
+                <a href={c.href} className={s.railRow}>
+                  <KindMark kind={c.kind} size={16} />
+                  <span className={s.countLabel}>{c.label}</span>
+                  <b>{c.n}</b>
+                </a>
+              </li>
             ))}
-          </SimpleGrid>
-        </GridCol>
-      </Grid>
-    </Stack>
+            <li>
+              <a href={back.get("sequence")} className={s.railRow}>
+                <KindMark kind="interaction" size={16} />
+                <span className={s.countLabel}>{brief.rail.interactions(vm.back.interactions)}</span>
+              </a>
+            </li>
+            <li className={s.railRow}>
+              <KindMark kind="data" size={16} />
+              <span className={s.countLabel}>{brief.rail.er}</span>
+              <span className={s.notYet}>{brief.rail.notYet}</span>
+            </li>
+            <li className={s.railRow}>
+              <KindMark kind="system" size={16} />
+              <span className={s.countLabel}>{brief.rail.services}</span>
+              <span className={s.notYet}>{brief.rail.notYet}</span>
+            </li>
+          </ul>
+          <RequiredList items={left} />
+        </aside>
+      </GridCol>
+    </Grid>
   );
 }

@@ -21,11 +21,11 @@ function Body({ state, frame }: { state: PageState; frame: FrameVM | null }) {
   }
   if (state.kind === "empty") {
     // one message and where to start (D-032, REVIEW-A-004 row 9) — the chat's href is the frame's own, never typed
-    const chat = frame?.nav.find((n) => n.page === "chat");
+    const chat = frame?.chatHref;
     return (
       <div className={`${s.stateBox} ${s.emptyState}`}>
         <p className={s.stateText}>{emptyProject}</p>
-        {chat && <Button type="primary" size="large" href={chat.href}>{startInChat}</Button>}
+        {chat && <Button type="primary" size="large" href={chat}>{startInChat}</Button>}
       </div>
     );
   }

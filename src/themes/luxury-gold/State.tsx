@@ -22,13 +22,13 @@ function Body({ frame, state }: { frame: FrameVM | null; state: PageState }) {
   }
   if (state.kind === "empty") {
     // one sentence and where to start (frontend-finish rule 10, D-032, TASK-C-024) — the chat's href is the frame's own
-    const chat = frame?.nav.find((n) => n.page === "chat");
+    const chat = frame?.chatHref;
     return (
       <div className="lg-state lg-state-empty">
         {/* The page's only heading: these states have no page title of their own. */}
         <h1 className="lg-state-text">{emptyProject}</h1>
         {chat && (
-          <a className="lg-state-action" href={chat.href}>
+          <a className="lg-state-action" href={chat}>
             {startInChat}
           </a>
         )}

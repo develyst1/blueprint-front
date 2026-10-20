@@ -44,7 +44,7 @@ export function Web({ vm, required }: { vm: PageVMs["web"]; required: RequiredIt
   const near = new Set(sel ? neighbours(l, sel.key) : []);
   const lit = (e: { from: string; to: string }) => !!sel && (e.from === sel.key || e.to === sel.key);
   const kinds = ([...new Set(l.nodes.map((n) => n.kind))] as PartKind[]).sort((a, b) => (KIND_ORDER.indexOf(a) + 1 || 99) - (KIND_ORDER.indexOf(b) + 1 || 99));
-  const stuckPage = vm.frame.nav.find((n) => n.page === "stuck");
+  const stuckPage = vm.frame.rooms.flatMap((r) => r.pages).find((n) => n.page === "stuck");
   const anyStuck = l.nodes.some((n) => n.stuck);
   const ell = estimateLabel("…", PX).w;
   const legendRow = useEdges<HTMLDivElement>();

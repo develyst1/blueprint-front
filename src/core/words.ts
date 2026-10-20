@@ -207,3 +207,40 @@ export const chatActionError = {
   unreachable: "ต่อระบบไม่ได้ตอนนี้",
 } as const;
 export const chatTryAgain = "ลองใหม่";
+
+// ---------- REQ-017: the two rooms and the brief (SPEC-C-006 § 4, D-109 — one change: ยังรอคำตอบจากคุณ) ----------
+
+// The two rooms (the frame's main tabs), and room 2's count of views
+export const roomLabel = { front: "สิ่งที่เราเข้าใจ", back: "เบื้องหลังเทคนิค" } as const;
+export const roomViews = (n: number): string => `${n} มุมมอง`;
+
+// The brief (the overview page, comp A): the goal's source line (the version part only when the version is known),
+// the sections, an ending, no open question, and the side rail
+export const brief = {
+  source: (version: number | null): string => (version === null ? "สรุปจากที่คุณเล่าในแชต" : `สรุปจากที่คุณเล่าในแชต · spec เวอร์ชัน ${version}`),
+  roles: "ใครเกี่ยวข้อง",
+  path: "เส้นทางของงาน",
+  rules: "กติกาที่ตกลงกันแล้ว",
+  waiting: "ยังรอคำตอบจากคุณ",
+  ending: (n: number, stepTitle: string): string => `จบแบบที่ ${n} — ${stepTitle}`,
+  noQuestions: "ไม่มี ทุกคำถามตอบแล้ว",
+  rail: {
+    title: "เบื้องหลังที่ระบบต้องมี",
+    screens: "หน้าจอ",
+    apis: "API",
+    systems: "ระบบที่ต่อด้วย",
+    data: "ข้อมูล",
+    interactions: (n: number): string => `ลำดับการโต้ตอบ (${n} ขั้น)`,
+    er: "ER diagram",
+    services: "service / type",
+    notYet: "ยังไม่มี",
+  },
+} as const;
+
+// REQ-017 back room — the ลำดับงาน matrix (comp C, D-112): the card head, the column cue and the foot line
+export const matrix = {
+  size: (steps: number, lanes: number): string => `${steps} ขั้น × ${lanes} ผู้มีส่วนร่วม`,
+  seen: (n: number, m: number): string => `เห็น ${n} จาก ${m} คอลัมน์`,
+  more: (k: number): string => `อีก ${k} คอลัมน์ →`,
+  foot: "คอลัมน์ขั้นงานอยู่กับที่เสมอ · เลื่อนด้วย trackpad, Shift+ล้อเมาส์ หรือปุ่มลูกศรเมื่อเลือกตาราง",
+} as const;

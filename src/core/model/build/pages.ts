@@ -8,7 +8,8 @@ import { formatThaiDate } from "@/core/format/date";
 import { WEB_ASPECT } from "@/core/layout/web";
 import { historyCause, historyWhat, linkKind, stamp } from "@/core/words";
 import {
-  decisions, frame, href, index, isEmpty, pickWork, readiness, stuckItems, stuckTargets, stuckWordings, webHref, workLinks, works,
+  backCounts, briefRoles, briefWorks, decisions, frame, href, index, isEmpty, pickWork, readiness, stuckItems, stuckTargets, stuckWordings,
+  webHref, workLinks, works, type ProjectWithSeal,
 } from "./common";
 import type {
   ApiFlowchart, ApiHistoryEntry, ApiProject, ApiSequence, ApiSwimlane, Built, Layouts, ProjectData,
@@ -19,9 +20,22 @@ const asParticipant = (p: { key: string; kind: string; title: string }): Partici
   ({ key: p.key, kind: p.kind as ParticipantVM["kind"], title: p.title });
 
 // ---------- ภาพรวม ----------
-export function buildOverview(data: ProjectData): Built<OverviewVM> {
+/** The brief (REQ-017, comp A): what we understood, who is involved, the path with its endings, the rules agreed, the open
+ *  questions, and the back room's counts. */
+export function buildOverview(data: ProjectWithSeal): Built<OverviewVM> {
   if (isEmpty(data)) return empty("overview");
-  return { ok: true, vm: { frame: frame(data, "overview"), works: works(data), decisions: decisions(data) } };
+  return {
+    ok: true,
+    vm: {
+      frame: frame(data, "overview"),
+      works: briefWorks(data),
+      decisions: decisions(data),
+      roles: briefRoles(data),
+      questions: stuckItems(data).filter((i) => i.kind === "open_question"),
+      back: backCounts(data),
+      version: data.latestVersion ?? null,
+    },
+  };
 }
 
 // ---------- ลำดับงาน (swimlane) ----------
@@ -38,7 +52,7 @@ export function buildWorkOrder(data: ProjectData, swim: ApiSwimlane, layouts: La
       works: workLinks(data, "workOrder"),
       work,
       layout: {
-        lanes: layouts.swimLanes(swim.lanes.map(asParticipant)),
+        ...layouts.swimLanes(swim.lanes.map(asParticipant)),
         rows: swim.rows.filter((r) => stepByKey.has(r.step.key)).map((r) => ({
           step: stepByKey.get(r.step.key)!,
           lanes: r.lanes,

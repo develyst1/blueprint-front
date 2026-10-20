@@ -19,7 +19,13 @@
   background: var(--cb-canvas);
   min-width: 0;
   min-height: 100dvh; /* the canvas fills the viewport on a short page (REVIEW-A-004 row 4) */
+  /* one column for the bar, the rooms and the page (REQ-017 P1): at most 1360 px, centred; the gutter inside it */
+  --cb-col: 1360px;
+  --cb-gutter: clamp(16px, 4vw, 40px);
+  --cb-inline: max(var(--cb-gutter), calc((100% - var(--cb-col)) / 2 + var(--cb-gutter)));
 }
+/* the back room's pages are wide views (the matrix, the diagrams): a column of up to 1680 px (TASK-C-047), same centring */
+.pageWide { --cb-col: 1680px; }
 
 .skip {
   position: absolute;
@@ -41,7 +47,7 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 12px 20px;
-  padding: 20px clamp(16px, 4vw, 40px) 16px;
+  padding: 20px var(--cb-inline) 16px;
   background: var(--cb-paper);
 }
 .project { display: grid; gap: 2px; min-width: 0; flex: 1 1 260px; }
@@ -76,14 +82,60 @@
 .readinessStuck { background: var(--cb-stuckSoft); color: var(--cb-stuck); }
 .readinessEmpty { background: var(--cb-neutralSoft); color: var(--cb-ink2); }
 .readinessDot { display: inline-grid; place-items: center; font-size: 22px; line-height: 1; }
+/* แชต (REQ-017): a pill with the chat's tile; on the chat page itself it reads as current, like a dock tile */
+.chatButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 4px 18px 4px 6px;
+  border-radius: 999px;
+  border: 1px solid var(--cb-line);
+  background: var(--cb-paper);
+  color: var(--cb-ink) !important;
+  font-weight: 600;
+  text-decoration: none;
+}
+.chatButton:hover { background: var(--cb-blueSoft); color: var(--cb-blue) !important; }
+.chatButton[aria-current="page"] { background: var(--cb-blueSoft); border-color: var(--cb-blueSoft); color: var(--cb-blue) !important; }
 
-/* ---------- page dock: one tile + label per page ---------- */
+/* ---------- the two rooms (REQ-017): text tabs with a blue underline on the current one, over its page dock ---------- */
+.nav { background: var(--cb-paper); border-bottom: 1px solid var(--cb-line); }
+.rooms {
+  display: flex;
+  gap: 8px;
+  padding: 0 var(--cb-inline);
+  border-bottom: 1px solid var(--cb-line);
+}
+.room {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 8px 14px;
+  margin-bottom: -1px;
+  border-bottom: 3px solid transparent;
+  color: var(--cb-ink2) !important;
+  font-size: 16px;
+  font-weight: 600;
+  text-decoration: none;
+}
+.room:hover { color: var(--cb-ink) !important; border-bottom-color: var(--cb-lineStrong); }
+.room[aria-current="true"] { color: var(--cb-blue) !important; border-bottom-color: var(--cb-blue); }
+.roomCount {
+  padding: 0 10px;
+  border-radius: 999px;
+  background: var(--cb-neutralSoft);
+  color: var(--cb-ink2);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* ---------- page dock: one tile + label per page of the current room ---------- */
 .dock {
   display: flex;
   gap: 4px;
-  padding: 4px clamp(16px, 4vw, 40px) 12px; /* 4 px on top so a tile's focus ring is not cut (row 5) */
-  background: var(--cb-paper);
-  border-bottom: 1px solid var(--cb-line);
+  padding: 12px var(--cb-inline) 12px; /* room above a tile so its focus ring is not cut (row 5) */
   overflow-x: auto;
   scrollbar-width: thin;
 }
@@ -106,8 +158,9 @@
 
 /* ---------- content ---------- */
 .main {
-  padding: 28px clamp(16px, 4vw, 40px) 48px;
-  max-width: 1360px;
+  padding: 28px var(--cb-gutter) 48px;
+  max-width: var(--cb-col);
+  margin-inline: auto; /* centred: no dead band on one side (REQ-017 P1) */
 }
 /* the core's <main id="content"> is the one child; the page's blocks sit in it */
 .main > * { display: grid; gap: 24px; min-width: 0; }
@@ -115,7 +168,17 @@
 
 @media (max-width: 640px) {
   .project h1 { font-size: 22px; }
-  .dockItem { min-width: 72px; padding: 8px 6px; }
+  /* a phone keeps the page above the fold (the web box in the top half, TASK-B-034): the bar a little tighter, and the
+     rooms + the dock as one-line rows — the dock's pages as words without their tiles, แชต without its tile */
+  .bar { padding-top: 12px; row-gap: 8px; }
+  .chatButton { padding: 4px 16px; }
+  .chatButton > [aria-hidden], .dockItem > [aria-hidden] { display: none; }
+  .dockItem { display: inline-flex; align-items: center; min-width: 0; padding: 0 12px; white-space: nowrap; }
+  .dock { padding-block: 6px; }
+  /* the two rooms share the row; the back room's count goes under its name */
+  .rooms { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; }
+  .room { flex-direction: column; align-items: flex-start; justify-content: center; gap: 0; min-height: 44px; padding: 2px 8px; font-size: 15px; line-height: 1.25; }
+  .roomCount { padding: 0; background: none; line-height: 1.25; }
   .main { padding-top: 20px; }
   .main > * { gap: 20px; }
 }

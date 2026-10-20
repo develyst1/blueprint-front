@@ -14,7 +14,7 @@ import { Alert, Anchor, Button, Paper, Stack, Text } from "@mantine/core";
 import { useTransition } from "react";
 import type { ReactNode } from "react";
 import type { FrameVM, PageState, RequiredItem } from "@/core/theme/contract";
-import { apiDown, backHome, emptyProject, notFound, retry } from "@/core/words";
+import { apiDown, backHome, emptyProject, notFound, retry, startInChat } from "@/core/words";
 import { StuckIcon } from "../parts/StuckIcon";
 import { RequiredList } from "../parts/Required";
 import { Shell } from "../shell/Shell";
@@ -50,6 +50,12 @@ export function State({ frame, state, required = [], tools }: { frame: FrameVM |
           <Text fz="md" c="#5C5C5C">
             {emptyProject}
           </Text>
+          {/* where to start: the chat (REQ-017 AC-2, DEF-1, TASK-C-048) — the frame's own href, mono's primary button */}
+          {frame ? (
+            <Button component="a" href={frame.chatHref} color="ink" radius="md" h={44} w="fit-content">
+              {startInChat}
+            </Button>
+          ) : null}
         </Stack>
       </Paper>
     );

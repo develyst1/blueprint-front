@@ -83,6 +83,53 @@
 .decisionBody dt { font-weight: 600; }
 .decisionBody dd { margin: 0; }
 
+/* ---------- overview: the brief (REQ-017, comp A) — the column and a panel beside it; one column at ≤ 960 ---------- */
+.brief { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 24px; align-items: start; }
+.briefMain { display: grid; gap: 24px; min-width: 0; }
+.briefSection { display: grid; gap: 16px; min-width: 0; }
+.goal { gap: 8px; border-color: var(--cb-blueSoft); }
+.goalText { font-size: 22px; line-height: 1.6; font-weight: 600; max-width: 42em; }
+.roles { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr)); gap: 12px; }
+.role { display: grid; gap: 2px; padding: 14px 16px; border-radius: var(--cb-r-tile); background: var(--cb-canvas); }
+.briefPath { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; }
+.briefPath + .briefPath { padding-top: 16px; border-top: 1px solid var(--cb-line); }
+.briefPathWork { font-size: 17px; font-weight: 700; }
+.endings { display: grid; gap: 4px; padding-top: 12px; border-top: 1px dashed var(--cb-line); }
+.endings li { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; }
+.endingN { color: var(--cb-ink2); font-size: 15px; }
+.endingLink, .question {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-weight: 600;
+  text-underline-offset: 4px;
+}
+.questions { display: grid; }
+.rail { position: sticky; top: 24px; gap: 12px; }
+.railReady { font-weight: 600; color: var(--cb-blue); padding-bottom: 12px; border-bottom: 1px solid var(--cb-line); }
+.railReadyStuck { color: var(--cb-stuck); }
+.railTitle { font-size: 18px; line-height: 1.4; font-weight: 700; }
+.counts { display: grid; }
+.railRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  color: var(--cb-ink) !important;
+  text-decoration: none;
+  border-bottom: 1px solid var(--cb-line);
+}
+.railRow > span:not([aria-hidden]) { flex: 1; }
+.railRow b { font-size: 18px; color: var(--cb-blue); }
+a.railRow:hover { color: var(--cb-blue) !important; }
+a.railRow:hover > span:not([aria-hidden]) { text-decoration: underline; }
+li.railRow { color: var(--cb-ink2) !important; }
+.notYet { flex: none !important; padding: 0 10px; border-radius: 999px; border: 1px dashed var(--cb-lineStrong); font-size: 14px; }
+@media (max-width: 960px) {
+  .brief { grid-template-columns: minmax(0, 1fr); }
+  .rail { position: static; }
+}
+
 /* ---------- diagrams ---------- */
 .diagram { padding: 16px; }
 .diagram svg { display: block; }
@@ -126,6 +173,48 @@
 .handoffs { display: grid; gap: 8px; padding: 4px 0; }
 .stickyCol { position: sticky !important; left: 0; z-index: 2; background: var(--cb-paper) !important; }
 .handoff { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+
+/* the back room's matrix (comp C, D-112, TASK-C-047): a card head with the size and, while lanes are hidden, the count and
+   the one-view button; the lanes under a group row with a divider per group; fades over the scroller's edges that have
+   more (useEdges' data-more) — overlays, not a mask, so the sticky step column is never faded */
+/* no overflow:hidden here: lanes past the card edge must stay reachable by the scroller alone (check-required) */
+.matrix { padding: 0; gap: 0; }
+.matrixHead { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; min-height: 64px; padding: 10px 24px; border-bottom: 1px solid var(--cb-line); }
+.matrixHead strong { font-weight: 700; }
+.moreColumns {
+  display: inline-flex; align-items: center; min-height: 44px; padding: 0 16px; border-radius: 999px;
+  border: 1px solid var(--cb-blue); background: var(--cb-paper); color: var(--cb-blue); font: inherit; font-weight: 600; cursor: pointer;
+}
+.moreColumns:hover { background: var(--cb-blueSoft); }
+.matrixFrame { position: relative; }
+.matrix .scroll { border-radius: 0; background: var(--cb-paper); }
+.fadeStart, .fadeEnd { position: absolute; top: 0; bottom: 0; z-index: 3; pointer-events: none; opacity: 0; }
+.fadeEnd { right: 0; width: 72px; background: linear-gradient(to right, transparent, var(--cb-paper) 80%); }
+.fadeStart { left: 248px; width: 40px; background: linear-gradient(to left, transparent, var(--cb-paper)); }
+.matrixFrame:has(> [data-more="end"]) .fadeEnd, .matrixFrame:has(> [data-more="both"]) .fadeEnd,
+.matrixFrame:has(> [data-more="start"]) .fadeStart, .matrixFrame:has(> [data-more="both"]) .fadeStart { opacity: 1; }
+.matrixFoot { padding: 12px 24px 16px; border-top: 1px solid var(--cb-line); }
+.matrix .stickyCol { width: 248px; min-width: 248px; box-shadow: 1px 0 0 var(--cb-line); }
+/* comp C's density: lane columns ~104 px, 8 px cell padding, no Ant divider ticks between head cells (the group lines divide) */
+.matrix :global(.ant-table-thead > tr > th::before) { display: none; }
+.matrix .scroll :global(.ant-table-thead > tr > th) { padding: 8px; }
+.matrix .scroll :global(.ant-table-tbody > tr > td) { padding: 6px 8px; }
+.matrix .stickyCol { padding-left: 24px !important; }
+.matrix .laneHead { min-width: 0; width: 96px; margin: 0 auto; }
+.groupHead { padding-left: 12px !important; text-align: left !important; font-size: 14px; font-weight: 500 !important; color: var(--cb-ink2) !important; border-left: 1px solid var(--cb-line); }
+.groupStart { border-left: 1px solid var(--cb-line); }
+/* the step title is the row's expand button: the whole cell, ≥ 44 px, its chevron turns when open */
+.rowToggle {
+  width: 100%; min-height: 44px; padding: 4px 8px; margin: -4px -8px; border: 0; border-radius: var(--cb-r-tile);
+  background: none; color: inherit; font: inherit; font-weight: 600; text-align: left; cursor: pointer;
+}
+.rowToggle:hover { background: var(--cb-canvas); }
+.toggleMark { margin-left: auto; color: var(--cb-ink2); font-size: 14px; }
+.rowToggle[aria-expanded="true"] .toggleMark { transform: rotate(90deg); }
+/* a diagram that scrolls sideways (ลำดับการโต้ตอบ): fade the edge with more — the C-047 walk found it cut with no cue */
+.edgeFade[data-more="end"] { mask-image: linear-gradient(to right, black calc(100% - 40px), transparent); }
+.edgeFade[data-more="start"] { mask-image: linear-gradient(to left, black calc(100% - 40px), transparent); }
+.edgeFade[data-more="both"] { mask-image: linear-gradient(to right, transparent, black 40px, black calc(100% - 40px), transparent); }
 
 /* ---------- web ---------- */
 .webLayout { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 20px; align-items: start; }

@@ -136,6 +136,23 @@ for (const theme of ["default", "clean-blue"]) {
   });
 }
 
+for (const theme of ["default", "clean-blue", "minimal-mono", "luxury-gold"]) {
+  test(`${theme}: an empty project still shows both rooms, แชต, and เริ่มที่แชต — ≥ 44 px, to the chat (REQ-017 AC-2, DEF-1, TASK-C-048)`, async ({ page }) => {
+    const p = await call("POST", "/v1/projects", { name: `โปรเจกต์ว่าง ห้อง ${theme}`, theme }); // no change-sets
+    const chat = `/p/${p.id}/chat`;
+    await page.goto(`/p/${p.id}/overview`);
+    await expect(page.getByRole("link", { name: /^สิ่งที่เราเข้าใจ/ }).first()).toBeVisible();
+    await expect(page.getByRole("link", { name: /^เบื้องหลังเทคนิค/ }).first()).toBeVisible();
+    const chatButton = page.getByRole("link", { name: "แชต", exact: true }).first();
+    await expect(chatButton).toBeVisible();
+    expect(new URL(await chatButton.evaluate((a) => (a as HTMLAnchorElement).href)).pathname).toBe(chat);
+    const start = page.getByRole("link", { name: "เริ่มที่แชต" });
+    await expect(start).toBeVisible();
+    expect(new URL(await start.evaluate((a) => (a as HTMLAnchorElement).href)).pathname).toBe(chat);
+    expect((await start.boundingBox())!.height, "เริ่มที่แชต height (px)").toBeGreaterThanOrEqual(44);
+  });
+}
+
 test("default ใยโหนด: node text is at least 14 px and a stuck node carries ⚠, not only a colour (TASK-B-024)", async ({ page }) => {
   const id = await projectIn("default", "ใยโหนด default");
   await page.goto(`/p/${id}/web`);
