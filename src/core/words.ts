@@ -15,6 +15,8 @@ export const pageLabel: Record<NavItemVM["page"], string> = {
   stuck: "ติดอยู่ตรงไหน",
   history: "ประวัติ",
   ready: "พร้อมสร้างหรือยัง",
+  // REQ-103 has no row for this page's name: the one word the PM's own "เพิ่ม requirement" row uses (TASK-108 Q1)
+  requirements: "requirement",
 };
 
 // The frame's readiness seal (REQ-007 "Frame readiness seal", D-031): stuck · nothing stuck but not confirmed ·
@@ -89,6 +91,15 @@ export const historyWhat: Record<string, string> = {
   link_add: "เชื่อม",
   link_remove: "เลิกเชื่อม",
   link_update: "แก้การเชื่อม",
+  // audit rows of the project-wide history (REQ-103 § Wording, Q4 — the PM's decided copy, 2026-10-29)
+  project_create: "สร้างโปรเจกต์",
+  settings: "เปลี่ยนการตั้งค่า",
+  source_add: "เพิ่มเอกสาร",
+  source_refetch: "ดึงลิงก์ใหม่",
+  label: "ใส่ป้าย version",
+  quiz_start: "เริ่ม quiz",
+  quiz_ask: "ถาม quiz",
+  quiz_mark: "ตรวจคำตอบ quiz",
 };
 
 // A part's links on its detail panel — read from this part outward (out) / inward (in) (D-009)
@@ -124,6 +135,18 @@ export const emptyList = {
   decision: "ยังไม่มีการตัดสินใจในโปรเจกต์นี้",
   question: "ยังไม่มีคำถามในโปรเจกต์นี้",
 } as const;
+
+// REQ-103 § User-facing wording (2026-10-29): the name prompt, the full history's title, the add-requirement button
+export const namePrompt = "พิมพ์ชื่อคุณก่อน ระบบจะบันทึกว่าใครแก้";
+export const historyAll = "ประวัติการแก้ทั้งหมด";
+export const addRequirement = "เพิ่ม requirement";
+// the overview / PDF section (REQ-103 § Wording, added 2026-10-29 by the PM, Q6) — the same word as the nav, plural
+export const requirementsSection = "Requirements";
+// the name button once a name is set: "{ชื่อ} · เปลี่ยนชื่อ" (REQ-103 AC-11, § Wording)
+export const changeName = "เปลี่ยนชื่อ";
+export const nameButtonText = (name: string): string => `${name} · ${changeName}`;
+// The empty requirements list: D-015's pattern "ยังไม่มี{…}ในโปรเจกต์นี้" with the PM's own noun (TASK-108 Q1)
+export const emptyRequirements = "ยังไม่มี requirement ในโปรเจกต์นี้";
 
 // Name of the strip that lists the spec pages — the nav landmark's accessible name in every shell (D-018)
 export const pageNav = "หน้าใน spec";
@@ -172,6 +195,7 @@ export const partKind: Record<PartKind, string> = {
   data: "ข้อมูล",
   decision: "การตัดสินใจ",
   question: "คำถาม",
+  requirement: "requirement", // REQ-103: the PM's own noun (TASK-108 Q1)
 };
 
 // A stuck question's proposed answer (REQ-002 Q4 note — Porter on REVIEW-C-001 row 5)

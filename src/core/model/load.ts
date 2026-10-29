@@ -5,13 +5,14 @@ import { apiLoad, type ApiResult } from "@/core/api/load";
 import type { PageId, PageVMs, ProjectCardVM } from "@/core/theme/contract";
 import { confirmedOf, HOME_HREF, works, type ProjectWithSeal } from "./build/common";
 import {
-  buildApis, buildCard, buildFlowchart, buildHistory, buildOverview, buildScreens, buildSequence, buildStuck, buildWeb,
+  buildApis, buildCard, buildFlowchart, buildHistory, buildOverview, buildRequirements, buildScreens, buildSequence, buildStuck, buildWeb,
   buildWorkOrder, defaultStepKey,
 } from "./build/pages";
 import { realLayouts } from "@/core/layout";
 import type {
-  ApiFlowchart, ApiHistoryEntry, ApiSequence, ApiSwimlane, Built, Layouts,
+  ApiFlowchart, ApiHistoryEntry, ApiProjectHistoryEntry, ApiSequence, ApiSwimlane, Built, Layouts,
 } from "./build/types";
+import { raw } from "@/features/chat/load";
 
 /** What a page can be told instead of a view model. The route adds `retry` (a server action) to "unreachable". */
 export type LoadState = { kind: "unreachable" } | { kind: "empty"; page: PageId } | { kind: "notFound"; homeHref: string };
@@ -40,6 +41,13 @@ export async function loadProjectData(projectId: string): Promise<ApiResult<Proj
 
 function diagram<T>(projectId: string, kind: "flowchart" | "swimlane" | "sequence", key: string) {
   return apiLoad(api.GET("/v1/projects/{projectId}/diagrams/{kind}/{key}", { params: { path: { projectId, kind, key } } })) as Promise<ApiResult<T>>;
+}
+
+/** `GET …/history` — the whole project's changes and audit rows, newest first (REQ-103, SPEC-104). Not in the generated
+ *  client until `gen:api` has seen the new back end, so it goes through `raw()` like the chat's routes. */
+async function projectHistory(projectId: string): Promise<{ ok: true; data: ApiProjectHistoryEntry[] } | { ok: false }> {
+  const r = await raw<{ entries: ApiProjectHistoryEntry[] }>(`/v1/projects/${encodeURIComponent(projectId)}/history?limit=500`);
+  return r.ok && Array.isArray(r.data?.entries) ? { ok: true, data: r.data.entries } : { ok: false };
 }
 
 function history(projectId: string, key: string) {
@@ -79,8 +87,13 @@ export async function loadPage<P extends PageId>(page: P, projectId: string, que
         const h = await history(projectId, query.part);
         return h.ok ? fromBuilt(buildWeb(data, layouts, query.part, h.data)) : fail(h.state);
       }
+      case "requirements": return fromBuilt(buildRequirements(data));
       case "history": {
-        if (!query.part || !data.parts.some((p) => p.key === query.part)) return fromBuilt(buildHistory(data));
+        if (!query.part || !data.parts.some((p) => p.key === query.part)) {
+          // no part chosen: the whole project's history (REQ-103). A read that fails never hides the page — it shows without rows.
+          const all = await projectHistory(projectId);
+          return fromBuilt(buildHistory(data, undefined, [], all.ok ? all.data : undefined));
+        }
         const h = await history(projectId, query.part);
         return h.ok ? fromBuilt(buildHistory(data, query.part, h.data)) : fail(h.state);
       }

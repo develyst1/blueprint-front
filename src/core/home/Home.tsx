@@ -1,6 +1,8 @@
 // The projects home (R2, AC-4): one card per project, drawn by that project's theme inside its own Root (unknown
 // id → default); the new-project dialog with every theme's live preview. Core-owned layout.
 import { retryAction } from "@/app/actions";
+import { readBy } from "@/core/api/by";
+import { NameControl } from "@/core/name/NameControl";
 import { contentHref, contentId } from "@/core/theme/anchors";
 import { defaultTheme } from "@/core/theme/default";
 import d from "@/core/theme/default/default.module.css"; // the default shell's skip link look — home has no shell
@@ -15,6 +17,7 @@ import s from "./home.module.css";
 export async function Home() {
   // one API call: the list carries partCount, so an empty project's card is built from it (D-025)
   const res = await loadHome();
+  const by = await readBy();
   if (!res.ok) return <StateView theme={defaultTheme} frame={null} state={{ kind: "unreachable", retry: retryAction }} />;
   const cards = res.vm;
 
@@ -29,6 +32,7 @@ export async function Home() {
       <main id={contentId} tabIndex={-1} className={s.home}>
         <div className={s.top}>
           <h1>{productMark}</h1>
+          <NameControl name={by} />
           <NewProject themes={options} />
         </div>
         <ul className={s.grid}>

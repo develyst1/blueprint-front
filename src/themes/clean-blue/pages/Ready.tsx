@@ -1,18 +1,17 @@
 "use client";
 
 // พร้อมสร้างหรือยัง in clean-blue (TASK-B-013, REQ-007 on Team C's contract). The picture first — the work as the
-// overview's journey, three count tiles, what is stuck, the confirmed version — then the quiz card, then the gate card:
-// ยืนยัน 100% as the one primary button, every reason it is off as an amber link (`confirmed` in the done tone), and
-// Build, off, with its reason.
+// overview's journey, three count tiles, what is stuck — then the quiz card, then the label card: the core's label
+// section (REQ-103, in place of ยืนยัน 100%), every open note as an amber link, and Build, always a link.
 // Words only from Team C's ready words and @/core/words; every action is Team C's.
-import { CheckCircleFilled, MessageOutlined, WarningFilled } from "@ant-design/icons";
+import { MessageOutlined, WarningFilled } from "@ant-design/icons";
 import { Button, Card, Input, Steps, Tag, Typography } from "antd";
 import { useState, useTransition } from "react";
 import { useEdges } from "../parts/useEdges";
 import type { ReadyPageProps } from "@/core/theme/contract";
 import type { ReadyActions, ReadyQuizItemVM } from "@/features/ready/contract";
 import {
-  ask as askWord, botFailed, build as buildWord, changedSince, confirm as confirmWord, confirmed, markRight, markWrong, notInSpec,
+  ask as askWord, botFailed, build as buildWord, markRight, markWrong, notInSpec,
   partsUsed, quizHeading, quizHint, reasons, restartQuiz, retry as retryWord, score, scoreEarly, startQuiz as startWord, wrongNote,
 } from "@/features/ready/words";
 import { requiredId } from "@/core/theme/required";
@@ -76,23 +75,11 @@ function Retry({ question, actions }: { question: string; actions: ReadyActions 
   return <Button size="large" disabled={busy} onClick={() => start(async () => { await actions.ask(question); })}>{retryWord}</Button>;
 }
 
-// Off is aria-disabled, not disabled: it stays in the Tab order and names its reasons (REVIEW-C-004 row 4)
-function Confirm({ enabled, actions, why, primary }: { enabled: boolean; actions: ReadyActions; why?: string; primary: boolean }) {
-  const [busy, start] = useTransition();
-  const off = !enabled || busy;
-  return (
-    <Button type={primary ? "primary" : "default"} size="large" aria-disabled={off} aria-describedby={why} className={off ? s.off : undefined}
-      onClick={() => { if (!off) start(async () => { await actions.confirm(); }); }}>
-      {confirmWord}
-    </Button>
-  );
-}
-
-export function Ready({ vm, actions, required }: ReadyPageProps) {
+export function Ready({ vm, actions, required, labelSection }: ReadyPageProps) {
   const q = vm.quiz;
   const scoreLine = q ? (q.score !== null ? score(q.score, q.marked) : scoreEarly(q.marked)) : null;
   const stepsRow = useEdges<HTMLDivElement>();
-  const buildOpen = vm.build.enabled && vm.build.href !== null;
+  const buildOpen = vm.build.enabled && vm.build.href !== null; // REQ-103: always, once the core hands the href
   return (
     <>
       <PageHead page="ready" />
@@ -118,8 +105,6 @@ export function Ready({ vm, actions, required }: ReadyPageProps) {
         </ul>
         <div className={p.tags}>
           {vm.stuck.count > 0 && <a href={vm.stuck.href} className={s.stuckChip}><WarningFilled aria-hidden />{reasons.stuck(vm.stuck.count)}</a>}
-          {vm.version && <Tag className={p.tagBlue}>{confirmed(vm.version.n, vm.version.dateLabel)}</Tag>}
-          {vm.version?.changedSince && <Tag className={s.tagWrong}>{changedSince(vm.version.n)}</Tag>}
         </div>
       </section>
 
@@ -161,19 +146,17 @@ export function Ready({ vm, actions, required }: ReadyPageProps) {
         </div>
       </Card>
 
-      {/* the gate (R3) and Build (R5) */}
+      {/* the label (REQ-103), what is still open, and Build (R5) */}
       <Card>
         <div className={s.gate}>
-          {/* one primary on screen: ยืนยัน 100% until there is a confirmed, unchanged version — then Build is the next action (TASK-B-044) */}
-          <Confirm enabled={vm.gate.ok} actions={actions} why={vm.gate.reasons.length ? "cb-reasons" : undefined} primary={!buildOpen} />
+          {labelSection}
           {vm.gate.reasons.length > 0 && (
             <ul id="cb-reasons" className={s.reasons}>
               {vm.gate.reasons.map((r) => (
                 <li key={r.code} id={`cb-reason-${r.code}`}>
-                  {/* `confirmed` is a state (TASK-B-020 Q1) and `empty` a next step — the chat (TASK-B-019, C-016): neither is
-                      stuck, so the blue tone and no ⚠; each keeps its link */}
-                  <a href={r.href} className={r.code === "confirmed" || r.code === "empty" ? `${s.reason} ${s.reasonDone}` : s.reason}>
-                    {r.code === "confirmed" ? <CheckCircleFilled aria-hidden /> : r.code === "empty" ? <MessageOutlined aria-hidden /> : <WarningFilled aria-hidden />}
+                  {/* `empty` is a next step — the chat (TASK-B-019, C-016): not stuck, so the blue tone and no ⚠; it keeps its link */}
+                  <a href={r.href} className={r.code === "empty" ? `${s.reason} ${s.reasonDone}` : s.reason}>
+                    {r.code === "empty" ? <MessageOutlined aria-hidden /> : <WarningFilled aria-hidden />}
                     <Req required={required} id={requiredId.readyReason(r.code)}>{r.text}</Req>
                   </a>
                 </li>
@@ -181,8 +164,8 @@ export function Ready({ vm, actions, required }: ReadyPageProps) {
             </ul>
           )}
           <div className={s.build}>
-            {/* Build opens CAW's start page for this project + version (REQ-011 R1, D-050): a real link to the core's `href`, its
-                label the core's — the theme builds no URL. Off: today's disabled button and the core's reason */}
+            {/* Build opens CAW's start page for this project (+ the newest label's version, REQ-103): a real link to the core's `href`,
+                its label the core's — the theme builds no URL. The off branch below is dead since REQ-103 (build is always on). */}
             {buildOpen
               ? <Button size="large" type="primary" href={vm.build.href!} data-build>{vm.build.label}</Button>
               : <><Button size="large" disabled data-build>{vm.build.label || buildWord}</Button><span className={p.muted}>{vm.build.reason}</span></>}

@@ -1,0 +1,12 @@
+/* The requirements page's neutral default (zero specificity: a theme's rules win). */
+:where(.list) { list-style: none; margin: 0 0 16px; padding: 0; display: grid; gap: 12px; }
+:where(.item) { border: 1px solid currentColor; border-radius: 6px; padding: 12px 14px; display: grid; gap: 8px; }
+:where(.title) { font-weight: 600; margin: 0; }
+:where(.text) { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+:where(.row) { display: flex; flex-wrap: wrap; gap: 8px; }
+:where(.form) { display: grid; gap: 8px; max-width: 40em; }
+:where(.field) { box-sizing: border-box; width: 100%; min-height: 44px; padding: 8px 12px; border: 1.5px solid currentColor; border-radius: 6px; background: transparent; color: inherit; font: inherit; }
+:where(.button) { box-sizing: border-box; min-height: 44px; min-width: 44px; padding: 0 14px; border: 1.5px solid currentColor; border-radius: 6px; background: transparent; color: inherit; font: inherit; cursor: pointer; }
+:where(.button):disabled { border-style: dashed; cursor: default; }
+:where(.button):focus-visible, :where(.field):focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+:where(.label) { display: grid; gap: 4px; }

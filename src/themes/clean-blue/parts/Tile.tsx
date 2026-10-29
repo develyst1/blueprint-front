@@ -4,7 +4,7 @@
 // A tile is never the only signal: the kind's word or the item's title always stands beside it.
 import {
   ApartmentOutlined, ApiOutlined, AppstoreOutlined, BranchesOutlined, CheckCircleOutlined, CloudServerOutlined,
-  DatabaseOutlined, DeploymentUnitOutlined, HistoryOutlined, MessageOutlined, MobileOutlined, NodeIndexOutlined,
+  DatabaseOutlined, DeploymentUnitOutlined, FileTextOutlined, HistoryOutlined, MessageOutlined, MobileOutlined, NodeIndexOutlined,
   ProjectOutlined, QuestionCircleOutlined, SwapOutlined, TableOutlined, UserOutlined, WarningOutlined,
 } from "@ant-design/icons";
 import type { ComponentType } from "react";
@@ -25,6 +25,7 @@ export const kindIcon: Record<PartKind, Icon> = {
   data: DatabaseOutlined,
   decision: BranchesOutlined,
   question: QuestionCircleOutlined,
+  requirement: FileTextOutlined,
 };
 
 export const pageIcon: Record<NavItemVM["page"], Icon> = {
@@ -38,6 +39,7 @@ export const pageIcon: Record<NavItemVM["page"], Icon> = {
   web: DeploymentUnitOutlined,
   stuck: WarningOutlined,
   history: HistoryOutlined,
+  requirements: FileTextOutlined,
   ready: CheckCircleOutlined,
 };
 

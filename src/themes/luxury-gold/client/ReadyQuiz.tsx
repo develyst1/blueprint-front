@@ -2,14 +2,14 @@
 
 // Screen ④'s interactive parts in luxury gold, on HeroUI: the question box (TextField + Input + Button; Enter sends,
 // the first question with no quiz starts one — the only way to start, REVIEW-A-003 row 7), the right / wrong row with
-// the optional note, a failed answer (a ledger line + `retry`, row 11), and Confirm (a Tab stop even when off, row 5).
+// the optional note, and a failed answer (a ledger line + `retry`, row 11).
 // Each calls a server action handed down by the core (it refreshes the page) inside a transition; a control is off
 // while its action runs. Words only from @/features/ready/words.
 import { Button, Input, Label, ScrollShadow, TextField } from "@heroui/react";
 import { useEffect, useRef, useState, useTransition, type FormEvent, type ReactNode } from "react";
 import type { ReadyActions } from "@/core/theme/contract";
 import {
-  ask as askWord, confirm as confirmWord, markRight, markWrong, restartQuiz, retry as retryWord, wrongNote,
+  ask as askWord, markRight, markWrong, restartQuiz, retry as retryWord, wrongNote,
 } from "@/features/ready/words";
 
 /** `off`: nothing to ask about yet (an empty project — critique C-016 P2-a); the page's lead leads to the chat. */
@@ -93,26 +93,6 @@ export function QuizRetry({ text, question, ask }: { text: string; question: str
         {retryWord}
       </Button>
     </p>
-  );
-}
-
-/** Confirm. Off, it stays a Tab stop (`aria-disabled`, the press guarded) and is described by the reasons — a
- *  screen-reader user who meets it hears why (row 5). Off look: `data-off`. */
-export function GateConfirm({ enabled, confirm, describedBy }: { enabled: boolean; confirm: ReadyActions["confirm"]; describedBy?: string }) {
-  const [busy, start] = useTransition();
-  const off = !enabled || busy;
-  return (
-    <Button
-      className="lg-ready-confirm"
-      data-print="screen-only"
-      variant="primary"
-      aria-disabled={off || undefined}
-      data-off={off || undefined}
-      aria-describedby={describedBy}
-      onPress={() => { if (!off) start(async () => { await confirm(); }); }}
-    >
-      {confirmWord}
-    </Button>
   );
 }
 

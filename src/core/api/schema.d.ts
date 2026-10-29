@@ -590,6 +590,111 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/projects/{projectId}/history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    limit?: number;
+                };
+                header?: never;
+                path: {
+                    projectId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description the newest `limit` records of the project, spec changes and other writes merged, newest first */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            entries: components["schemas"]["ProjectHistoryEntry"][];
+                        };
+                    };
+                };
+                /** @description validation */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description not_found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/projects/{projectId}/labels": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    projectId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description every label of the project, newest first; `label` is null on a version confirmed before labels existed */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Labels"];
+                    };
+                };
+                /** @description not_found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/projects/{projectId}/locate": {
         parameters: {
             query?: never;
@@ -1396,22 +1501,23 @@ export interface paths {
                 };
                 cookie?: never;
             };
-            /** @description who confirms */
+            /** @description the label to put on the spec as it is now; who puts it is the `X-Blueprint-By` header */
             requestBody: {
                 content: {
                     "application/json": {
-                        confirmedBy: string;
+                        label: string;
                     };
                 };
             };
             responses: {
-                /** @description confirmed and frozen */
+                /** @description labelled and frozen */
                 201: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content: {
                         "application/json": {
+                            label: string;
                             version: number;
                         };
                     };
@@ -1427,15 +1533,6 @@ export interface paths {
                 };
                 /** @description not_found */
                 404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Error"];
-                    };
-                };
-                /** @description undo_conflict · confirm_blocked · nothing_to_confirm · already_confirmed · already_added · quiz_missing · quiz_not_100 · quiz_stale · quiz_closed · quiz_full · already_marked · not_markable · nothing_to_retry */
-                409: {
                     headers: {
                         [name: string]: unknown;
                     };
@@ -1569,7 +1666,7 @@ export interface components {
                 [key: string]: unknown;
             };
             /** @enum {string} */
-            kind: "work" | "step" | "interaction" | "role" | "screen" | "api" | "system" | "data" | "decision" | "question" | "contradiction";
+            kind: "work" | "step" | "interaction" | "role" | "screen" | "api" | "system" | "data" | "decision" | "question" | "contradiction" | "requirement";
             /** @enum {string} */
             op: "part.add";
             origin: {
@@ -1694,6 +1791,7 @@ export interface components {
             after?: unknown;
             at: string;
             before?: unknown;
+            by: string | null;
             cause: {
                 /** @enum {string} */
                 kind: "operator" | "message" | "source" | "undo";
@@ -1703,6 +1801,14 @@ export interface components {
             entity: string;
             /** @enum {string} */
             op: "add" | "update" | "remove" | "restore" | "link_add" | "link_update" | "link_remove";
+        };
+        Labels: {
+            labels: {
+                by: string;
+                label: string | null;
+                labelledAt: string;
+                version: number;
+            }[];
         };
         Link: {
             fromKey: string;
@@ -1758,7 +1864,7 @@ export interface components {
             createdIn: string;
             key: string;
             /** @enum {string} */
-            kind: "work" | "step" | "interaction" | "role" | "screen" | "api" | "system" | "data" | "decision" | "question" | "contradiction";
+            kind: "work" | "step" | "interaction" | "role" | "screen" | "api" | "system" | "data" | "decision" | "question" | "contradiction" | "requirement";
             origin: {
                 channel?: string;
                 date: string;
@@ -1812,6 +1918,16 @@ export interface components {
             organisationId: string;
             theme: string;
         };
+        ProjectHistoryEntry: {
+            after?: unknown;
+            at: string;
+            before?: unknown;
+            by: string | null;
+            changeSetId: string | null;
+            entity: string;
+            kind: string;
+            op: string;
+        };
         Quiz: {
             createdAt: string;
             id: string;
@@ -1857,7 +1973,7 @@ export interface components {
             participants: {
                 key: string;
                 /** @enum {string} */
-                kind: "work" | "step" | "interaction" | "role" | "screen" | "api" | "system" | "data" | "decision" | "question" | "contradiction";
+                kind: "work" | "step" | "interaction" | "role" | "screen" | "api" | "system" | "data" | "decision" | "question" | "contradiction" | "requirement";
                 title: string;
             }[];
         };
@@ -1899,7 +2015,7 @@ export interface components {
             lanes: {
                 key: string;
                 /** @enum {string} */
-                kind: "work" | "step" | "interaction" | "role" | "screen" | "api" | "system" | "data" | "decision" | "question" | "contradiction";
+                kind: "work" | "step" | "interaction" | "role" | "screen" | "api" | "system" | "data" | "decision" | "question" | "contradiction" | "requirement";
                 title: string;
             }[];
             rows: {

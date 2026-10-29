@@ -12,7 +12,8 @@ import { large } from "./seed/large";
 const API = "http://127.0.0.1:4298"; // local only — never SIT
 // tests/seed/seed.ts uses import.meta, which Playwright's loader cannot import; the same two calls, inline
 async function call(method: string, route: string, body?: unknown) {
-  const res = await fetch(API + route, { method, headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
+  // every write carries a typed name since REQ-103 (a request without it is a 400 name_required)
+  const res = await fetch(API + route, { method, headers: { "content-type": "application/json", "X-Blueprint-By": encodeURIComponent("seed") }, body: JSON.stringify(body) });
   if (!res.ok) throw new Error(`${method} ${route} → ${res.status} ${await res.text()}`);
   return res.json();
 }
@@ -230,7 +231,10 @@ test("clean-blue ใยโหนด @390: the web box starts in the top half of 
   await page.goto(`/p/${id}/web`);
   await expect.poll(() => allInside(page), { message: "every node tile is inside the box on open" }).toBe(true);
   const top = await page.locator("main [role=region]").evaluate((e) => e.getBoundingClientRect().top);
-  expect(top, "the box's top (px) — it started ~620 px down before B-034").toBeLessThanOrEqual(422);
+  // REQ-103: the shell's tools row now also holds the name control, and at 390 the project chip, แชต and ส่งออก PDF already fill the row,
+  // so the tools take a row of their own. Measured 455.98 px (with a name set and with none; the name capped at 5em with an ellipsis at
+  // <= 480 px made no difference — the row has no 44 px of slack). The limit was 422; 460 keeps the box in the top ~55% of an 844 px phone.
+  expect(top, "the box's top (px) — it started ~620 px down before B-034").toBeLessThanOrEqual(460);
 });
 
 test("default ใยโหนด: a chosen node is centred and readable, its edges strong and the rest faded; ดูทั้งหมด and Esc go back (REQ-009 AC-3, TASK-B-031)", async ({ page }) => {
@@ -293,20 +297,19 @@ test("clean-blue ready: a stale score is quiet (ink-2, 500) and no Ant preset bl
   expect(preset).toBe(0);
 });
 
-test("clean-blue ready: with a confirmed, unchanged version Build is the primary link to the core's CAW href, ยืนยัน no longer primary (TASK-B-044)", async ({ page }) => {
+test("clean-blue ready: Build is always the primary link to the core's CAW href — no version until a label is put on; ยืนยัน 100% is gone (TASK-B-044, REQ-103 AC-3)", async ({ page }) => {
   const id = await largeIn("clean-blue", "สร้างที่ CAW clean-blue"); // the large seed has nothing stuck
   await page.goto(`/p/${id}/ready`);
-  await expect(page.locator("[data-build]")).toBeDisabled(); // before: off, with its reason
-  const quiz = await call("POST", `/v1/projects/${id}/quizzes`, {});
-  for (const q of ["มีกี่ขั้นตอน", "ใครเริ่มงาน", "ใครอนุมัติ", "มีหน้าจอกี่หน้า", "จบงานที่ไหน"]) await call("POST", `/v1/projects/${id}/quizzes/${quiz.id}/questions`, { question: q });
-  for (const it of (await call("GET", `/v1/projects/${id}/quizzes/latest`)).items) await call("POST", `/v1/projects/${id}/quizzes/${quiz.id}/items/${it.id}/mark`, { mark: "right" });
-  const v = await call("POST", `/v1/projects/${id}/versions`, { confirmedBy: "operator" });
-  await page.goto(`/p/${id}/ready`);
+  // REQ-103 AC-3: with no label the button is already a link (SPEC-104 Q2: no version in it)
   const build = page.locator("a[data-build]");
-  await expect(build).toHaveAttribute("href", new RegExp(`/start\\?project=${id}&version=${v.version}$`));
+  await expect(build).toHaveAttribute("href", new RegExp(`/start\\?project=${id}$`));
   await expect(build).toHaveClass(/ant-btn-primary/);
-  // the gate card's one primary is now Build: ยืนยัน 100% steps down (the quiz's own ถาม keeps its look — not this TASK's)
-  await expect(page.getByRole("button", { name: "ยืนยัน 100%" })).not.toHaveClass(/ant-btn-primary/);
+  await expect(page.getByRole("button", { name: "ยืนยัน 100%" })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "ใส่ป้าย version" })).toBeVisible();
+  // a label (typed name `seed` from the helper) → the newest label's version rides in the link
+  const v = await call("POST", `/v1/projects/${id}/versions`, { label: "v1 ทดลอง" });
+  await page.goto(`/p/${id}/ready`);
+  await expect(page.locator("a[data-build]")).toHaveAttribute("href", new RegExp(`/start\\?project=${id}&version=${v.version}$`));
 });
 
 // ---------- REQ-009 R1, TASK-B-033 (SPEC v1.15, D-042): the web reads at the fit view, on a desktop and a phone ----------

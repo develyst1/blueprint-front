@@ -6,7 +6,7 @@ import "@mantine/core/styles/Title.css";
 import { Grid, GridCol, Paper, Stack, Text, Title } from "@mantine/core";
 import type { HistoryVM, RequiredItem } from "@/core/theme/contract";
 import { requiredId } from "@/core/theme/required";
-import { historyPick, pageLabel, partKind } from "@/core/words";
+import { historyAll, historyPick, pageLabel, partKind } from "@/core/words";
 import { KindMark } from "../parts/KindMark";
 import { RequiredList, RequiredPicker } from "../parts/Required";
 import { StripScroll } from "../shell/StripScroll";
@@ -16,8 +16,32 @@ import s from "./cards.module.css";
 // the kind's word for a screen reader), so two parts with the same title read apart (v1.8); with no part chosen, the
 // historyPick prompt. The chosen part's changes in the core's order — oldest first (REQ-002 AC-11): what · when · by
 // what · what was done. An empty `summary` (v1.8) or `whatLabel` is left out; the `what` code is never shown.
+// REQ-103: each entry says who typed it; with no part chosen the whole project's changes lead under "ประวัติการแก้ทั้งหมด"
+// (an audit row has no word, so its action code stands in `what`, project-wide only).
 export function History({ vm, required }: { vm: HistoryVM; required: RequiredItem[] }) {
   const picker = new RequiredPicker(required);
+  const timeline = (
+    <ol className={s.timeline}>
+      {vm.entries.map((e, i) => (
+        <li key={`${e.at}-${i}`}>
+          <span className={s.dot} aria-hidden="true" />
+          <div>
+            {e.summary ? (
+              <Text fz="md" fw={700} lh={1.5} lineClamp={2}>
+                {e.summary}
+              </Text>
+            ) : null}
+            <div className={e.summary ? s.meta : `${s.meta} ${s.metaOnly}`}>
+              <time dateTime={e.at}>{e.atLabel}</time>
+              {e.by ? <span>{e.by}</span> : null}
+              {e.cause ? <span>{e.cause}</span> : null}
+              {e.whatLabel || (!vm.part && e.what) ? <span className={s.what}>{e.whatLabel || e.what}</span> : null}
+            </div>
+          </div>
+        </li>
+      ))}
+    </ol>
+  );
   return (
     <Grid gap="lg">
       {/* the chosen part's history comes first in the DOM (read first on a phone, not after every part's link);
@@ -29,34 +53,23 @@ export function History({ vm, required }: { vm: HistoryVM; required: RequiredIte
               <Title order={2} className={s.title} {...picker.takeId(requiredId.part(vm.part.key))}>
                 {vm.part.title}
               </Title>
-              <ol className={s.timeline}>
-                {vm.entries.map((e, i) => (
-                  <li key={`${e.at}-${i}`}>
-                    <span className={s.dot} aria-hidden="true" />
-                    <div>
-                      {e.summary ? (
-                        <Text fz="md" fw={700} lh={1.5} lineClamp={2}>
-                          {e.summary}
-                        </Text>
-                      ) : null}
-                      <div className={e.summary ? s.meta : `${s.meta} ${s.metaOnly}`}>
-                        <time dateTime={e.at}>{e.atLabel}</time>
-                        <span>{e.cause}</span>
-                        {e.whatLabel ? <span className={s.what}>{e.whatLabel}</span> : null}
-                      </div>
-                    </div>
-                  </li>
-                ))}
-              </ol>
+              {timeline}
             </Stack>
           </Paper>
         </GridCol>
       ) : (
         <GridCol span={{ base: 12, md: 8, xl: 9 }} order={{ base: 1, md: 2 }}>
           <Paper radius="lg" p="lg" className={s.card}>
-            <Text fz="lg" fw={700} lh={1.5}>
-              {historyPick}
-            </Text>
+            {vm.entries.length > 0 ? (
+              <Stack gap="lg">
+                <Title order={2} className={s.title}>{historyAll}</Title>
+                {timeline}
+              </Stack>
+            ) : (
+              <Text fz="lg" fw={700} lh={1.5}>
+                {historyPick}
+              </Text>
+            )}
           </Paper>
         </GridCol>
       )}

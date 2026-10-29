@@ -8,7 +8,15 @@ export const markWrong = "ผิด";
 export const wrongNote = "ผิดตรงไหน (ไม่บังคับ)";
 export const notInSpec = "spec นี้ยังไม่มีคำตอบเรื่องนี้";
 export const score = (n: number, m: number): string => `ได้ ${n}% จาก ${m} ข้อ`;
-export const confirm = "ยืนยัน 100%";
+// REQ-103 § User-facing wording (2026-10-29), verbatim — replaces ยืนยัน 100%
+export const labelButton = "ใส่ป้าย version";
+export const labelPlaceholder = "ตั้งชื่อป้าย เช่น v1 ทดลอง";
+export const emptyLabel = "ต้องตั้งชื่อป้ายก่อน";
+export const warningBoth = (n: number): string => `ยังมี ${n} จุดค้าง และ quiz ยังไม่ครบ — ใส่ป้ายได้ แต่ spec อาจยังไม่พร้อม`;
+export const warningStuck = (n: number): string => `ยังมี ${n} จุดค้าง — ใส่ป้ายได้ แต่ spec อาจยังไม่พร้อม`;
+export const warningQuiz = "quiz ยังไม่ครบ — ใส่ป้ายได้ แต่ spec อาจยังไม่พร้อม";
+/** An old confirmed version has no label text (SPEC-104 D3): it shows as v{n}. */
+export const versionTag = (n: number): string => `v${n}`;
 export const reasons = {
   stuck: (n: number): string => `ยังติดอยู่ ${n} จุด`,
   noQuiz: "ยังไม่ได้ทดสอบความเข้าใจ",
@@ -17,11 +25,8 @@ export const reasons = {
   // REQ-007 line 46 as amended 2026-10-09 (C-016 Q1, PM): the D-032 verb, like the early line
   tooFew: "ต้องตรวจอย่างน้อย 5 ข้อ",
   // added 2026-10-09 (REQ-007 lines 54–55: D-030, D-032)
-  confirmed: (n: number): string => `ยืนยันเวอร์ชัน ${n} แล้ว · ยังไม่มีอะไรเปลี่ยน`,
   empty: "ยังไม่มีข้อมูลในโปรเจกต์นี้ · เริ่มที่แชต",
 } as const;
-export const confirmed = (n: number, date: string): string => `ยืนยันแล้ว เวอร์ชัน ${n} · ${date}`;
-export const changedSince = (n: number): string => `spec เปลี่ยนหลังเวอร์ชัน ${n}`;
 export const build = "ส่งไปสร้างที่ CAW";
 export const buildNotReady = "CAW ยังไม่พร้อม";
 // added 2026-10-09 (SPEC-C-002 Q1, REQ-007 lines 50–53)

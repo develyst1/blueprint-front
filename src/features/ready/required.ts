@@ -6,4 +6,5 @@ import type { GateCode } from "./contract";
 export const readyRequiredId = {
   reason: (code: GateCode) => `ready:reason:${code}`,
   score: "ready:score",
+  warning: "ready:warning", // REQ-103: the warning before a label
 } as const;

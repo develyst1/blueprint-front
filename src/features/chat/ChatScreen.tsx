@@ -4,6 +4,8 @@
 // An empty project is not an empty state here: the chat is where an empty project starts (R1).
 import { notFound } from "next/navigation";
 import { retryAction as coreRetry } from "@/app/actions";
+import { readBy } from "@/core/api/by";
+import { NameControl } from "@/core/name/NameControl";
 import { exportHref } from "@/core/model/build/common";
 import { shellRequired } from "@/core/model/build/required";
 import { StateView } from "@/core/render/ProjectPage";
@@ -21,6 +23,7 @@ import s from "./chat.module.css";
 
 export async function ChatScreen({ projectId, focus }: { projectId: string; focus: string | null }) {
   const res = await loadChat(projectId, focus);
+  const by = await readBy();
   if (!res.ok) {
     if (res.state === "notFound") notFound();
     return <StateView theme={defaultTheme} frame={null} state={{ kind: "unreachable", retry: coreRetry }} />;
@@ -43,7 +46,7 @@ export async function ChatScreen({ projectId, focus }: { projectId: string; focu
   };
   return (
     <Root>
-      <Shell frame={vm.frame} required={shellRequired(vm.frame)} tools={<ExportButton href={exportHref(vm.frame.project.id)} />}>
+      <Shell frame={vm.frame} required={shellRequired(vm.frame)} tools={<><NameControl name={by} /><ExportButton href={exportHref(vm.frame.project.id)} /></>}>
         <main id={contentId} tabIndex={-1}>
           {/* the core's default frame pads nothing (measured: chat box at x 0 on a phone); a theme's own shell does */}
           <div className={theme.id === defaultTheme.id || !theme.shell ? s.bare : undefined}>

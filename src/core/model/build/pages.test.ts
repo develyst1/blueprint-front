@@ -3,18 +3,18 @@ import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { findRequired, requiredId } from "@/core/theme/required";
-import { allProjects, linkedWith, productMark, stuck as words, stuckNodeName, webAll, zoomIn, zoomOut } from "@/core/words";
+import { allProjects, historyWhat, linkedWith, productMark, stuck as words, stuckNodeName, webAll, zoomIn, zoomOut } from "@/core/words";
 import type { GateCode } from "@/features/ready/contract";
 import { readyRequiredId } from "@/features/ready/required";
 import {
-  buildApis, buildCard, buildFlowchart, buildHistory, buildOverview, buildScreens, buildSequence, buildStuck, buildWeb,
-  buildWorkOrder,
+  auditSummary, buildApis, buildCard, buildFlowchart, buildHistory, buildOverview, buildRequirements, buildScreens, buildSequence, buildStuck,
+  buildWeb, buildWorkOrder,
 } from "./pages";
 import { sampleFrame, sampleHistory, sampleWeb } from "@/core/model/samples";
 import { confirmedOf, exportHref, frame, readiness, stuckTargets } from "./common";
 import { pageRequired, shellRequired } from "./required";
 import { sampleLayouts as L } from "./sample-layouts";
-import type { ApiFlowchart, ApiHistoryEntry, ApiSequence, ApiSwimlane, Built, ProjectData } from "./types";
+import type { ApiFlowchart, ApiHistoryEntry, ApiProjectHistoryEntry, ApiSequence, ApiSwimlane, Built, ProjectData } from "./types";
 
 const fixture = <T>(name: string): T =>
   JSON.parse(readFileSync(path.join(process.cwd(), "tests/fixtures/api", `${name}.json`), "utf8")) as T;
@@ -312,12 +312,12 @@ describe("v1.9 + v1.10: chat first and ready-to-build last in every frame's nav"
     vm(buildWeb(worked, L)).frame,
   ];
 
-  test("rooms hold the 9 pages + พร้อมสร้างหรือยัง with core-built hrefs; แชต is the frame's chatHref, in no room (R-3)", () => {
+  test("rooms hold the 9 pages + requirement (REQ-103) + พร้อมสร้างหรือยัง with core-built hrefs; แชต is the frame's chatHref, in no room (R-3)", () => {
     for (const f of frames) {
       const pages = f.rooms.flatMap((r) => r.pages);
-      expect(pages).toHaveLength(10);
+      expect(pages).toHaveLength(11);
       expect(pages.find((n) => n.page === "ready")).toMatchObject({ label: "พร้อมสร้างหรือยัง", href: `/p/${id}/ready` });
-      expect(pages.map((n) => n.page).sort()).toEqual(["api", "flowchart", "history", "overview", "ready", "screens", "sequence", "stuck", "web", "workOrder"]);
+      expect(pages.map((n) => n.page).sort()).toEqual(["api", "flowchart", "history", "overview", "ready", "requirements", "screens", "sequence", "stuck", "web", "workOrder"]);
       expect(f.chatHref).toBe(`/p/${id}/chat`);
       expect("nav" in f).toBe(false);
     }
@@ -501,7 +501,7 @@ describe("REQ-017: the frame's two rooms", () => {
   test("2 rooms in order, each with its pages in sub-nav order and core-built hrefs; the chat link beside them", () => {
     const f = vm(buildOverview(worked)).frame;
     expect(f.rooms.map((r) => [r.id, r.label])).toEqual([["front", "สิ่งที่เราเข้าใจ"], ["back", "เบื้องหลังเทคนิค"]]);
-    expect(f.rooms[0]!.pages.map((p) => p.page)).toEqual(["overview", "flowchart", "stuck", "ready"]);
+    expect(f.rooms[0]!.pages.map((p) => p.page)).toEqual(["overview", "flowchart", "stuck", "requirements", "ready"]);
     expect(f.rooms[1]!.pages.map((p) => p.page)).toEqual(["workOrder", "sequence", "screens", "api", "web", "history"]);
     expect(f.rooms[0]!.href).toBe(`/p/${id}/overview`);
     expect(f.rooms[1]!.href).toBe(`/p/${id}/work-order`);
@@ -510,7 +510,7 @@ describe("REQ-017: the frame's two rooms", () => {
   });
 
   test("the current room holds the current page — the 9 pages, chat and ready; one current page inside it", () => {
-    const front = ["overview", "flowchart", "stuck"] as const;
+    const front = ["overview", "flowchart", "stuck", "requirements"] as const;
     const back = ["workOrder", "sequence", "screens", "api", "web", "history"] as const;
     for (const p of [...front, ...back]) {
       const f = frame(worked, p);
@@ -570,5 +570,112 @@ describe("REQ-017: the brief (overview VM)", () => {
     ]);
     // no goal → no goal item (the theme draws none); the roles stay
     expect(ids(worked).map((r) => r.id)).toEqual(["role:ROLE-001", "role:ROLE-002"]);
+  });
+});
+
+describe("REQ-103: project-wide history, who, and the requirements page", () => {
+  const entry = (extra: Partial<ApiProjectHistoryEntry>): ApiProjectHistoryEntry => ({
+    at: "2026-10-29T05:00:00.000Z", by: "โด่ง", kind: "operator", entity: "WORK-001", op: "update", before: null, after: null, changeSetId: "cs-1", ...extra,
+  });
+
+  test("no part chosen + project entries → the whole project's rows with who, in the API's order; no part", () => {
+    const rows = vm(buildHistory(worked, undefined, [], [
+      entry({ kind: "label", op: "label", entity: "label:2", changeSetId: null, after: { version: 2, label: "v1 ทดลอง" } }),
+      entry({ kind: "source_add", op: "source_add", entity: "source:s1", changeSetId: null, after: { name: "brief.txt", text: "…" } }),
+      entry({ op: "update", entity: "DEC-001", after: { title: "ชื่อใหม่" } }),
+    ]));
+    expect(rows.part).toBeNull();
+    expect(rows.entries.map((e) => [e.by, e.what, e.whatLabel, e.summary])).toEqual([
+      ["โด่ง", "label", "ใส่ป้าย version", "v1 ทดลอง"],
+      ["โด่ง", "source_add", "เพิ่มเอกสาร", "brief.txt"],
+      ["โด่ง", "update", "แก้", "ชื่อใหม่"],
+    ]);
+  });
+
+  test("every audit action has the PM's word (REQ-103 Q4), so the page never shows a raw code", () => {
+    expect(["project_create", "settings", "source_add", "source_refetch", "label", "quiz_start", "quiz_ask", "quiz_mark"].map((k) => historyWhat[k])).toEqual([
+      "สร้างโปรเจกต์", "เปลี่ยนการตั้งค่า", "เพิ่มเอกสาร", "ดึงลิงก์ใหม่", "ใส่ป้าย version", "เริ่ม quiz", "ถาม quiz", "ตรวจคำตอบ quiz",
+    ]);
+  });
+
+  test("a settings row says what moved: field, before → after, no invented words", () => {
+    expect(auditSummary("settings", { model: "tier:small", creativity: 0.7 }, { model: "tier:small", creativity: 1 })).toBe("creativity: 0.7 → 1");
+    expect(auditSummary("settings", { model: "a", creativity: 1 }, { model: "b", creativity: 1 })).toBe("model: a → b");
+    expect(auditSummary("label", null, { version: 3, label: null })).toBe("v3");
+    expect(auditSummary("quiz_ask", null, { question: "?" })).toBe("");
+  });
+
+  test("an empty spec still shows the project-wide history when it has rows (sources and settings come first); with none it is empty", () => {
+    const empty = { ...worked, parts: [], links: [], stuck: [] };
+    expect(vm(buildHistory(empty, undefined, [], [entry({ kind: "project_create", op: "project_create", entity: "project", changeSetId: null, after: { name: "ใหม่" } })])).entries).toHaveLength(1);
+    expect(buildHistory(empty).ok).toBe(false);
+    expect(buildHistory(empty, undefined, [], []).ok).toBe(false);
+  });
+
+  test("a per-part row gains `by` (null on a row from before names)", () => {
+    const rows = vm(buildHistory(worked, "DEC-001", [{ ...fixture<ApiHistoryEntry[]>("worked-history-DEC-001")[0]!, by: "โด่ง" }, fixture<ApiHistoryEntry[]>("worked-history-DEC-001")[0]!])).entries;
+    expect(rows.map((e) => e.by)).toEqual(["โด่ง", null]);
+  });
+
+  test("requirements: only requirement parts, title + text; the page marks each title as required", () => {
+    const withReq: ProjectData = {
+      ...worked,
+      parts: [...worked.parts, { key: "REQ-001", kind: "requirement", title: "ชำระเงินได้", body: { text: "ผู้ใช้ต้องจ่ายผ่านบัตรได้" }, origin: { stamp: "operator", date: "2026-10-29" } } as unknown as ProjectData["parts"][number]],
+    };
+    const v = vm(buildRequirements(withReq));
+    expect(v.requirements).toEqual([{ key: "REQ-001", title: "ชำระเงินได้", text: "ผู้ใช้ต้องจ่ายผ่านบัตรได้" }]);
+    expect(v.frame.page).toBe("requirements");
+    expect(pageRequired("requirements", v)).toEqual([{ id: requiredId.part("REQ-001"), text: "ชำระเงินได้" }]);
+    expect(vm(buildRequirements(worked)).requirements).toEqual([]); // no requirement yet: an empty list, not an empty-state page
+  });
+});
+
+describe("REQ-103 rework: who, in words — a named row shows the name, not 'โดยคุณ' (Sober 13:5x)", () => {
+  const row = (extra: Partial<ApiProjectHistoryEntry>): ApiProjectHistoryEntry => ({
+    at: "2026-10-29T05:00:00.000Z", by: "โด่ง", kind: "operator", entity: "WORK-001", op: "update", before: null, after: null, changeSetId: "cs-1", ...extra,
+  });
+  const cause = (e: ApiProjectHistoryEntry) => vm(buildHistory(worked, undefined, [], [e])).entries[0]!;
+
+  test("named operator row → the name stands in (cause word left out, `by` carries it)", () => {
+    expect(cause(row({}))).toMatchObject({ by: "โด่ง", cause: "" });
+    expect(cause(row({ kind: "label", op: "label", changeSetId: null }))).toMatchObject({ by: "โด่ง", cause: "" });
+  });
+  test("named chat row → keeps 'จากแชต' (how, not who); source and undo too", () => {
+    expect(cause(row({ kind: "message" }))).toMatchObject({ by: "โด่ง", cause: "จากแชต" });
+    expect(cause(row({ kind: "source" }))).toMatchObject({ cause: "จากเอกสาร" });
+    expect(cause(row({ kind: "undo" }))).toMatchObject({ cause: "ย้อนการแก้ไข" });
+  });
+  test("a row from before names (by null) keeps 'โดยคุณ'", () => {
+    expect(cause(row({ by: null }))).toMatchObject({ by: null, cause: "โดยคุณ" });
+    expect(cause(row({ by: null, kind: "label", op: "label", changeSetId: null }))).toMatchObject({ cause: "โดยคุณ" });
+  });
+  test("per-part rows follow the same rule", () => {
+    const base = fixture<ApiHistoryEntry[]>("worked-history-DEC-001")[0]!;
+    const rows = vm(buildHistory(worked, "DEC-001", [{ ...base, cause: { kind: "operator" }, by: "โด่ง" }, { ...base, cause: { kind: "operator" } }, { ...base, cause: { kind: "message" }, by: "โด่ง" }])).entries;
+    expect(rows.map((e) => e.cause)).toEqual(["", "โดยคุณ", "จากแชต"]);
+  });
+});
+
+describe("REQ-103 AC-10: requirements on the overview (and so in the PDF, which prints the overview page)", () => {
+  const withReqs: ProjectData = {
+    ...worked,
+    parts: [...worked.parts,
+      { key: "REQ-001", kind: "requirement", title: "จองห้องได้", body: { text: "เลือกวันและเวลา" }, origin: { stamp: "operator", date: "2026-10-29" } } as unknown as ProjectData["parts"][number],
+      { key: "REQ-002", kind: "requirement", title: "ยกเลิกได้", body: { text: "ก่อน 1 ชั่วโมง" }, origin: { stamp: "operator", date: "2026-10-29" } } as unknown as ProjectData["parts"][number],
+    ],
+  };
+  test("the overview VM lists both requirements, in order; none → an empty list (no section)", () => {
+    expect(vm(buildOverview(withReqs)).requirements).toEqual([
+      { key: "REQ-001", title: "จองห้องได้", text: "เลือกวันและเวลา" },
+      { key: "REQ-002", title: "ยกเลิกได้", text: "ก่อน 1 ชั่วโมง" },
+    ]);
+    expect(vm(buildOverview(worked)).requirements).toEqual([]);
+  });
+  test("the section's title and each requirement's title are required items — only when there are requirements", () => {
+    const req = pageRequired("overview", vm(buildOverview(withReqs)));
+    expect(req).toContainEqual({ id: requiredId.requirementsSection, text: "Requirements" });
+    expect(req).toContainEqual({ id: requiredId.part("REQ-001"), text: "จองห้องได้" });
+    expect(req).toContainEqual({ id: requiredId.part("REQ-002"), text: "ยกเลิกได้" });
+    expect(pageRequired("overview", vm(buildOverview(worked))).some((r) => r.id === requiredId.requirementsSection)).toBe(false);
   });
 });

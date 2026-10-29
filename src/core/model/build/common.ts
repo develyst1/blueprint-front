@@ -8,10 +8,12 @@ import { contradiction, emptyProject, pageLabel, readinessClean, readinessClear,
 import type { ApiLink, ApiStuckItem, ProjectData } from "./types";
 
 export const PAGES: PageId[] = ["overview", "workOrder", "flowchart", "sequence", "screens", "api", "web", "stuck", "history"];
+/** REQ-103: a page with its own URL that the PDF does not print (its editor is not part of the spec sheet). */
+export const ROUTED_PAGES: PageId[] = [...PAGES, "requirements"];
 /** REQ-017 (SPEC-C-006 § 3, D-107): the two rooms and their pages in sub-nav order — the one place. A room lands on its first
  *  page. The chat is not a room (a header button); a route outside every room (the chat) counts as `front`. */
 export const ROOMS: { id: RoomId; pages: NavItemVM["page"][] }[] = [
-  { id: "front", pages: ["overview", "flowchart", "stuck", "ready"] },
+  { id: "front", pages: ["overview", "flowchart", "stuck", "requirements", "ready"] },
   { id: "back", pages: ["workOrder", "sequence", "screens", "api", "web", "history"] },
 ];
 export const HOME_HREF = "/";

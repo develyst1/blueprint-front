@@ -1,0 +1,23 @@
+/* The label section's neutral default (REQ-103): every rule in :where(), so any theme rule wins; colour and font come
+   through (inherit / currentColor). Placed by each theme's ready page where the confirm button was. */
+:where(.root) { display: grid; gap: 10px; }
+:where(.form) { display: flex; flex-wrap: wrap; gap: 8px; align-items: stretch; }
+:where(.input), :where(.button) {
+  box-sizing: border-box;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1.5px solid currentColor;
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+}
+:where(.input) { flex: 1 1 14em; min-width: 0; }
+:where(.button) { min-width: 44px; cursor: pointer; white-space: nowrap; }
+:where(.button):disabled { border-style: dashed; cursor: default; }
+:where(.input):focus-visible, :where(.button):focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+:where(.warning), :where(.error), :where(.empty) { margin: 0; }
+:where(.warning)::before { content: "⚠ "; } /* status is never colour alone */
+:where(.list) { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+:where(.item) { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; }
+:where(.text) { font-weight: 600; overflow-wrap: anywhere; }

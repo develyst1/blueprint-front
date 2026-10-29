@@ -9,6 +9,8 @@ import type { FrameVM, PageId, PageVMs, Theme } from "@/core/theme/contract";
 import { defaultTheme } from "@/core/theme/default";
 import { getTheme } from "@/core/theme/registry";
 import { exportHref, frame as buildFrame } from "@/core/model/build/common";
+import { readBy } from "@/core/api/by";
+import { NameControl } from "@/core/name/NameControl"; // REQ-103: who is typing — core-owned, placed through the shell's tools slot
 import { ExportButton } from "@/features/export/ExportButton"; // Team A's (REQ-008) — themes never import it (v1.11)
 import { pageRequired, shellRequired } from "@/core/model/build/required";
 import { loadPage, loadProjectData, type Query } from "@/core/model/load";
@@ -27,6 +29,7 @@ export function StateView({ theme, frame, state, tools }: { theme: Theme; frame:
 
 export async function ProjectPage({ projectId, page, query }: { projectId: string; page: PageId; query: Query }) {
   const res = await loadPage(page, projectId, query);
+  const by = await readBy();
 
   if (!res.ok) {
     if (res.state.kind === "notFound") notFound(); // HTTP 404 → src/app/not-found.tsx
@@ -41,7 +44,7 @@ export async function ProjectPage({ projectId, page, query }: { projectId: strin
     }
     const theme = getTheme(data.data.project.theme);
     // an empty project can still be exported — the PDF says so itself (D-038, v1.13)
-    return <StateView theme={theme} frame={buildFrame(data.data, page)} state={{ kind: "empty", page }} tools={<ExportButton href={exportHref(projectId)} />} />;
+    return <StateView theme={theme} frame={buildFrame(data.data, page)} state={{ kind: "empty", page }} tools={<><NameControl name={by} /><ExportButton href={exportHref(projectId)} /></>} />;
   }
 
   const vm = res.vm as PageVMs[PageId];
@@ -51,7 +54,7 @@ export async function ProjectPage({ projectId, page, query }: { projectId: strin
   const Page = (theme.pages?.[page] ?? defaultTheme.pages![page]!) as (p: { vm: PageVMs[PageId]; required: ReturnType<typeof pageRequired> }) => React.ReactNode;
   return (
     <Root>
-      <Shell frame={vm.frame} required={shellRequired(vm.frame)} tools={<ExportButton href={exportHref(vm.frame.project.id)} />}>
+      <Shell frame={vm.frame} required={shellRequired(vm.frame)} tools={<><NameControl name={by} /><ExportButton href={exportHref(vm.frame.project.id)} /></>}>
         <main id={contentId} tabIndex={-1}>
           <Page vm={vm} required={pageRequired(page, vm)} />
         </main>

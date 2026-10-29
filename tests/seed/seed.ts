@@ -25,7 +25,8 @@ export async function call(apiUrl: string, method: string, route: string, body?:
   assertLocal(apiUrl);
   const res = await fetch(apiUrl + route, {
     method,
-    headers: body ? { "content-type": "application/json" } : undefined,
+    // every write carries a typed name since REQ-103 (a request without it is a 400 name_required)
+    headers: body ? { "content-type": "application/json", "X-Blueprint-By": encodeURIComponent("seed") } : undefined,
     body: body ? JSON.stringify(body) : undefined,
   });
   if (!res.ok) throw new Error(`${method} ${route} → ${res.status} ${await res.text()}`);

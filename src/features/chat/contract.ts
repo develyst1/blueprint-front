@@ -82,7 +82,7 @@ export interface ChatVM {
   specHref: string;
 }
 
-export type ActionCode = "undo_refused" | "invalid" | "unreachable" | "too_large" | "unsupported_file" | "already_added";
+export type ActionCode = "undo_refused" | "invalid" | "unreachable" | "too_large" | "unsupported_file" | "already_added" | "name_required" /* REQ-103: the page asks for the name first */;
 export type ActionResult = { ok: true } | { ok: false; code: ActionCode; parts?: string[] };
 
 /** `upload` is refused by the page itself for a file over `MAX_UPLOAD_BYTES` (`./limits`): call `isTooLarge(file)` first and

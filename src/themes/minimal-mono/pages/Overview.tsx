@@ -17,7 +17,7 @@ import { IconChevronDown } from "@tabler/icons-react";
 import { useId, useState } from "react";
 import type { DecisionVM, OverviewVM, RequiredItem } from "@/core/theme/contract";
 import { requiredId } from "@/core/theme/required";
-import { brief, decisionPart, showMore } from "@/core/words";
+import { brief, decisionPart, requirementsSection, showMore } from "@/core/words";
 import { KindMark } from "../parts/KindMark";
 import { StepCard } from "../parts/StepCard";
 import { RequiredList, RequiredPicker } from "../parts/Required";
@@ -178,6 +178,21 @@ export function Overview({ vm, required }: { vm: OverviewVM; required: RequiredI
               {roles}
             </SimpleGrid>
           </section>
+          {vm.requirements.length ? (
+            <section aria-labelledby="brief-requirements" className={s.section}>
+              <Title order={2} id="brief-requirements" className={s.heading} {...picker.takeId(requiredId.requirementsSection)}>
+                {requirementsSection}
+              </Title>
+              <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
+                {vm.requirements.map((r) => (
+                  <Card key={r.key} padding="md" radius="lg" className={s.role}>
+                    <Text component="span" fz="md" fw={700} {...picker.takeId(requiredId.part(r.key))}>{r.title}</Text>
+                    {r.text ? <Text component="span" fz="md" className={s.muted}>{r.text}</Text> : null}
+                  </Card>
+                ))}
+              </SimpleGrid>
+            </section>
+          ) : null}
           <section aria-labelledby="brief-path" className={s.section}>
             <Title order={2} id="brief-path" className={s.heading}>
               {brief.path}

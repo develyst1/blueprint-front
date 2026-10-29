@@ -19,7 +19,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { chromium, type Page } from "@playwright/test";
 import type { PageId, RequiredItem } from "@/core/theme/contract";
-import { pageSlug, PAGES } from "@/core/model/build/common";
+import { pageSlug, ROUTED_PAGES } from "@/core/model/build/common";
 import { pageRequired, shellRequired } from "@/core/model/build/required";
 import { loadPage, loadProjectData } from "@/core/model/load";
 import { frame as buildFrame } from "@/core/model/build/common";
@@ -51,6 +51,11 @@ async function seedFor(theme: string) {
   for (const [name, changes] of sets) {
     const p = await call(api, "POST", "/v1/projects", { name: `${name} · ${theme}`, theme });
     if (changes) await call(api, "POST", `/v1/projects/${p.id}/change-sets`, { cause: { kind: "operator" }, changes });
+    if (name === "worked") {
+      // REQ-103 AC-10: two requirements, so the overview's "Requirements" section and the requirements page are checked too
+      const requirement = (ref: string, title: string, text: string) => ({ op: "part.add", ref, kind: "requirement", title, body: { text }, origin: { stamp: "operator", date: "2026-10-29" } });
+      await call(api, "POST", `/v1/projects/${p.id}/change-sets`, { cause: { kind: "operator" }, changes: [requirement("$r1", "จองห้องได้ทุกวัน", "เลือกวันและเวลาแล้วจองได้"), requirement("$r2", "ยกเลิกการจองได้", "ยกเลิกก่อนเวลา 1 ชั่วโมง")] });
+    }
     out[name] = p.id;
   }
   return out;
@@ -125,7 +130,7 @@ async function check(base: string, themes: string[]) {
     for (const [seed, id] of Object.entries(ids)) {
       const first = (await loadProjectData(id));
       const someKey = first.ok ? first.data.parts.find((p) => p.kind === "decision" || p.kind === "step")?.key : undefined;
-      for (const p of [...PAGES, ...FEATURES] as Route[]) {
+      for (const p of [...ROUTED_PAGES, ...FEATURES] as Route[]) {
         const query: Record<string, string> = p === "history" && someKey ? { part: someKey } : {};
         const items = await expected(id, p, query);
         // Every page of a project that exists carries at least the shell's readiness item, so an empty list means the back

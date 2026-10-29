@@ -3,6 +3,7 @@
 // TASK-B-007's check proves every theme renders each item.
 import type { FrameVM, PageId, PageVMs, RequiredItem } from "@/core/theme/contract";
 import { requiredId } from "@/core/theme/required";
+import { requirementsSection } from "@/core/words";
 
 export function shellRequired(frame: FrameVM): RequiredItem[] {
   return [{ id: requiredId.readiness, text: frame.readiness.label }];
@@ -19,6 +20,8 @@ export function pageRequired<P extends PageId>(page: P, vm: PageVMs[P]): Require
         ...v.works.filter((w) => w.goal).map((w) => ({ id: requiredId.goal(w.key), text: w.goal! })),
         ...v.roles.map((r) => ({ id: requiredId.role(r.key), text: r.title })),
         ...v.works.flatMap((w) => steps(w.steps)),
+        // REQ-103 AC-10: the "Requirements" section's title and each requirement's title, when there is one
+        ...(v.requirements.length ? [{ id: requiredId.requirementsSection, text: requirementsSection }, ...v.requirements.map((r) => ({ id: requiredId.part(r.key), text: r.title }))] : []),
       ];
     }
     case "workOrder": {
@@ -53,6 +56,10 @@ export function pageRequired<P extends PageId>(page: P, vm: PageVMs[P]): Require
     case "history": {
       const v = vm as PageVMs["history"];
       return v.part ? [{ id: requiredId.part(v.part.key), text: v.part.title }] : [];
+    }
+    case "requirements": {
+      const v = vm as PageVMs["requirements"];
+      return v.requirements.map((r) => ({ id: requiredId.part(r.key), text: r.title }));
     }
   }
   return [];

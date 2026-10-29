@@ -9,7 +9,13 @@ export type ApiProject = S["Project"];
 export type ApiPart = S["Part"];
 export type ApiLink = S["Link"];
 export type ApiStuckItem = S["StuckItem"];
-export type ApiHistoryEntry = S["HistoryEntry"];
+// `by` (REQ-103, SPEC-104): who typed the change; null on rows from before names. Intersected so the type holds both before
+// and after `gen:api` has seen the new back end.
+export type ApiHistoryEntry = S["HistoryEntry"] & { by?: string | null };
+/** One entry of `GET …/history` (REQ-103): a spec change (`kind` = the change set's cause) or an audit row (`kind` = the action). */
+export interface ApiProjectHistoryEntry {
+  at: string; by: string | null; kind: string; entity: string; op: string; before?: unknown; after?: unknown; changeSetId: string | null;
+}
 export type ApiFlowchart = S["FlowchartDiagram"];
 export type ApiSwimlane = S["SwimlaneDiagram"];
 export type ApiSequence = S["SequenceDiagram"];

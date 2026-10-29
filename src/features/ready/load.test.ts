@@ -1,9 +1,9 @@
 // Screen ④'s loader mapping against fixture API responses (invented data, shaped as blueprint-back answers).
 import { describe, expect, test } from "bun:test";
 import type { ProjectData } from "@/core/model/build/types";
-import { actionCode, buildReadyVM, gate, gateReasons, toQuiz, MAX_ANSWERED, QUIZ_ANCHOR, type ApiQuiz, type ApiQuizItem, type ApiVersions } from "./load";
+import { actionCode, buildReadyVM, gate, gateReasons, labelWarning, readyRequired, toQuiz, MAX_ANSWERED, QUIZ_ANCHOR, type ApiLabel, type ApiQuiz, type ApiQuizItem } from "./load";
 import { readyRequiredId } from "./required";
-import { build, buildNotReady, reasons, scoreEarly } from "./words";
+import { build, emptyLabel, labelButton, labelPlaceholder, reasons, scoreEarly, warningBoth, warningQuiz, warningStuck } from "./words";
 
 const origin = { stamp: "team-proposed" as const, date: "2026-10-09" };
 const part = (key: string, kind: string, title = `ส่วน ${key}`) =>
@@ -30,10 +30,8 @@ const quiz = (items: ApiQuizItem[], extra: Partial<ApiQuiz> = {}): ApiQuiz => {
   const right = items.filter((i) => i.mark === "right").length;
   return { id: "q-1", createdAt: "2026-10-09T02:00:00.000Z", stale: false, items, right, marked, score: marked >= 5 ? Math.floor((right * 100) / marked) : null, ...extra };
 };
-/** One entry of `GET …/versions` (the schema's VersionFeed item). */
-const version = (n: number, confirmedAt: string): ApiVersions["versions"][number] => ({
-  version: n, confirmedAt, confirmedBy: "operator", summary: { parts: 0, links: 0, partsByKind: {} }, changes: { added: [], changed: [], removed: [] },
-});
+/** One entry of `GET …/labels` (REQ-103, SPEC-104): `label` null = an old confirmed version. */
+const label = (version: number, text: string | null, labelledAt: string, by = "โด่ง"): ApiLabel => ({ version, label: text, labelledAt, by });
 const marks = (n: number, wrong = 0) => Array.from({ length: n }, (_, i) => item(i + 1, { mark: i < wrong ? "wrong" : "right" }));
 const codes = (stuck: number, q: ApiQuiz | null) => gateReasons(stuck, toQuiz(data(), q), "/p/p-1/stuck").map((r) => r.code);
 
@@ -65,7 +63,7 @@ describe("gate reasons (SPEC-C-002 order)", () => {
 
 describe("quiz", () => {
   test("404 latest quiz → quiz null", () => {
-    expect(buildReadyVM({ data: data(), quiz: null, versions: [] }).quiz).toBeNull();
+    expect(buildReadyVM({ data: data(), quiz: null, labels: [] }).quiz).toBeNull();
   });
 
   test("full at 10 answered; failed items do not count", () => {
@@ -92,13 +90,12 @@ describe("quiz", () => {
   });
 });
 
-describe("summary, version, build", () => {
+describe("summary, labels, build", () => {
   test("steps of the main work, counts by kind, stuck count and link", () => {
-    const vm = buildReadyVM({ data: data([stuckItem("Q-1"), stuckItem("Q-2")]), quiz: null, versions: [] });
+    const vm = buildReadyVM({ data: data([stuckItem("Q-1"), stuckItem("Q-2")]), quiz: null, labels: [] });
     expect(vm.steps.map((s) => [s.number, s.title])).toEqual([["01", "ขั้นแรก"], ["02", "ขั้นสอง"]]);
     expect(vm.counts).toEqual({ screens: 2, apis: 1, people: 1 });
     expect(vm.stuck).toEqual({ count: 2, href: "/p/p-1/stuck" });
-    expect(vm.gate.ok).toBe(false);
     // this page's own nav entry is the current one (SPEC-B-001 v1.10, TASK-C-012 A1)
     expect(vm.frame.rooms.flatMap((r) => r.pages).filter((n) => n.current).map((n) => [n.page, n.href])).toEqual([["ready", "/p/p-1/ready"]]);
     // REQ-017: ④ sits in the front room, as its last page (SPEC-C-006 § 3)
@@ -106,27 +103,52 @@ describe("summary, version, build", () => {
     expect(vm.frame.rooms[0]!.pages.filter((p) => p.current).map((p) => p.page)).toEqual(["ready"]);
   });
 
-  test("version = the last of `versions`, date by formatThaiDate; changedSince false until Team A's field", () => {
+  test("labels keep the API's order (newest first), the typed text or v{n}, a Thai date and who", () => {
     const vm = buildReadyVM({
-      data: data(), quiz: quiz(marks(5)),
-      versions: [version(1, "2026-10-08T03:00:00.000Z"), version(2, "2026-10-09T03:00:00.000Z")],
+      data: data(), quiz: null,
+      labels: [label(3, "v1 ทดลอง", "2026-10-09T03:00:00.000Z"), label(1, null, "2026-10-08T03:00:00.000Z", "operator")],
     });
-    expect(vm.version).toEqual({ n: 2, dateLabel: "9 ต.ค. 2569", changedSince: false });
-    // clean and confirmed, nothing changed since: the gate's state is `confirmed` and Confirm is off (D-030)
-    expect(vm.gate).toEqual({ ok: false, reasons: [{ code: "confirmed", text: reasons.confirmed(2), href: QUIZ_ANCHOR }] });
-    expect(buildReadyVM({ data: data(), quiz: null, versions: [] }).version).toBeNull();
+    expect(vm.labels).toEqual([
+      { version: 3, text: "v1 ทดลอง", dateLabel: "9 ต.ค. 2569", by: "โด่ง" },
+      { version: 1, text: "v1", dateLabel: "8 ต.ค. 2569", by: "operator" },
+    ]);
+    expect(buildReadyVM({ data: data(), quiz: null, labels: [] }).labels).toEqual([]);
   });
-
-  test("changedSince = the back end's changedSinceLatest when it sends it (TASK-A-032)", () => {
-    const versions = [version(1, "2026-10-09T03:00:00.000Z")];
-    expect(buildReadyVM({ data: data(), quiz: null, versions, changedSinceLatest: true }).version!.changedSince).toBe(true);
-    expect(buildReadyVM({ data: data(), quiz: null, versions, changedSinceLatest: false }).version!.changedSince).toBe(false);
-  });
-
 });
 
-describe("build → CAW (D-050, TASK-C-033)", () => {
-  const v2 = [version(1, "2026-10-08T03:00:00.000Z"), version(2, "2026-10-09T03:00:00.000Z")];
+describe("the warning before a label (REQ-103 § Wording, SPEC-104 Q1) — never a gate", () => {
+  const complete = toQuiz(data(), quiz(marks(5)));
+  test("stuck and quiz → both halves; stuck only; quiz only; neither → null", () => {
+    expect(labelWarning(2, null)).toBe(warningBoth(2));
+    expect(labelWarning(2, complete)).toBe(warningStuck(2));
+    expect(labelWarning(0, null)).toBe(warningQuiz);
+    expect(labelWarning(0, complete)).toBeNull();
+  });
+  test("a quiz is incomplete under 5 marks, with a wrong mark, or stale", () => {
+    expect(labelWarning(0, toQuiz(data(), quiz(marks(4))))).toBe(warningQuiz);
+    expect(labelWarning(0, toQuiz(data(), quiz(marks(5, 1))))).toBe(warningQuiz);
+    expect(labelWarning(0, toQuiz(data(), quiz(marks(5), { stale: true })))).toBe(warningQuiz);
+  });
+  test("the words are REQ-103's, verbatim", () => {
+    expect(warningBoth(3)).toBe("ยังมี 3 จุดค้าง และ quiz ยังไม่ครบ — ใส่ป้ายได้ แต่ spec อาจยังไม่พร้อม");
+    expect(warningStuck(3)).toBe("ยังมี 3 จุดค้าง — ใส่ป้ายได้ แต่ spec อาจยังไม่พร้อม");
+    expect(warningQuiz).toBe("quiz ยังไม่ครบ — ใส่ป้ายได้ แต่ spec อาจยังไม่พร้อม");
+    expect(labelButton).toBe("ใส่ป้าย version");
+    expect(labelPlaceholder).toBe("ตั้งชื่อป้าย เช่น v1 ทดลอง");
+    expect(emptyLabel).toBe("ต้องตั้งชื่อป้ายก่อน");
+  });
+  test("the VM carries it, and the page must show it (a required item)", () => {
+    const vm = buildReadyVM({ data: data([stuckItem("Q-1")]), quiz: null, labels: [] });
+    expect(vm.warning).toBe(warningBoth(1));
+    expect(readyRequired(vm).find((r) => r.id === readyRequiredId.warning)?.text).toBe(warningBoth(1));
+    const clean = buildReadyVM({ data: data(), quiz: quiz(marks(5)), labels: [] });
+    expect(clean.warning).toBeNull();
+    expect(readyRequired(clean).some((r) => r.id === readyRequiredId.warning)).toBe(false);
+  });
+});
+
+describe("build → CAW (REQ-103 AC-3, SPEC-104 Q2 — always on, D-050 for the href)", () => {
+  const two = [label(2, "v2", "2026-10-09T03:00:00.000Z"), label(1, "v1", "2026-10-08T03:00:00.000Z")];
   const withEnv = (value: string | undefined, fn: () => void) => {
     const was = process.env.CAW_URL;
     if (value === undefined) delete process.env.CAW_URL;
@@ -134,80 +156,72 @@ describe("build → CAW (D-050, TASK-C-033)", () => {
     try { fn(); } finally { if (was === undefined) delete process.env.CAW_URL; else process.env.CAW_URL = was; }
   };
 
-  test("(a) nothing confirmed → off, no href, REQ-007's reason", () => withEnv(undefined, () => {
-    expect(buildReadyVM({ data: data(), quiz: null, versions: [] }).build).toEqual({ enabled: false, label: build, reason: buildNotReady, href: null });
+  test("(a) no label → still on; CAW's start page for this project, no version", () => withEnv(undefined, () => {
+    expect(buildReadyVM({ data: data(), quiz: null, labels: [] }).build)
+      .toEqual({ enabled: true, label: build, reason: "", href: "http://127.0.0.1:3500/start?project=p-1" });
   }));
 
-  test("(b) confirmed and unchanged since → on, CAW's start page for this project + version, no reason", () => withEnv(undefined, () => {
-    expect(buildReadyVM({ data: data(), quiz: null, versions: v2, changedSinceLatest: false }).build)
+  test("(b) with labels → the newest label's version", () => withEnv(undefined, () => {
+    expect(buildReadyVM({ data: data(), quiz: null, labels: two }).build)
       .toEqual({ enabled: true, label: build, reason: "", href: "http://127.0.0.1:3500/start?project=p-1&version=2" });
   }));
 
-  test("(c) confirmed but changed since → off", () => withEnv(undefined, () => {
-    expect(buildReadyVM({ data: data(), quiz: null, versions: v2, changedSinceLatest: true }).build).toEqual({ enabled: false, label: build, reason: buildNotReady, href: null });
+  test("(c) on even with stuck items and an incomplete quiz", () => withEnv(undefined, () => {
+    expect(buildReadyVM({ data: data([stuckItem("Q-1")]), quiz: null, labels: [] }).build.enabled).toBe(true);
   }));
 
   test("CAW_URL set → that base; an empty one falls back (|| not ??)", () => {
     withEnv("https://caw.example.test", () => {
-      expect(buildReadyVM({ data: data(), quiz: null, versions: v2 }).build.href).toBe("https://caw.example.test/start?project=p-1&version=2");
+      expect(buildReadyVM({ data: data(), quiz: null, labels: two }).build.href).toBe("https://caw.example.test/start?project=p-1&version=2");
     });
     withEnv("", () => {
-      expect(buildReadyVM({ data: data(), quiz: null, versions: v2 }).build.href).toBe("http://127.0.0.1:3500/start?project=p-1&version=2");
+      expect(buildReadyVM({ data: data(), quiz: null, labels: two }).build.href).toBe("http://127.0.0.1:3500/start?project=p-1&version=2");
     });
   });
 });
 
 describe("readyRequiredId (TASK-C-014 — moved to ./required, strings unchanged)", () => {
-  test("the same id strings as before the move", () => {
+  test("the same id strings as before the move; the warning's is new (REQ-103)", () => {
     expect(readyRequiredId.reason("stuck")).toBe("ready:reason:stuck");
     expect(readyRequiredId.score).toBe("ready:score");
+    expect(readyRequiredId.warning).toBe("ready:warning");
   });
 });
 
-describe("gate states `empty` and `confirmed` (TASK-C-016, D-030, D-032)", () => {
-  const confirmedV1 = { n: 1, dateLabel: "9 ต.ค. 2569", changedSince: false };
+describe("gate state `empty` (TASK-C-016, D-032) — the `confirmed` state went with the confirm button", () => {
   const empty = (): ProjectData => ({ ...data(), parts: [], links: [] });
 
   test("empty project → `empty` is the only reason, and it leads to the chat", () => {
-    expect(gate(empty(), null, null)).toEqual({ ok: false, reasons: [{ code: "empty", text: reasons.empty, href: "/p/p-1/chat" }] });
-    // alone even when other reasons would apply (stuck, a quiz, a version)
-    const r = gate({ ...empty(), stuck: [stuckItem("Q-1")] }, toQuiz(data(), quiz(marks(3))), confirmedV1);
+    expect(gate(empty(), null)).toEqual({ reasons: [{ code: "empty", text: reasons.empty, href: "/p/p-1/chat" }] });
+    // alone even when other reasons would apply (stuck, a quiz)
+    const r = gate({ ...empty(), stuck: [stuckItem("Q-1")] }, toQuiz(data(), quiz(marks(3))));
     expect(r.reasons.map((x) => x.code)).toEqual(["empty"]);
-    expect(buildReadyVM({ data: empty(), quiz: null, versions: [] }).gate.reasons.map((x) => x.code)).toEqual(["empty"]);
+    expect(buildReadyVM({ data: empty(), quiz: null, labels: [] }).gate.reasons.map((x) => x.code)).toEqual(["empty"]);
   });
 
-  test("confirmed + unchanged + nothing else blocks → `confirmed`, Confirm off; its link is the quiz that passed", () => {
-    expect(gate(data(), toQuiz(data(), quiz(marks(5))), confirmedV1)).toEqual({
-      ok: false, reasons: [{ code: "confirmed", text: reasons.confirmed(1), href: QUIZ_ANCHOR }],
-    });
+  test("a clean project with a complete quiz has no reasons", () => {
+    expect(gate(data(), toQuiz(data(), quiz(marks(5))))).toEqual({ reasons: [] });
+    expect(gate(data([stuckItem("Q-1")]), toQuiz(data(), quiz(marks(5)))).reasons.map((x) => x.code)).toEqual(["stuck"]);
   });
 
-  test("`confirmed` is gone once the spec changed, and never shown beside another reason", () => {
-    const clean = toQuiz(data(), quiz(marks(5)));
-    expect(gate(data(), clean, { ...confirmedV1, changedSince: true })).toEqual({ ok: true, reasons: [] });
-    expect(gate(data(), toQuiz(data(), quiz(marks(5), { stale: true })), confirmedV1).reasons.map((x) => x.code)).toEqual(["stale"]);
-    expect(gate(data([stuckItem("Q-1")]), clean, confirmedV1).reasons.map((x) => x.code)).toEqual(["stuck"]);
-    expect(gate(data(), clean, null)).toEqual({ ok: true, reasons: [] });
-  });
-
-  test("REQ-007's new words, verbatim (lines 53–55)", () => {
+  test("REQ-007's words, verbatim (lines 53–55)", () => {
     expect(scoreEarly(3)).toBe("ตรวจแล้ว 3 ข้อ · ต้องตรวจอย่างน้อย 5 ข้อ");
-    expect(reasons.confirmed(1)).toBe("ยืนยันเวอร์ชัน 1 แล้ว · ยังไม่มีอะไรเปลี่ยน");
     expect(reasons.empty).toBe("ยังไม่มีข้อมูลในโปรเจกต์นี้ · เริ่มที่แชต");
     // the too-few reason uses the same verb as the early line (C-016 Q1, PM 2026-10-09, REQ-007 line 46)
     expect(reasons.tooFew).toBe("ต้องตรวจอย่างน้อย 5 ข้อ");
   });
 });
 
-describe("action codes (blueprint-back 409s → the page's codes)", () => {
+describe("action codes (blueprint-back 4xx → the page's codes)", () => {
   const conflict = (code: string, details?: unknown) => ({ ok: false as const, status: 409, body: { error: { code, message: "", details } } });
-  test("409 already_confirmed {version} → `already_confirmed` (TASK-A-050)", () => {
-    expect(actionCode(conflict("already_confirmed", { version: 1 }))).toBe("already_confirmed");
-  });
-  test("the existing codes are unchanged", () => {
+  test("the existing quiz codes are unchanged", () => {
     expect(actionCode(conflict("quiz_stale"))).toBe("stale");
-    expect(actionCode(conflict("confirm_blocked"))).toBe("blocked");
+    expect(actionCode(conflict("quiz_missing"))).toBe("blocked");
     expect(actionCode({ ok: false, status: 0, body: null })).toBe("unreachable");
     expect(actionCode({ ok: false, status: 400, body: null })).toBe("invalid");
+  });
+  test("400 name_required → `name_required` (REQ-103 AC-6); the old confirm refusals are no longer a code", () => {
+    expect(actionCode({ ok: false, status: 400, body: { error: { code: "name_required", message: "" } } })).toBe("name_required");
+    expect(actionCode(conflict("already_confirmed", { version: 1 }))).toBe("invalid");
   });
 });

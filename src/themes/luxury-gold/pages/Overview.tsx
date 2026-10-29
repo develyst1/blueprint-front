@@ -5,7 +5,7 @@
 // link into the back room. Required: every step title, every role title, every goal.
 import type { OverviewVM, RequiredItem } from "@/core/theme/contract";
 import { findRequired, requiredId, requiredProps } from "@/core/theme/required";
-import { brief, decisionPart, pageLabel } from "@/core/words";
+import { brief, decisionPart, pageLabel, requirementsSection } from "@/core/words";
 import { MoreDisclosure } from "../client/MoreDisclosure";
 import { Medallion } from "../primitives/Medallion";
 
@@ -44,6 +44,20 @@ export function Overview({ vm, required }: { vm: OverviewVM; required: RequiredI
             ))}
           </ul>
         </section>
+
+        {vm.requirements.length > 0 && (
+          <section className="lg-work" aria-labelledby="lg-brief-requirements">
+            <h2 id="lg-brief-requirements" className="lg-work-title" {...marked(requiredId.requirementsSection)}>{requirementsSection}</h2>
+            <ul className="lg-roles">
+              {vm.requirements.map((r) => (
+                <li key={r.key} className="lg-role">
+                  <span className="lg-role-title" {...marked(requiredId.part(r.key))}>{r.title}</span>
+                  {r.text && <span className="lg-role-duty">{r.text}</span>}
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
 
         <section className="lg-work" aria-labelledby="lg-brief-path">
           <h2 id="lg-brief-path" className="lg-work-title">{brief.path}</h2>

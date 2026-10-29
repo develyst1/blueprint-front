@@ -39,6 +39,7 @@ export const kindGroup: Record<PartKind, keyof typeof group> = {
   data: "knowledge",
   decision: "knowledge",
   question: "question",
+  requirement: "knowledge",
 };
 
 export const radius = { card: 16, tile: 12, chip: 999 } as const;

@@ -6,13 +6,24 @@
 import { refresh } from "next/cache";
 import type { ActionCode, ActionResult } from "./contract";
 import type { ProjectData } from "@/core/model/build/types";
+import { byHeader, readBy } from "@/core/api/by";
 import { isTooLarge } from "./limits";
 import { raw, type RawResult } from "./load";
 
 const json = (body: unknown): RequestInit => ({ method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
 
+/** Every write carries the typed name (REQ-103, SPEC-104 D4). No name → nothing is sent and the answer is the back end's own
+ *  `name_required` 400, so one code path serves both; the refresh then draws the page with the name field open (AC-6). */
+const NAME_REQUIRED: RawResult<never> = { ok: false, status: 400, body: { error: { code: "name_required" } } };
+async function send<T>(path: string, init: RequestInit = {}): Promise<RawResult<T>> {
+  const by = await readBy();
+  if (!by) return NAME_REQUIRED;
+  return raw<T>(path, { ...init, headers: { ...(init.headers as Record<string, string> | undefined), ...byHeader(by) } });
+}
+
 function codeOf(r: Extract<RawResult<unknown>, { ok: false }>): ActionCode {
   const code = (r.body as { error?: { code?: string } } | null)?.error?.code;
+  if (r.status === 400 && code === "name_required") return "name_required";
   if (r.status === 0 || r.status >= 500) return "unreachable";
   if (r.status === 413) return "too_large";
   if (r.status === 415) return "unsupported_file";
@@ -30,7 +41,7 @@ function done(r: RawResult<unknown>): ActionResult {
 export async function sendAction(projectId: string, text: string): Promise<ActionResult> {
   const message = text.trim();
   if (!message) return { ok: false, code: "invalid" };
-  return done(await raw(`/v1/projects/${projectId}/rounds`, json({ message })));
+  return done(await send(`/v1/projects/${projectId}/rounds`, json({ message })));
 }
 
 /** "ตามนั้น": every key in one round (POST …/rounds { accept }) → one change set (AC-2). Only questions that have a
@@ -44,26 +55,26 @@ export async function acceptAction(projectId: string, keys: string[]): Promise<A
     .filter((p) => p.kind === "question" && p.body.status === "open" && typeof p.body.proposedAnswer === "string" && p.body.proposedAnswer.trim())
     .map((p) => p.key));
   if (!keys.every((k) => acceptable.has(k))) return { ok: false, code: "invalid" };
-  return done(await raw(`/v1/projects/${projectId}/rounds`, json({ accept: keys })));
+  return done(await send(`/v1/projects/${projectId}/rounds`, json({ accept: keys })));
 }
 
 /** ตอบเอง…: one open question answered in the user's own words (POST …/rounds { answers }) — REQ-003 Addendum A. */
 export async function answerAction(projectId: string, key: string, text: string): Promise<ActionResult> {
   const answer = text.trim();
   if (!answer) return { ok: false, code: "invalid" };
-  return done(await raw(`/v1/projects/${projectId}/rounds`, json({ answers: [{ key, text: answer }] })));
+  return done(await send(`/v1/projects/${projectId}/rounds`, json({ answers: [{ key, text: answer }] })));
 }
 
 /** ไม่ต้องใช้ข้อนี้: park one open question, with the reason if one was given (POST …/rounds { park }). The back end
  *  makes no model call for it. */
 export async function parkAction(projectId: string, key: string, reason?: string): Promise<ActionResult> {
   const why = reason?.trim();
-  return done(await raw(`/v1/projects/${projectId}/rounds`, json({ park: [{ key, ...(why ? { reason: why } : {}) }] })));
+  return done(await send(`/v1/projects/${projectId}/rounds`, json({ park: [{ key, ...(why ? { reason: why } : {}) }] })));
 }
 
 /** "ย้อนกลับ". 409 undo_conflict → the titles of the parts changed since (AC-4). */
 export async function undoAction(projectId: string, changeSetId: string): Promise<ActionResult> {
-  const r = await raw(`/v1/projects/${projectId}/change-sets/${encodeURIComponent(changeSetId)}/undo`, { method: "POST" });
+  const r = await send(`/v1/projects/${projectId}/change-sets/${encodeURIComponent(changeSetId)}/undo`, { method: "POST" });
   refresh();
   if (r.ok) return { ok: true };
   const err = (r.body as { error?: { code?: string; details?: { parts?: { key: string; title: string }[] } } } | null)?.error;
@@ -81,20 +92,20 @@ export async function uploadAction(projectId: string, form: FormData): Promise<A
   const body = new FormData();
   body.set("file", file, file.name);
   body.set("origin", JSON.stringify({ stamp, date: today }));
-  return done(await raw(`/v1/projects/${projectId}/sources`, { method: "POST", body }));
+  return done(await send(`/v1/projects/${projectId}/sources`, { method: "POST", body }));
 }
 
 export async function setModelAction(projectId: string, model: string): Promise<ActionResult> {
-  return done(await raw(`/v1/projects/${projectId}`, { ...json({ model }), method: "PATCH" }));
+  return done(await send(`/v1/projects/${projectId}`, { ...json({ model }), method: "PATCH" }));
 }
 
 export async function setCreativityAction(projectId: string, value: number): Promise<ActionResult> {
   if (!Number.isFinite(value) || value < 0 || value > 2) return { ok: false, code: "invalid" };
-  return done(await raw(`/v1/projects/${projectId}`, { ...json({ creativity: value }), method: "PATCH" }));
+  return done(await send(`/v1/projects/${projectId}`, { ...json({ creativity: value }), method: "PATCH" }));
 }
 
 /** "ลองใหม่": ask the bot again for the turn it could not answer (POST …/rounds { retry: true }, D-023). The user's
  *  decisions in that turn were already kept; no new message is sent. 409 nothing_to_retry → `invalid`. */
 export async function retryAction(projectId: string): Promise<ActionResult> {
-  return done(await raw(`/v1/projects/${projectId}/rounds`, json({ retry: true })));
+  return done(await send(`/v1/projects/${projectId}/rounds`, json({ retry: true })));
 }

@@ -5,8 +5,9 @@ import type { PageVMs, RequiredItem } from "../contract";
 import { requiredId } from "../required";
 import {
   apiDetail, apiGroup, brief, decisionPart, emptyList, historyPick, linkKind, pageLabel, partKind, participantKind, proposedAnswer,
-  screenGroup, showMore,
+  screenGroup, showMore, historyAll, requirementsSection,
 } from "@/core/words";
+import { RequirementsEditor } from "@/core/requirements/RequirementsEditor";
 import { Mark, markAttrs } from "./Mark";
 import { WebView } from "./WebView";
 import s from "./default.module.css";
@@ -59,6 +60,20 @@ export function Overview({ vm, required }: P<"overview">) {
             ))}
           </ul>
         </section>
+
+        {vm.requirements.length > 0 && (
+          <section>
+            <h2><Mark required={required} id={requiredId.requirementsSection}>{requirementsSection}</Mark></h2>
+            <ul className={s.roles}>
+              {vm.requirements.map((r) => (
+                <li key={r.key} className={s.roleCard}>
+                  <strong><Mark required={required} id={requiredId.part(r.key)}>{r.title}</Mark></strong>
+                  {r.text && <span className={s.muted}>{r.text}</span>}
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
 
         <section>
           <h2>{brief.path}</h2>
@@ -328,6 +343,18 @@ export function History({ vm, required }: P<"history">) {
   return (
     <>
       <h2>{pageLabel.history}</h2>
+      {!vm.part && vm.entries.length > 0 && (
+        <section className={s.detail}>
+          <h3>{historyAll}</h3>
+          <table className={s.table}>
+            <tbody>
+              {vm.entries.map((e, i) => (
+                <tr key={i}><td>{e.by ?? "—"}</td><td>{e.atLabel}</td><td>{e.cause}</td><td>{e.whatLabel || e.what}</td><td>{e.summary}</td></tr>
+              ))}
+            </tbody>
+          </table>
+        </section>
+      )}
       {!vm.part && <p className={s.muted}>{historyPick}</p>}
       {vm.part && (
         <section className={s.detail}>
@@ -335,7 +362,7 @@ export function History({ vm, required }: P<"history">) {
           <table className={s.table}>
             <tbody>
               {vm.entries.map((e, i) => (
-                <tr key={i}><td>{e.atLabel}</td><td>{e.cause}</td><td>{e.whatLabel}</td><td>{e.summary}</td></tr>
+                <tr key={i}><td>{e.by ?? "—"}</td><td>{e.atLabel}</td><td>{e.cause}</td><td>{e.whatLabel}</td><td>{e.summary}</td></tr>
               ))}
             </tbody>
           </table>
@@ -348,7 +375,17 @@ export function History({ vm, required }: P<"history">) {
   );
 }
 
+// ---------- requirement (REQ-103) ----------
+export function Requirements({ vm, required }: P<"requirements">) {
+  return (
+    <>
+      <h2>{pageLabel.requirements}</h2>
+      <RequirementsEditor projectId={vm.frame.project.id} requirements={vm.requirements} required={required} />
+    </>
+  );
+}
+
 export const defaultPages = {
   overview: Overview, workOrder: WorkOrder, flowchart: Flowchart, sequence: Sequence, screens: Screens, api: Api,
-  web: Web, stuck: Stuck, history: History,
+  web: Web, stuck: Stuck, history: History, requirements: Requirements,
 };

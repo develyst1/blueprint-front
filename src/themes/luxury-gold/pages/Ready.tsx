@@ -1,40 +1,39 @@
 // Screen ④ (`readyPage`, REQ-007) in luxury gold — stage + plaque (direction § 1).
 // Stage: the work as a row of medallions (stuck ones sealed) with the counts beside it — or, for a project with no
 // parts, the core's `emptyProject` line — then the quiz as a ledger: question → answer → the parts it used (links) →
-// `markRight` / `markWrong`. Plaque: the gate. Its bold slot holds what is true now: the `confirmed` state (D-030), or
-// the `stale` reason while the quiz is stale (the old score goes quiet), or else the score; then Confirm, the other
-// reasons as links to where each is fixed, the confirmed version, and Build (off, with why). In reading order the
-// plaque comes right after the summary, so on a phone the reason Confirm is off is seen before the long quiz.
+// `markRight` / `markWrong`. Plaque: its bold slot holds what is true now: an empty project's way to the chat, or the
+// `stale` reason while the quiz is stale (the old score goes quiet), or else the score; then the core's label section
+// (REQ-103, in place of Confirm), the other open notes as links to where each is fixed, and Build (always a link). In
+// reading order the plaque comes right after the summary, so on a phone the warning before a label is seen before the long quiz.
 // TASK-C-016 = REVIEW-A-003 rows 1, 2, 4–11. Words only from @/core/words, @/features/ready/words (PM 2026-10-09) or
 // the view model; never typed here.
 import type { ReadyPageProps } from "@/core/theme/contract";
 import { findRequired, requiredId, requiredProps } from "@/core/theme/required";
 import { emptyProject, pageLabel, participantKind } from "@/core/words";
 import {
-  botFailed, build as buildWord, changedSince, confirmed, notInSpec, partsUsed, quizHeading, quizHint, readyPage, score, scoreEarly,
+  botFailed, build as buildWord, notInSpec, partsUsed, quizHeading, quizHint, readyPage, score, scoreEarly,
 } from "@/features/ready/words";
-import { GateConfirm, QuizAsk, QuizMark, QuizRetry, ReadySteps } from "../client/ReadyQuiz";
+import { QuizAsk, QuizMark, QuizRetry, ReadySteps } from "../client/ReadyQuiz";
 import { Medallion } from "../primitives/Medallion";
 import { Seal } from "../primitives/Seal";
 
 const ids = { lead: "lg-ready-lead", reasons: "lg-ready-reasons", hint: "lg-ready-hint", quiz: "lg-ready-quiz", build: "lg-ready-build-why" };
 
-export function Ready({ vm, actions, required }: ReadyPageProps) {
+export function Ready({ vm, actions, required, labelSection }: ReadyPageProps) {
   const props = (id: string) => {
     const item = findRequired(required, id);
     return item ? requiredProps(item) : {};
   };
   const q = vm.quiz;
   const empty = vm.gate.reasons.some((r) => r.code === "empty");
-  // the plaque's bold slot: what is true now — an empty project (its way to the chat), a confirmed state, or the reason
-  // a stale quiz no longer counts (critique C-016 P2-a: an empty plaque opened with the off Confirm)
-  const lead = vm.gate.reasons.find((r) => r.code === "empty" || r.code === "confirmed")
+  // the plaque's bold slot: what is true now — an empty project (its way to the chat), or the reason a stale quiz no
+  // longer counts (critique C-016 P2-a)
+  const lead = vm.gate.reasons.find((r) => r.code === "empty")
     ?? (q?.stale ? vm.gate.reasons.find((r) => r.code === "stale") : undefined);
   const rest = vm.gate.reasons.filter((r) => r !== lead);
   const scoreLine = q ? (q.score !== null ? score(q.score, q.marked) : scoreEarly(q.marked)) : null;
-  // the score is quiet when it is not the news: before 5 marks (row 4), on a stale quiz (row 2), or under `confirmed`
+  // the score is quiet when it is not the news: before 5 marks (row 4), on a stale quiz (row 2), or under a lead
   const scoreTone = q?.score === null ? "early" : q?.stale || lead ? "quiet" : undefined;
-  const describedBy = [lead && ids.lead, rest.length > 0 && ids.reasons].filter(Boolean).join(" ") || undefined;
   const lastFailed = q?.items.at(-1)?.status === "failed";
   return (
     <div className="lg-page lg-page-split lg-ready">
@@ -72,8 +71,7 @@ export function Ready({ vm, actions, required }: ReadyPageProps) {
       <aside className="lg-plaque lg-ready-gate">
         {lead && (
           <p id={ids.lead} className="lg-ready-lead" data-code={lead.code} {...props(requiredId.readyReason(lead.code))}>
-            {/* confirmed is a state, not something to go and fix: text, no link */}
-            {lead.code === "confirmed" ? lead.text : <a href={lead.href}>{lead.text}</a>}
+            <a href={lead.href}>{lead.text}</a>
           </p>
         )}
         {scoreLine && (
@@ -81,7 +79,7 @@ export function Ready({ vm, actions, required }: ReadyPageProps) {
             {scoreLine}
           </p>
         )}
-        <GateConfirm enabled={vm.gate.ok} confirm={actions.confirm} describedBy={describedBy} />
+        {labelSection}
         {rest.length > 0 && (
           <ul id={ids.reasons} className="lg-ready-reasons">
             {rest.map((r) => (
@@ -94,10 +92,7 @@ export function Ready({ vm, actions, required }: ReadyPageProps) {
             ))}
           </ul>
         )}
-        {/* under a lead the version lines are a footnote — the lead already says it (critique C-016 P2-b) */}
-        {vm.version && <p className="lg-ready-version" data-quiet={lead ? true : undefined}>{confirmed(vm.version.n, vm.version.dateLabel)}</p>}
-        {vm.version?.changedSince && <p className="lg-ready-changed" data-quiet={lead ? true : undefined}>{changedSince(vm.version.n)}</p>}
-        {/* Build (D-050): a real link to CAW once the newest version is confirmed and unchanged; otherwise off, with why */}
+        {/* Build (REQ-103 AC-3): always a real link to CAW; the off branch below is dead since REQ-103 */}
         <div className="lg-ready-build">
           {vm.build.enabled && vm.build.href ? (
             <a className="lg-ready-build-link" href={vm.build.href}>

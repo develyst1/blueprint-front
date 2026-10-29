@@ -198,11 +198,15 @@ test("buildChatVM: failed from the newest bot row, แชต is current — no r
 
 describe("A-034 actions (fixture API; next/cache's refresh stubbed — no Next request here)", () => {
   mock.module("next/cache", () => ({ refresh: () => {} }));
+  // the typed name (REQ-103): the `bp_by` cookie as Next would hand it over; null = none typed yet
+  let typed: string | null = "โด่ง";
+  mock.module("next/headers", () => ({ cookies: async () => ({ get: (n: string) => (n === "bp_by" && typed !== null ? { value: typed } : undefined) }) }));
   const project = (parts: ProjectData["parts"]) => ({ ...data(parts).project, parts, links: [] });
   const fakeApi = (parts: ProjectData["parts"], round = (): Response => Response.json({ status: "applied" })) => {
-    const calls: { url: string; body: unknown }[] = [];
+    const calls: { url: string; body: unknown; by: string | null }[] = [];
     const spy = spyOn(globalThis, "fetch").mockImplementation((async (url: string | URL | Request, init?: RequestInit) => {
-      calls.push({ url: String(url), body: typeof init?.body === "string" ? JSON.parse(init.body) : null }); // a multipart body (FormData) has no JSON form
+      const by = new Headers(init?.headers).get("x-blueprint-by");
+      calls.push({ url: String(url), body: typeof init?.body === "string" ? JSON.parse(init.body) : null, by }); // a multipart body (FormData) has no JSON form
       return String(url).endsWith("/rounds") ? round() : Response.json(project(parts));
     }) as typeof fetch);
     return { calls, rounds: () => calls.filter((c) => c.url.endsWith("/rounds")), spy };
@@ -331,4 +335,54 @@ test("A-039: the D-020 words have one home — ours re-export the core's under t
   expect(chatWords.actionError).toBe(core.chatActionError);
   expect([chatWords.sourceFailed("unreadable_pdf"), chatWords.sourceFailed("weird"), chatWords.sourceFailed(null)])
     .toEqual(["อ่านไม่ได้ (เปิดไฟล์ PDF ไม่ได้)", "อ่านไม่ได้", "อ่านไม่ได้"]);
+});
+
+describe("REQ-103: every chat write carries the typed name, or is refused before any call (AC-6)", () => {
+  mock.module("next/cache", () => ({ refresh: () => {} }));
+  let typed: string | null = "โด่ง";
+  mock.module("next/headers", () => ({ cookies: async () => ({ get: (n: string) => (n === "bp_by" && typed !== null ? { value: typed } : undefined) }) }));
+  const record = () => {
+    const calls: { url: string; method: string; by: string | null }[] = [];
+    const spy = spyOn(globalThis, "fetch").mockImplementation((async (url: string | URL | Request, init?: RequestInit) => {
+      calls.push({ url: String(url), method: init?.method ?? "GET", by: new Headers(init?.headers).get("x-blueprint-by") });
+      return Response.json({ status: "applied" });
+    }) as typeof fetch);
+    return { calls, spy };
+  };
+
+  test("a name → X-Blueprint-By is the percent-encoded name on the write", async () => {
+    const { sendAction } = await import("./actions");
+    typed = "โด่ง";
+    const r = record();
+    try {
+      expect(await sendAction("p-1", "สวัสดี")).toEqual({ ok: true });
+      expect(r.calls).toHaveLength(1);
+      expect(r.calls[0]!.by).toBe(encodeURIComponent("โด่ง"));
+      expect(decodeURIComponent(r.calls[0]!.by!)).toBe("โด่ง");
+    } finally { r.spy.mockRestore(); }
+  });
+
+  test("no name → name_required, and nothing is sent — for a round, a setting, an undo and an upload alike", async () => {
+    const { sendAction, setModelAction, setCreativityAction, undoAction, retryAction } = await import("./actions");
+    typed = null;
+    const r = record();
+    try {
+      const refused = { ok: false as const, code: "name_required" as const };
+      expect(await sendAction("p-1", "สวัสดี")).toEqual(refused);
+      expect(await setModelAction("p-1", "tier:small")).toEqual(refused);
+      expect(await setCreativityAction("p-1", 0.5)).toEqual(refused);
+      expect(await undoAction("p-1", "cs-1")).toEqual(refused);
+      expect(await retryAction("p-1")).toEqual(refused);
+      expect(r.calls).toHaveLength(0);
+    } finally { r.spy.mockRestore(); typed = "โด่ง"; }
+  });
+
+  test("a back-end 400 name_required maps to the same code", async () => {
+    const { sendAction } = await import("./actions");
+    typed = "โด่ง";
+    const spy = spyOn(globalThis, "fetch").mockImplementation((async () => Response.json({ error: { code: "name_required", message: "type your name first" } }, { status: 400 })) as unknown as typeof fetch);
+    try {
+      expect(await sendAction("p-1", "สวัสดี")).toEqual({ ok: false, code: "name_required" });
+    } finally { spy.mockRestore(); }
+  });
 });

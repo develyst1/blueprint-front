@@ -1,0 +1,18 @@
+/* The name control's neutral default: zero specificity (:where), so any theme rule wins; colour and font come through. */
+:where(.root) { display: inline-flex; align-items: center; gap: 6px; margin-inline-end: 8px; } /* a gap before the next tool (ส่งออก PDF) */
+:where(.button), :where(.input) {
+  box-sizing: border-box;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1.5px solid currentColor;
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+}
+:where(.button) { min-width: 44px; cursor: pointer; white-space: nowrap; }
+:where(.input) { min-width: 0; width: clamp(9em, 40vw, 22em); max-width: 100%; text-overflow: ellipsis; } /* the prompt is a long sentence: wide where there is room, never wider than a phone allows */
+:where(.button):focus-visible, :where(.input):focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+/* the name inside the button: capped with an ellipsis, tighter on a phone, so the header's tools stay on one row (Sober's Q4 answer) */
+:where(.nameText) { display: inline-block; max-width: 12em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; vertical-align: bottom; }
+@media (max-width: 480px) { :where(.nameText) { max-width: 5em; } :where(.button) { padding: 0 10px; } }

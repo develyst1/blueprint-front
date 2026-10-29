@@ -21,6 +21,7 @@ export const requiredId = {
   role: (key: string) => `role:${key}`, // REQ-017: the brief's ใครเกี่ยวข้อง
   goal: (workKey: string) => `goal:${workKey}`, // REQ-017: the brief's understanding paragraph, when the spec has one
   stuck: (item: Pick<StuckItemVM, "key" | "kind" | "reason">) => `stuck:${item.key}:${item.reason ?? item.kind}`,
+  requirementsSection: "requirements:section", // REQ-103 AC-10: the overview / PDF section's title
   readyReason: readyRequiredId.reason, // screen ④: one gate reason (Team C, TASK-B-015)
   readyScore: readyRequiredId.score, //   screen ④: the score line
 } as const;

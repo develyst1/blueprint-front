@@ -8,7 +8,7 @@
 import { Collapse, Grid, Steps } from "antd";
 import type { PageVMs, RequiredItem } from "@/core/theme/contract";
 import { requiredId } from "@/core/theme/required";
-import { brief, decisionPart, linkKind, showMore } from "@/core/words";
+import { brief, decisionPart, linkKind, requirementsSection, showMore } from "@/core/words";
 import { PageHead } from "../parts/PageHead";
 import { Req } from "../parts/Req";
 import { KindTile } from "../parts/Tile";
@@ -49,6 +49,20 @@ export function Overview({ vm, required }: { vm: PageVMs["overview"]; required: 
               ))}
             </ul>
           </section>
+
+          {vm.requirements.length > 0 && (
+            <section className={s.panel}>
+              <div className={s.panelHead}><KindTile kind="requirement" /><h3><Req required={required} id={requiredId.requirementsSection}>{requirementsSection}</Req></h3></div>
+              <ul className={s.roles}>
+                {vm.requirements.map((r) => (
+                  <li key={r.key} className={s.role}>
+                    <strong><Req required={required} id={requiredId.part(r.key)}>{r.title}</Req></strong>
+                    {r.text && <span className={s.muted}>{r.text}</span>}
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
 
           <section className={`${s.panel} ${s.journey}`}>
             <div className={s.panelHead}><KindTile kind="work" /><h3>{brief.path}</h3></div>

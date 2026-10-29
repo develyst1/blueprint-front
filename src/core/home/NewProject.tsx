@@ -25,7 +25,7 @@ export function NewProject({ themes }: { themes: ThemeOption[] }) {
   const create = () => start(async () => {
     const res = await createProjectAction(name, theme);
     if (res.ok) { close(); router.push(chatHref(res.id)); }
-    else setFailed(true);
+    else setFailed(res.state !== "name_required"); // name_required: the page re-rendered with the name field open
   });
 
   return (

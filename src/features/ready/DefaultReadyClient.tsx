@@ -1,12 +1,12 @@
 "use client";
 
-// The default screen ④ page's interactive parts: the question box, the mark buttons, Confirm. Each calls a server
+// The default screen ④ page's interactive parts: the question box, the mark buttons. Each calls a server
 // action (which refreshes the page) inside a transition; a button is off while its action runs. A failed action leaves
 // what the user typed in place — the refreshed page shows why through the gate reasons (REQ-007 has no error words).
 import { useState, useTransition, type FormEvent } from "react";
 import type { ReadyActions } from "./contract";
 import {
-  ask as askWord, confirm as confirmWord, markRight, markWrong, restartQuiz, retry as retryWord, wrongNote,
+  ask as askWord, markRight, markWrong, restartQuiz, retry as retryWord, wrongNote,
 } from "./words";
 import s from "./ready.module.css";
 
@@ -97,24 +97,6 @@ export function RetryButton({ question, ask }: { question: string; ask: ReadyAct
   return (
     <button type="button" className={s.button} disabled={busy} onClick={() => start(async () => { await ask(question); })}>
       {retryWord}
-    </button>
-  );
-}
-
-// Off by the gate: aria-disabled, not `disabled`, so it stays a Tab stop and reads out why (`describedBy` = the reasons,
-// TASK-C-022); a press then does nothing. Off while its own action runs: native `disabled`, as every other button.
-export function ConfirmButton({ enabled, confirm, describedBy }: { enabled: boolean; confirm: ReadyActions["confirm"]; describedBy?: string }) {
-  const [busy, start] = useTransition();
-  return (
-    <button
-      type="button"
-      className={`${s.button} ${s.primary}`}
-      disabled={busy}
-      aria-disabled={enabled ? undefined : true}
-      aria-describedby={enabled ? undefined : describedBy}
-      onClick={() => { if (enabled) start(async () => { await confirm(); }); }}
-    >
-      {confirmWord}
     </button>
   );
 }

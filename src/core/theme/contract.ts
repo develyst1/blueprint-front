@@ -5,8 +5,8 @@ export type { ChatVM, ChatActions, ChatPageProps } from "@/features/chat/contrac
 import type { ReadyPageProps } from "@/features/ready/contract"; // Team C, REQ-007 (v1.10)
 export type { ReadyVM, ReadyActions, ReadyPageProps } from "@/features/ready/contract";
 
-export type PageId = "overview" | "workOrder" | "flowchart" | "sequence" | "screens" | "api" | "web" | "stuck" | "history";
-export type PartKind = "work" | "step" | "interaction" | "role" | "screen" | "api" | "system" | "data" | "decision" | "question";
+export type PageId = "overview" | "workOrder" | "flowchart" | "sequence" | "screens" | "api" | "web" | "stuck" | "history" | "requirements" /* REQ-103 */;
+export type PartKind = "work" | "step" | "interaction" | "role" | "screen" | "api" | "system" | "data" | "decision" | "question" | "requirement" /* REQ-103 */;
 export type ParticipantKind = "role" | "screen" | "api" | "system";
 export type StuckKind = "open_question" | "unlinked_part" | "flow_break" | "unconfirmed_guess" | "screen_without_api" | "contradiction" /* v1.13 */;
 export type FlowBreakReason = "unreachable" | "dead_end" | "unlabelled_branch" | "no_interactions" | "incomplete_interaction";
@@ -68,6 +68,8 @@ export interface BackCountsVM { screens: number; apis: number; systems: number; 
 export interface OverviewVM {
   frame: FrameVM; works: (WorkVM & { goal: string | null })[]; decisions: DecisionVM[];
   roles: BriefRoleVM[]; questions: StuckItemVM[]; back: BackCountsVM; version: number | null /* the latest confirmed spec version, if known */;
+  /** REQ-103 AC-10: the project's requirements, in their own "Requirements" section (none → no section) */
+  requirements: RequirementVM[];
 }
 export interface WorkOrderVM { frame: FrameVM; works: { key: string; title: string; href: string }[]; work: WorkVM; layout: SwimLayout }
 export interface FlowchartVM { frame: FrameVM; works: { key: string; title: string; href: string }[]; work: WorkVM; layouts: { LR: FlowLayout; TB: FlowLayout } }
@@ -80,10 +82,14 @@ export interface PartDetailVM { key: string; kind: PartKind; title: string; stam
 export interface WebVM { frame: FrameVM; layout: WebLayout; tall: WebLayout /* v1.15: the same web arranged for a portrait box (phone) — useWebView picks by the box */; selected: PartDetailVM | null; allHref: string /* v1.14: this web with nothing chosen — ดูทั้งหมด / ปิด (REQ-009) */ }
 export interface StuckItemVM { kind: StuckKind; reason: FlowBreakReason | null; key: string; title: string; wording: string; proposedAnswer: string | null; target: { key: string; title: string; href: string } }
 export interface StuckVM { frame: FrameVM; items: StuckItemVM[] }
-export interface HistoryEntryVM { at: string; atLabel: string /* core-formatted, D-006 */; cause: string /* words.historyCause.* */; what: string /* the API op code — logic only */; whatLabel: string /* words.historyWhat[what], "" if no word (v1.7, D-010) */; summary: string }
+export interface HistoryEntryVM { by: string | null /* REQ-103: who typed it; null on rows from before names */; at: string; atLabel: string /* core-formatted, D-006 */; cause: string /* words.historyCause.* */; what: string /* the API op code — logic only */; whatLabel: string /* words.historyWhat[what], "" if no word (v1.7, D-010) */; summary: string }
+/** REQ-103: one requirement part — a PM writes it by hand; the core's default page lists it, a theme may draw its own later. */
+export interface RequirementVM { key: string; title: string; text: string }
+export interface RequirementsVM { frame: FrameVM; requirements: RequirementVM[] }
+/** `part` null = the whole project's history (REQ-103 "ประวัติการแก้ทั้งหมด"), `entries` from GET …/history. */
 export interface HistoryVM { frame: FrameVM; parts: { key: string; kind: PartKind /* v1.8 */; title: string; href: string }[]; part: { key: string; title: string } | null; entries: HistoryEntryVM[] }
 
-export interface PageVMs { overview: OverviewVM; workOrder: WorkOrderVM; flowchart: FlowchartVM; sequence: SequenceVM; screens: ScreensVM; api: ApisVM; web: WebVM; stuck: StuckVM; history: HistoryVM }
+export interface PageVMs { overview: OverviewVM; workOrder: WorkOrderVM; flowchart: FlowchartVM; sequence: SequenceVM; screens: ScreensVM; api: ApisVM; web: WebVM; stuck: StuckVM; history: HistoryVM; requirements: RequirementsVM }
 
 // ---------- home + new project ----------
 export interface ProjectCardVM { project: ProjectHeadVM; readiness: ReadinessVM; href: string }

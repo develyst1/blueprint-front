@@ -2,7 +2,7 @@
 // from the Layouts passed in (TASK-B-006 swaps the sample ones for real ones without touching this file).
 import type {
   ApiVM, ApisVM, FlowchartVM, HistoryEntryVM, HistoryVM, OverviewVM, PageId, ParticipantVM, PartDetailVM, PartKind,
-  ProjectCardVM, ScreenVM, ScreensVM, SequenceVM, StuckVM, WebVM, WorkOrderVM,
+  ProjectCardVM, RequirementsVM, ScreenVM, ScreensVM, SequenceVM, StuckVM, WebVM, WorkOrderVM,
 } from "@/core/theme/contract";
 import { formatThaiDate } from "@/core/format/date";
 import { WEB_ASPECT } from "@/core/layout/web";
@@ -12,7 +12,7 @@ import {
   webHref, workLinks, works, type ProjectWithSeal,
 } from "./common";
 import type {
-  ApiFlowchart, ApiHistoryEntry, ApiProject, ApiSequence, ApiSwimlane, Built, Layouts, ProjectData,
+  ApiFlowchart, ApiHistoryEntry, ApiProject, ApiProjectHistoryEntry, ApiSequence, ApiSwimlane, Built, Layouts, ProjectData,
 } from "./types";
 
 const empty = (page: PageId) => ({ ok: false as const, state: { kind: "empty" as const, page } });
@@ -24,6 +24,7 @@ const asParticipant = (p: { key: string; kind: string; title: string }): Partici
  *  questions, and the back room's counts. */
 export function buildOverview(data: ProjectWithSeal): Built<OverviewVM> {
   if (isEmpty(data)) return empty("overview");
+  const requirements = requirementsOf(data);
   return {
     ok: true,
     vm: {
@@ -34,6 +35,7 @@ export function buildOverview(data: ProjectWithSeal): Built<OverviewVM> {
       questions: stuckItems(data).filter((i) => i.kind === "open_question"),
       back: backCounts(data),
       version: data.latestVersion ?? null,
+      requirements,
     },
   };
 }
@@ -209,16 +211,52 @@ function summaryOf(e: ApiHistoryEntry, titleOf: (key: string) => string | undefi
   return out && from && to ? `${from} ${out} ${to}` : "";
 }
 
-export function buildHistory(data: ProjectData, partKey?: string, entries: ApiHistoryEntry[] = []): Built<HistoryVM> {
-  if (isEmpty(data)) return empty("history");
+/** An audit row's one line (REQ-103): the value that matters, never an id and no invented words. */
+export function auditSummary(action: string, before: unknown, after: unknown): string {
+  const row = after ?? before;
+  const get = (v: unknown, k: string): unknown => (v && typeof v === "object" ? (v as Obj)[k] : undefined);
+  if (action === "label") return str(get(row, "label")) ?? (typeof get(row, "version") === "number" ? `v${get(row, "version")}` : "");
+  if (action === "source_add" || action === "source_refetch" || action === "project_create") return str(get(row, "name")) ?? "";
+  if (action === "settings") {
+    return ["model", "creativity"]
+      .filter((k) => get(before, k) !== get(after, k))
+      .map((k) => `${k}: ${String(get(before, k) ?? "—")} → ${String(get(after, k) ?? "—")}`)
+      .join(" · ");
+  }
+  return "";
+}
+
+/** Who did it, in words (REQ-103, Sober's rework): a row with a typed name shows the name, so the operator word "โดยคุณ" ("by you")
+ *  — false on someone else's row — is left out (`""`; the row's `by` carries the name). "จากแชต", "จากเอกสาร" and "ย้อนการแก้ไข"
+ *  say how, not who, and stay. A row from before names (`by` null) keeps "โดยคุณ". */
+export function causeWord(by: string | null | undefined, kind: keyof typeof historyCause): string {
+  return by && kind === "operator" ? "" : historyCause[kind];
+}
+
+/** `GET …/history` → rows, newest first as the API sends them. A spec change reads like the per-part rows; an audit row
+ *  (`changeSetId` null) has `what` = its action code and `whatLabel` = the PM's word for it (`historyWhat`, REQ-103 Q4). */
+function projectRows(entries: ApiProjectHistoryEntry[], titleOf: (key: string) => string | undefined): HistoryEntryVM[] {
+  return entries.map((e) => {
+    const audit = e.changeSetId === null;
+    const cause = causeWord(e.by, audit ? "operator" : (e.kind in historyCause ? (e.kind as keyof typeof historyCause) : "operator"));
+    const summary = audit
+      ? auditSummary(e.kind, e.before, e.after)
+      : summaryOf({ op: e.op, before: e.before, after: e.after } as ApiHistoryEntry, titleOf) || titleOf(e.entity) || "";
+    return { by: e.by, at: e.at, atLabel: formatThaiDate(e.at), cause, what: audit ? e.kind : e.op, whatLabel: historyWhat[audit ? e.kind : e.op] ?? "", summary };
+  });
+}
+
+export function buildHistory(data: ProjectData, partKey?: string, entries: ApiHistoryEntry[] = [], projectEntries?: ApiProjectHistoryEntry[]): Built<HistoryVM> {
+  // the project-wide view stays open on an empty spec: sources, settings and labels are recorded before any part exists
+  if (isEmpty(data) && !projectEntries?.length) return empty("history");
   const { part } = index(data);
   const sel = partKey ? part.get(partKey) : undefined;
   const titleOf = (key: string) => part.get(key)?.title;
   const rows: HistoryEntryVM[] = sel
     ? [...entries]
         .sort((a, b) => a.at.localeCompare(b.at)) // oldest first (R6)
-        .map((e) => ({ at: e.at, atLabel: formatThaiDate(e.at), cause: historyCause[e.cause.kind], what: e.op, whatLabel: historyWhat[e.op] ?? "", summary: summaryOf(e, titleOf) }))
-    : [];
+        .map((e) => ({ by: e.by ?? null, at: e.at, atLabel: formatThaiDate(e.at), cause: causeWord(e.by, e.cause.kind), what: e.op, whatLabel: historyWhat[e.op] ?? "", summary: summaryOf(e, titleOf) }))
+    : projectEntries ? projectRows(projectEntries, titleOf) : [];
   return {
     ok: true,
     vm: {
@@ -238,4 +276,17 @@ export function buildCard(project: ApiProject & { stuckCount: number; partCount:
     readiness: readiness(project.stuckCount, project.partCount === 0),
     href: href(project.id, "overview"),
   };
+}
+
+// ---------- requirement (REQ-103) ----------
+/** The requirement parts, in the order the API lists them. */
+export function requirementsOf(data: ProjectData): RequirementsVM["requirements"] {
+  return data.parts
+    .filter((p) => (p.kind as string) === "requirement")
+    .map((p) => ({ key: p.key, title: p.title, text: field(p.body, "text") ?? "" }));
+}
+
+/** Never an empty-state page: an empty list is the page's own message. */
+export function buildRequirements(data: ProjectData): Built<RequirementsVM> {
+  return { ok: true, vm: { frame: frame(data, "requirements"), requirements: requirementsOf(data) } };
 }

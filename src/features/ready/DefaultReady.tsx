@@ -6,15 +6,15 @@ import { useId } from "react";
 import { pageLabel, participantKind } from "@/core/words";
 import { requiredProps } from "@/core/theme/required";
 import type { ReadyPageProps } from "./contract";
-import { AskBox, ConfirmButton, MarkButtons, RetryButton } from "./DefaultReadyClient";
+import { AskBox, MarkButtons, RetryButton } from "./DefaultReadyClient";
 import { readyRequiredId } from "./load";
 import {
-  botFailed, build as buildWord, changedSince, confirmed, notInSpec, partsUsed, quizHeading, quizHint, readyPage, reasons, score, scoreEarly,
+  botFailed, build as buildWord, notInSpec, partsUsed, quizHeading, quizHint, readyPage, reasons, score, scoreEarly,
 } from "./words";
 import s from "./ready.module.css";
 
-export function DefaultReady({ vm, actions, required }: ReadyPageProps) {
-  // the reasons describe Confirm, the build reason describes Build (TASK-C-022)
+export function DefaultReady({ vm, actions, required, labelSection }: ReadyPageProps) {
+  // the build reason describes Build (TASK-C-022)
   const ids = { reasons: useId(), build: useId() };
   const req = new Map(required.map((r) => [r.id, r]));
   const props = (id: string) => {
@@ -46,8 +46,6 @@ export function DefaultReady({ vm, actions, required }: ReadyPageProps) {
             {reasons.stuck(vm.stuck.count)}
           </a>
         )}
-        {vm.version && <p className={s.version}>{confirmed(vm.version.n, vm.version.dateLabel)}</p>}
-        {vm.version?.changedSince && <p className={s.changed}>{changedSince(vm.version.n)}</p>}
       </section>
 
       {/* the quiz (R2) */}
@@ -98,9 +96,9 @@ export function DefaultReady({ vm, actions, required }: ReadyPageProps) {
         )}
       </section>
 
-      {/* the gate (R3) and Build (R5) */}
+      {/* the label (REQ-103, in place of the confirm button), what is still open, and Build (R5) */}
       <section className={s.gate}>
-        <ConfirmButton enabled={vm.gate.ok} confirm={actions.confirm} describedBy={vm.gate.reasons.length > 0 ? ids.reasons : undefined} />
+        {labelSection}
         {vm.gate.reasons.length > 0 && (
           <ul id={ids.reasons} className={s.reasons}>
             {vm.gate.reasons.map((r) => (
@@ -112,7 +110,7 @@ export function DefaultReady({ vm, actions, required }: ReadyPageProps) {
             ))}
           </ul>
         )}
-        {/* Build (D-050): a real link to CAW once the newest version is confirmed and unchanged; otherwise off, with why */}
+        {/* Build (REQ-103 AC-3): always a real link to CAW */}
         <div className={s.build}>
           {vm.build.enabled && vm.build.href ? (
             <a className={`${s.button} ${s.primary} ${s.buildLink}`} href={vm.build.href}>

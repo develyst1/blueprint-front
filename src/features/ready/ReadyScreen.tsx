@@ -4,6 +4,8 @@
 import type { FC } from "react";
 import { notFound } from "next/navigation";
 import { retryAction as coreRetry } from "@/app/actions";
+import { readBy } from "@/core/api/by";
+import { NameControl } from "@/core/name/NameControl";
 import { exportHref } from "@/core/model/build/common";
 import { shellRequired } from "@/core/model/build/required";
 import { StateView } from "@/core/render/ProjectPage";
@@ -12,9 +14,10 @@ import type { Theme } from "@/core/theme/contract";
 import { defaultTheme } from "@/core/theme/default";
 import { getTheme } from "@/core/theme/registry";
 import { ExportButton } from "@/features/export/ExportButton";
-import { askAction, confirmAction, markAction, startQuizAction } from "./actions";
+import { askAction, labelAction, markAction, startQuizAction } from "./actions";
 import type { ReadyActions, ReadyPageProps } from "./contract";
 import { DefaultReady } from "./DefaultReady";
+import { LabelSection } from "./LabelSection";
 import { loadReady, readyRequired } from "./load";
 import s from "./ready.module.css";
 
@@ -23,6 +26,7 @@ const readyOf = (theme: Theme): FC<ReadyPageProps> => theme.ready ?? DefaultRead
 
 export async function ReadyScreen({ projectId }: { projectId: string }) {
   const res = await loadReady(projectId);
+  const by = await readBy();
   if (!res.ok) {
     if (res.state === "notFound") notFound();
     return <StateView theme={defaultTheme} frame={null} state={{ kind: "unreachable", retry: coreRetry }} />;
@@ -32,18 +36,24 @@ export async function ReadyScreen({ projectId }: { projectId: string }) {
   const { Root } = theme;
   const Shell = theme.shell ?? defaultTheme.shell!;
   const Ready = readyOf(theme);
+  const required = readyRequired(vm);
   const actions: ReadyActions = {
     startQuiz: startQuizAction.bind(null, projectId),
     ask: askAction.bind(null, projectId),
     mark: markAction.bind(null, projectId),
-    confirm: confirmAction.bind(null, projectId),
+    label: labelAction.bind(null, projectId),
   };
   return (
     <Root>
       {/* the PDF export, as the core passes it on the spec pages (contract v1.11 `tools`, TASK-C-015) */}
-      <Shell frame={vm.frame} required={shellRequired(vm.frame)} tools={<ExportButton href={exportHref(vm.frame.project.id)} />}>
+      <Shell frame={vm.frame} required={shellRequired(vm.frame)} tools={<><NameControl name={by} /><ExportButton href={exportHref(vm.frame.project.id)} /></>}>
         <main id={contentId} tabIndex={-1} className={theme === defaultTheme ? s.bare : undefined}>
-          <Ready vm={vm} actions={actions} required={readyRequired(vm)} />
+          <Ready
+            vm={vm}
+            actions={actions}
+            required={required}
+            labelSection={<LabelSection warning={vm.warning} labels={vm.labels} label={actions.label} required={required} />}
+          />
         </main>
       </Shell>
     </Root>

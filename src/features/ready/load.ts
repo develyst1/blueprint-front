@@ -10,14 +10,17 @@ import { chatHref, frame, href, webHref, works } from "@/core/model/build/common
 import type { ProjectData } from "@/core/model/build/types";
 import { loadProjectData } from "@/core/model/load";
 import type { FrameVM, RequiredItem } from "@/core/theme/contract";
-import type { ActionCode, GateCode, ReadyQuizVM, ReadyVM } from "./contract";
+import { raw } from "@/features/chat/load";
+import type { ActionCode, GateCode, ReadyLabelVM, ReadyQuizVM, ReadyVM } from "./contract";
 import { readyRequiredId } from "./required";
-import { build, buildNotReady, reasons, score, scoreEarly } from "./words";
+import { build, reasons, score, scoreEarly, versionTag, warningBoth, warningQuiz, warningStuck } from "./words";
 
 // ---------- the API's shapes, from the generated schema ----------
 export type ApiQuizItem = components["schemas"]["QuizItem"];
 export type ApiQuiz = components["schemas"]["Quiz"];
-export type ApiVersions = components["schemas"]["VersionFeed"];
+/** One entry of `GET …/labels` (REQ-103, SPEC-104): newest first. `label` is null on an old confirmed version. Written here
+ *  until `gen:api` has seen the new back end (then the generated type can replace it). */
+export type ApiLabel = { version: number; label: string | null; labelledAt: string; by: string };
 
 /** At most 10 answered items per quiz (SPEC-A-004 rule 3). */
 export const MAX_ANSWERED = 10;
@@ -48,10 +51,9 @@ export function actionCode(r: Extract<CallResult<unknown>, { ok: false }>): Acti
     if (code === "quiz_full") return "full";
     if (code === "quiz_closed") return "closed";
     if (code === "already_marked") return "already_marked";
-    if (code === "quiz_missing" || code === "quiz_not_100" || code === "confirm_blocked") return "blocked";
-    // TASK-A-050: an unchanged confirmed spec cannot be confirmed again; the refreshed page shows the `confirmed` state
-    if (code === "already_confirmed") return "already_confirmed";
+    if (code === "quiz_missing") return "blocked";
   }
+  if (r.status === 400 && code === "name_required") return "name_required";
   return "invalid";
 }
 
@@ -86,8 +88,7 @@ export function toQuiz(data: ProjectData, q: ApiQuiz | null): ReadyQuizVM | null
   };
 }
 
-/** Why Confirm is off, in SPEC-C-002's order. It mirrors the server gate (SPEC-A-004 rule 8); confirm() stays the
- *  authority. */
+/** What is still open, in SPEC-C-002's order — notes now, not a gate (REQ-103: a label is never blocked). */
 export function gateReasons(stuckCount: number, quiz: ReadyQuizVM | null, stuckHref: string): ReadyVM["gate"]["reasons"] {
   const out: { code: GateCode; text: string; href: string }[] = [];
   if (stuckCount > 0) out.push({ code: "stuck", text: reasons.stuck(stuckCount), href: stuckHref });
@@ -100,36 +101,43 @@ export function gateReasons(stuckCount: number, quiz: ReadyQuizVM | null, stuckH
   return out;
 }
 
-/** The whole gate (TASK-C-016): a project with no parts has one reason, `empty`, which leads to the chat (D-032);
- *  otherwise the five reasons above; with none of them and a confirmed version nothing has changed since, the state
- *  `confirmed` (D-030) — Confirm is off. Its link is the quiz that passed (#quiz): `href` stays a string, because every
- *  theme's ready page links each reason (TASK-C-016 Interpreted; a theme may show this state as plain text). */
-export function gate(data: ProjectData, quiz: ReadyQuizVM | null, version: ReadyVM["version"]): ReadyVM["gate"] {
+/** The notes (TASK-C-016): a project with no parts has one, `empty`, which leads to the chat (D-032); otherwise the
+ *  reasons above. */
+export function gate(data: ProjectData, quiz: ReadyQuizVM | null): ReadyVM["gate"] {
   const id = data.project.id;
-  if (data.parts.length === 0) return { ok: false, reasons: [{ code: "empty", text: reasons.empty, href: chatHref(id) }] };
-  const out = gateReasons(data.stuck.length, quiz, href(id, "stuck"));
-  if (out.length === 0 && version && !version.changedSince) out.push({ code: "confirmed", text: reasons.confirmed(version.n), href: QUIZ_ANCHOR });
-  return { ok: out.length === 0, reasons: out };
+  if (data.parts.length === 0) return { reasons: [{ code: "empty", text: reasons.empty, href: chatHref(id) }] };
+  return { reasons: gateReasons(data.stuck.length, quiz, href(id, "stuck")) };
 }
 
-export function buildReadyVM(input: { data: ProjectData; quiz: ApiQuiz | null; versions: ApiVersions["versions"]; changedSinceLatest?: boolean }): ReadyVM {
+/** The warning before a label (REQ-103 § Wording): stuck items and/or an incomplete quiz — "complete" is what the old gate
+ *  asked: at least 5 marks, all right, not stale. Never blocks; null = nothing to warn about. */
+export function labelWarning(stuckCount: number, quiz: ReadyQuizVM | null): string | null {
+  const quizOpen = !quiz || quiz.marked < MIN_MARKED || quiz.right < quiz.marked || quiz.stale;
+  if (stuckCount > 0 && quizOpen) return warningBoth(stuckCount);
+  if (stuckCount > 0) return warningStuck(stuckCount);
+  return quizOpen ? warningQuiz : null;
+}
+
+export function toLabels(labels: ApiLabel[]): ReadyLabelVM[] {
+  return labels.map((l) => ({ version: l.version, text: l.label ?? versionTag(l.version), dateLabel: formatThaiDate(l.labelledAt), by: l.by }));
+}
+
+export function buildReadyVM(input: { data: ProjectData; quiz: ApiQuiz | null; labels: ApiLabel[] }): ReadyVM {
   const { data } = input;
   const id = data.project.id;
   const count = (kind: string) => data.parts.filter((p) => p.kind === kind).length;
   const stuckHref = href(id, "stuck");
   const quiz = toQuiz(data, input.quiz);
-  const last = input.versions.at(-1);
-  // changedSince: Team A's `changedSinceLatest` (SPEC-C-002 Q2 → TASK-A-032). Absent → false.
-  const version = last ? { n: last.version, dateLabel: formatThaiDate(last.confirmedAt), changedSince: input.changedSinceLatest === true } : null;
   return {
     frame: readyFrame(data),
     steps: works(data)[0]?.steps ?? [],
     counts: { screens: count("screen"), apis: count("api"), people: count("role") },
     stuck: { count: data.stuck.length, href: stuckHref },
     quiz,
-    gate: gate(data, quiz, version),
-    version,
-    build: buildLink(id, version),
+    gate: gate(data, quiz),
+    labels: toLabels(input.labels),
+    warning: labelWarning(data.stuck.length, quiz),
+    build: buildLink(id, input.labels[0]?.version ?? null),
   };
 }
 
@@ -137,13 +145,11 @@ export function buildReadyVM(input: { data: ProjectData; quiz: ApiQuiz | null; v
  *  the page is built, not when the module loads, so a test can set it. */
 const cawUrl = () => process.env.CAW_URL || "http://127.0.0.1:3500";
 
-/** Build (D-050): on only for a confirmed version with nothing changed since — then CAW's start page for this project and
- *  version; otherwise off with REQ-007's reason. */
-function buildLink(id: string, version: ReadyVM["version"]): ReadyVM["build"] {
-  const enabled = !!version && !version.changedSince;
-  return enabled
-    ? { enabled, label: build, reason: "", href: `${cawUrl()}/start?project=${encodeURIComponent(id)}&version=${version!.n}` }
-    : { enabled, label: build, reason: buildNotReady, href: null };
+/** Build (REQ-103 AC-3, SPEC-104 Q2 — the PM's default): always on. With a label, CAW's start page for this project and the
+ *  newest label's version, as before; with none, `/start?project=<id>` with no version. */
+function buildLink(id: string, version: number | null): ReadyVM["build"] {
+  const project = `project=${encodeURIComponent(id)}`;
+  return { enabled: true, label: build, reason: "", href: `${cawUrl()}/start?${project}${version === null ? "" : `&version=${version}`}` };
 }
 
 /** The ids live in the pure ./required (TASK-C-014); re-exported here because DefaultReady still imports them from load. */
@@ -152,6 +158,7 @@ export { readyRequiredId };
 /** What the page must show: each gate reason's text and the score line (readiness is the shell's). */
 export function readyRequired(vm: ReadyVM): RequiredItem[] {
   const items: RequiredItem[] = vm.gate.reasons.map((r) => ({ id: readyRequiredId.reason(r.code), text: r.text }));
+  if (vm.warning) items.push({ id: readyRequiredId.warning, text: vm.warning });
   if (vm.quiz) {
     const line = vm.quiz.score !== null ? score(vm.quiz.score, vm.quiz.marked) : scoreEarly(vm.quiz.marked);
     items.push({ id: readyRequiredId.score, text: line });
@@ -166,20 +173,13 @@ export async function loadReady(projectId: string): Promise<ReadyLoaded> {
   const res = await loadProjectData(projectId);
   if (!res.ok) return res;
   const path = { params: { path: { projectId } } };
-  const [quiz, versions] = await Promise.all([
+  const [quiz, labels] = await Promise.all([
     call<ApiQuiz>(api.GET("/v1/projects/{projectId}/quizzes/latest", path)),
-    call<ApiVersions>(api.GET("/v1/projects/{projectId}/versions", path)),
+    raw<{ labels: ApiLabel[] }>(`/v1/projects/${encodeURIComponent(projectId)}/labels`), // not in the generated client until gen:api
   ]);
   // 404 on the latest quiz = no quiz yet (the project exists — loadProjectData said so)
   if (!quiz.ok && quiz.status !== 404) return { ok: false, state: "unreachable" };
-  if (!versions.ok) return { ok: false, state: versions.status === 404 ? "notFound" : "unreachable" };
-  return {
-    ok: true,
-    vm: buildReadyVM({
-      data: res.data,
-      quiz: quiz.ok ? quiz.data : null,
-      versions: versions.data.versions,
-      changedSinceLatest: versions.data.changedSinceLatest,
-    }),
-  };
+  // the project exists, so a failing labels read is the back end being unreachable or out of step — never "not found"
+  if (!labels.ok || !Array.isArray(labels.data?.labels)) return { ok: false, state: "unreachable" };
+  return { ok: true, vm: buildReadyVM({ data: res.data, quiz: quiz.ok ? quiz.data : null, labels: labels.data.labels }) };
 }

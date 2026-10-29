@@ -237,6 +237,7 @@ export const sampleOverview: OverviewVM = {
   }],
   back: { screens: kindCount("screen"), apis: kindCount("api"), systems: kindCount("system"), data: kindCount("data"), interactions: kindCount("interaction") },
   version: null,
+  requirements: [],
 };
 
 export const sampleWorkOrder: WorkOrderVM = { frame: sampleFrame("workOrder"), works: workLinks("workOrder"), work, layout: swimLayout };
@@ -303,7 +304,7 @@ export const sampleStuck: StuckVM = {
 
 // The example was created by one change set from the operator: the decision's "add" entry and its two "covers" links,
 // worded as the core words them (v1.8 — a link reads "<from> <linkKind.out> <to>", never an id).
-const created = { at: project.createdAt, atLabel: project.createdLabel, cause: historyCause.operator };
+const created = { by: null, at: project.createdAt, atLabel: project.createdLabel, cause: historyCause.operator };
 export const sampleHistory: HistoryVM = {
   frame: sampleFrame("history"),
   parts: PARTS.map((p) => ({ key: p.key, kind: p.kind, title: p.title, href: href("history", `part=${p.key}`) })),
@@ -333,4 +334,5 @@ export const sampleRequired: { [P in PageId]: RequiredItem[] } = {
   web: sampleWeb.layout.nodes.filter((n) => n.stuck).map((n) => ({ id: requiredId.part(n.key), text: n.title })),
   stuck: sampleStuck.items.map((i) => ({ id: requiredId.stuck(i), text: i.wording })),
   history: sampleHistory.part ? [{ id: requiredId.part(sampleHistory.part.key), text: sampleHistory.part.title }] : [],
+  requirements: [],
 };
