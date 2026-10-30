@@ -2172,6 +2172,7 @@ export interface components {
                 via: string;
             }[];
             relatedDecisionsMore: boolean;
+            requirements: components["schemas"]["Part"][];
             version: number;
         };
         Project: {
@@ -2361,6 +2362,7 @@ export interface components {
                 via: string;
             }[];
             relatedDecisionsMore: boolean;
+            requirements: components["schemas"]["Part"][];
             revision: number;
             savedAt: string | null;
         };
