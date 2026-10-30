@@ -1394,6 +1394,218 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/projects/{projectId}/spec": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    projectId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description the current spec in one read, with its revision and the latest label */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["CurrentSpec"];
+                    };
+                };
+                /** @description not_found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/projects/{projectId}/spec/changes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    after?: number | null;
+                };
+                header?: never;
+                path: {
+                    projectId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description what changed since a revision, one entry per saved change set (first 500; `more` says there are further ones) */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SpecChanges"];
+                    };
+                };
+                /** @description validation */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description not_found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/projects/{projectId}/spec/locate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    projectId: string;
+                };
+                cookie?: never;
+            };
+            /** @description a change request in words */
+            requestBody: {
+                content: {
+                    "application/json": {
+                        request: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description the parts of the current spec the request touches, best first — or notInSpec */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SpecLocated"];
+                    };
+                };
+                /** @description validation */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description not_found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/projects/{projectId}/spec/parts/{key}/context": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    projectId: string;
+                    key: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description one part's context, from the current spec */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SpecPartContext"];
+                    };
+                };
+                /** @description not_found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/projects/{projectId}/stuck": {
         parameters: {
             query?: never;
@@ -1768,6 +1980,19 @@ export interface components {
             roundRefused: components["schemas"]["RefusedItem"][] | null;
             roundSaved: number | null;
         };
+        CurrentSpec: {
+            latestLabel: {
+                by: string;
+                label: string | null;
+                labelledAt: string;
+                version: number;
+            } | null;
+            links: components["schemas"]["Link"][];
+            parts: components["schemas"]["Part"][];
+            projectId: string;
+            revision: number;
+            savedAt: string | null;
+        };
         Error: {
             error: {
                 code: string;
@@ -2043,6 +2268,77 @@ export interface components {
             /** @enum {string} */
             status: "read" | "failed";
             text?: string;
+        };
+        SpecChanges: {
+            changes: {
+                added: string[];
+                at: string;
+                by: string | null;
+                /** @enum {string} */
+                cause: "operator" | "message" | "source" | "undo";
+                changed: string[];
+                removed: string[];
+                rev: number;
+            }[];
+            latestLabel: {
+                by: string;
+                label: string | null;
+                labelledAt: string;
+                version: number;
+            } | null;
+            more: boolean;
+            revision: number;
+        };
+        SpecLocated: {
+            candidates: {
+                key: string;
+                kind: string;
+                matched: string[];
+                score: number;
+                title: string;
+                where: ("title" | "body" | "link label")[];
+            }[];
+            notInSpec: boolean;
+            revision: number;
+        };
+        SpecPartContext: {
+            decisions: components["schemas"]["Part"][];
+            flows: {
+                at: string[];
+                steps: {
+                    key: string;
+                    position: number | null;
+                    title: string;
+                }[];
+                work: {
+                    key: string;
+                    title: string;
+                };
+            }[];
+            latestLabel: {
+                by: string;
+                label: string | null;
+                labelledAt: string;
+                version: number;
+            } | null;
+            neighbours: {
+                /** @enum {string} */
+                direction: "out" | "in";
+                label: string | null;
+                /** @enum {string} */
+                linkKind: "has_step" | "next" | "has_interaction" | "from" | "to" | "carries" | "reads" | "writes" | "shows" | "covers" | "about" | "conflicts";
+                part: {
+                    key: string;
+                    kind: string;
+                    title: string;
+                };
+                position: number | null;
+            }[];
+            part: components["schemas"]["Part"];
+            projectId: string;
+            questions: components["schemas"]["Part"][];
+            revision: number;
+            savedAt: string | null;
         };
         StuckItem: {
             between?: string[];
