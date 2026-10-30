@@ -2155,6 +2155,11 @@ export interface components {
             part: components["schemas"]["Part"];
             projectId: string;
             questions: components["schemas"]["Part"][];
+            relatedDecisions: {
+                decision: components["schemas"]["Part"];
+                via: string;
+            }[];
+            relatedDecisionsMore: boolean;
             version: number;
         };
         Project: {
@@ -2337,6 +2342,11 @@ export interface components {
             part: components["schemas"]["Part"];
             projectId: string;
             questions: components["schemas"]["Part"][];
+            relatedDecisions: {
+                decision: components["schemas"]["Part"];
+                via: string;
+            }[];
+            relatedDecisionsMore: boolean;
             revision: number;
             savedAt: string | null;
         };
