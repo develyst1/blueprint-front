@@ -13,7 +13,7 @@ import { loadProjectData } from "@/core/model/load";
 import type { FrameVM, RequiredItem } from "@/core/theme/contract";
 import { requiredId } from "@/core/theme/required";
 import type { ChatChangeVM, ChatContradictionVM, ChatMessageVM, ChatModelVM, ChatQuestionVM, ChatSourceVM, ChatVM } from "./contract";
-import { acceptPack, botFailed, cawAsks, contradiction, fieldDropped, modelTimeout, refusedItem, refusedMore, refusedReason, rejectReason, roundRejected, savedHeader, tierLabel } from "./words";
+import { acceptPack, botFailed, cawAsks, contradiction, fieldDropped, modelTimeout, refusedItem, refusedMore, refusedReason, rejectReason, roundRejected, savedHeader, tierLabel, urlKept } from "./words";
 
 // ---------- API shapes not in the generated schema yet (blueprint-back src/http/routes/*.ts, read 2026-10-09) ----------
 export type ApiMessage = {
@@ -28,7 +28,7 @@ export type ApiMessage = {
   /** REQ-110 round 3 (TASK-126): what the server repaired or left out of an item before saving it — only `field_dropped` is shown */
   roundAdjusted?: ApiAdjusted[] | null;
 };
-/** One element of `roundAdjusted` (SPEC-105 E8/E9): `what` is `ref_renamed` · `body_defaulted` · `wrapped_in_list` · `op_renamed` · `field_dropped`, or the
+/** One element of `roundAdjusted` (SPEC-105 E8/E9): `what` is `ref_renamed` · `body_defaulted` · `wrapped_in_list` · `op_renamed` · `field_dropped` · `url_kept`, or the
  *  trailing `{ item: "more", count }`. `roundRaw` (the unreadable reply, for the team) is never read by the page at all. */
 export type ApiAdjusted = {
   item: string; what?: string; field?: string | null; title?: string | null; key?: string | null; ref?: string | null;
@@ -106,12 +106,13 @@ export function refusedLines(list: ApiRefused[]): string[] {
 export const refusedCount = (list: ApiRefused[]): number => list.reduce((n, r) => n + (r.item === "more" ? r.count ?? 0 : 1), 0);
 
 /** One line per `field_dropped` adjustment (REQ-110 round 3, Q5): the item's name (title → key → ref → item path, as the refused list does)
- *  and the field that was left out. Every other `what` is invisible to the user; an entry with no field name has nothing to say. */
+ *  and the field that was left out. One line per `url_kept` (REQ-114 round 2, TASK-137): the address (`title`) and the key Blueprint stored it
+ *  under (key → ref). Every other `what` is invisible to the user; an entry with nothing to name has nothing to say. */
 export function adjustedLines(list: ApiAdjusted[]): string[] {
   const lines: string[] = [];
   for (const a of list) {
-    if (a.what !== "field_dropped" || !a.field) continue;
-    lines.push(fieldDropped(a.title || a.key || a.ref || a.item, a.field));
+    if (a.what === "field_dropped" && a.field) lines.push(fieldDropped(a.title || a.key || a.ref || a.item, a.field));
+    else if (a.what === "url_kept" && a.title && (a.key || a.ref)) lines.push(urlKept(a.title, (a.key || a.ref)!));
   }
   return lines;
 }

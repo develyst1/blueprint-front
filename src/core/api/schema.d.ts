@@ -1877,7 +1877,7 @@ export interface components {
             title: string | null;
             to?: string;
             /** @enum {string} */
-            what: "ref_renamed" | "body_defaulted" | "wrapped_in_list" | "field_dropped" | "op_renamed";
+            what: "ref_renamed" | "body_defaulted" | "wrapped_in_list" | "field_dropped" | "op_renamed" | "url_kept";
         } | {
             count: number;
             /** @enum {string} */

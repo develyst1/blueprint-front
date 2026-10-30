@@ -62,6 +62,9 @@ export const refusedMore = (n: number): string => `และอีก ${n} ร�
 // REQ-110 round 3 (SPEC-105 E9, Q5 default until the PM answers): a part was saved but one malformed optional field was left out
 export const fieldDropped = (name: string, field: string): string => `${name} — บันทึกแล้ว แต่ตัดช่อง ${field} ออก`;
 
+// REQ-114 round 2 (SPEC-111 E14b, TASK-137): an address the user's message held but the model's answer left out — Blueprint kept it (wording: PM, REQ-114 Q, 2026-10-30)
+export const urlKept = (url: string, key: string): string => `${url} — Blueprint เก็บไว้ใน ${key} ให้แล้ว (AI ไม่ได้ใส่ไว้ในสเปก)`;
+
 export const toSpec = "ดู spec";
 
 /** the chat's entry in the page strip — the core's nav label */

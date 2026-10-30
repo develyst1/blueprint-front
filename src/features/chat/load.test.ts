@@ -541,6 +541,25 @@ describe("REQ-110 round 3: 'saved, but field X left out' from roundAdjusted (SPE
     expect(text(bot({ roundAdjusted: only }))).toBe(text(bot({ roundAdjusted: null })));
   });
 
+  const kept = (extra: Partial<NonNullable<ApiMessage["roundAdjusted"]>[number]> = {}) => ({ item: "changes[0]", what: "url_kept", title: "http://127.0.0.1:4200/health", key: "API-001", ref: "$a", ...extra });
+
+  test("url_kept (REQ-114 round 2, TASK-137) → one line with the address and the key, wording verbatim", () => {
+    expect(adjustedLines([kept()])).toEqual(["http://127.0.0.1:4200/health — Blueprint เก็บไว้ใน API-001 ให้แล้ว (AI ไม่ได้ใส่ไว้ในสเปก)"]);
+    expect(text(bot({ roundAdjusted: [kept()] }))).toBe("เพิ่มกฎให้แล้วครับ\nhttp://127.0.0.1:4200/health — Blueprint เก็บไว้ใน API-001 ให้แล้ว (AI ไม่ได้ใส่ไว้ในสเปก)");
+  });
+
+  test("url_kept with no key uses the ref; with neither, or no address, says nothing", () => {
+    expect(adjustedLines([kept({ key: null })])).toEqual(["http://127.0.0.1:4200/health — Blueprint เก็บไว้ใน $a ให้แล้ว (AI ไม่ได้ใส่ไว้ในสเปก)"]);
+    expect(adjustedLines([kept({ key: null, ref: null })])).toEqual([]);
+    expect(adjustedLines([kept({ title: null })])).toEqual([]);
+  });
+
+  test("url_kept + field_dropped → both lines, in record order; op_renamed between them adds nothing", () => {
+    const lines = adjustedLines([dropped(), { item: "changes[1]", what: "op_renamed" }, kept()]);
+    expect(lines).toEqual(["กฎการจอง — บันทึกแล้ว แต่ตัดช่อง open ออก", "http://127.0.0.1:4200/health — Blueprint เก็บไว้ใน API-001 ให้แล้ว (AI ไม่ได้ใส่ไว้ในสเปก)"]);
+    expect(adjustedLines([kept(), dropped()])[0]).toContain("Blueprint เก็บไว้ใน API-001");
+  });
+
   test("roundRaw is never in the text", () => {
     const m = { ...bot({ roundAdjusted: [dropped()] }), roundRaw: "SECRET-UNREADABLE-REPLY {not json" } as ApiMessage;
     expect(text(m)).not.toContain("SECRET-UNREADABLE-REPLY");
