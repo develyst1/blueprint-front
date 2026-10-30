@@ -300,6 +300,7 @@
 }
 
 .bot {
+  white-space: pre-line; /* REQ-110 round 2: a refused list is one line per item */
   align-self: flex-start;
   background: #ffffff;
   color: #111111;

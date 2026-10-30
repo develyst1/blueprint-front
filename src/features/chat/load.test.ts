@@ -2,12 +2,12 @@
 import { describe, expect, mock, spyOn, test } from "bun:test";
 import type { ProjectData } from "@/core/model/build/types";
 import {
-  buildChatVM, chatRequired, lastChange, lastChangeSetId, toMessages, toModel, toPack, toSources, MESSAGES, PACK, type ApiMessage,
+  buildChatVM, chatRequired, lastChange, lastChangeSetId, adjustedLines, refusedCount, refusedLines, rejectedText, toMessages, toModel, toPack, toSources, MESSAGES, PACK, type ApiMessage,
 } from "./load";
 import * as core from "@/core/words";
 import { isTooLarge, MAX_UPLOAD_BYTES } from "./limits";
 import * as chatWords from "./words";
-import { acceptPack, botFailed, cawAsks, tierLabel } from "./words";
+import { acceptPack, botFailed, cawAsks, fieldDropped, modelTimeout, refusedMore, refusedReason, rejectReason, roundRejected, savedHeader, tierLabel } from "./words";
 
 const origin = { stamp: "team-proposed" as const, date: "2026-10-09" };
 const question = (key: string, extra: Record<string, unknown> = {}) => ({
@@ -384,5 +384,174 @@ describe("REQ-103: every chat write carries the typed name, or is refused before
     try {
       expect(await sendAction("p-1", "สวัสดี")).toEqual({ ok: false, code: "name_required" });
     } finally { spy.mockRestore(); }
+  });
+});
+
+describe("REQ-110: a rejected round and a timeout say so, in the PM's words (SPEC-105 § Front)", () => {
+  const bot = (i: number, extra: Partial<ApiMessage>) => msg(i, "bot", { content: "", ...extra });
+  const textOf = (m: ApiMessage) => toMessages([msg(0, "user", { content: "เพิ่ม feature" }), m]).at(-1)?.text;
+  const chat = (messages: ApiMessage[]) => buildChatVM({ data: data([question("Q-001")]), messages, focus: null, change: null, sources: [], models: null });
+
+  test("the words are verbatim (REQ-110 § Wording, SPEC-105 Q2)", () => {
+    expect(roundRejected("X")).toBe("รอบนี้ยังไม่ได้บันทึกอะไรเลย — X ลองพิมพ์ใหม่หรือแก้ตามนี้ได้ครับ");
+    expect(rejectReason.unknown_kind("feature")).toBe("AI เสนอข้อมูลแบบ “feature” ที่ Blueprint ยังไม่รองรับ");
+    expect(rejectReason.needs_user_words).toBe("การแก้หรือลบสิ่งที่คุณพูดไว้เองต้องใช้คำของคุณ");
+    expect(rejectReason.invalid_change).toBe("ข้อเสนอของ AI ไม่ผ่านการตรวจของระบบ");
+    expect(rejectReason.protocol).toBe("AI ตอบกลับมาในรูปแบบที่ระบบอ่านไม่ได้");
+    expect(modelTimeout).toBe("AI ตอบไม่ทันเวลา — ยังไม่ได้บันทึกอะไร ลองใหม่ หรือเปลี่ยนเป็นรุ่นที่เร็วกว่า");
+  });
+
+  test("rejected + unknown_kind + a note → the sentence naming the kind", () => {
+    expect(textOf(bot(1, { roundStatus: "changes_rejected", roundReason: "unknown_kind", roundNote: "feature" })))
+      .toBe("รอบนี้ยังไม่ได้บันทึกอะไรเลย — AI เสนอข้อมูลแบบ “feature” ที่ Blueprint ยังไม่รองรับ ลองพิมพ์ใหม่หรือแก้ตามนี้ได้ครับ");
+  });
+
+  test("rejected + each other code → its own reason inside the same sentence", () => {
+    for (const code of ["needs_user_words", "invalid_change", "protocol"] as const) {
+      expect(textOf(bot(1, { roundStatus: "changes_rejected", roundReason: code, roundNote: null }))).toBe(roundRejected(rejectReason[code]));
+    }
+  });
+
+  test("a rejected row's own content is never shown, and the sentence claims no change was made", () => {
+    const t = textOf(bot(1, { content: "เพิ่ม feature ให้แล้วครับ", roundStatus: "changes_rejected", roundReason: "invalid_change" }));
+    expect(t).toBe(roundRejected(rejectReason.invalid_change));
+    expect(t).not.toContain("ให้แล้ว");
+  });
+
+  test("a null or unknown reason → as before this TASK (no sentence: the empty row is left out)", () => {
+    expect(rejectedText(null, null)).toBeNull();
+    expect(rejectedText("something_new", null)).toBeNull();
+    expect(rejectedText("unknown_kind", null)).toBeNull(); // no kind to name
+    expect(toMessages([bot(1, { roundStatus: "changes_rejected", roundReason: null })])).toEqual([]);
+    expect(textOf(bot(1, { roundStatus: "bot_could_not_answer", roundReason: null }))).toBe(botFailed.message);
+    expect(textOf(bot(1, { roundStatus: "bot_could_not_answer" }))).toBe(botFailed.message); // an older back end sends no field
+  });
+
+  test("timeout → the timeout sentence, kept on the page beside the failed alert (retry + change model); other reasons keep the old behaviour", () => {
+    const timedOut = [msg(1, "user", { content: "ถาม" }), bot(2, { roundStatus: "bot_could_not_answer", roundReason: "timeout" })];
+    const vm = chat(timedOut);
+    expect(vm.failed).toBe(true);
+    expect(vm.messages.map((m) => m.text)).toEqual(["ถาม", modelTimeout]);
+    // any other reason: the alert says it, the newest failed row is not shown twice — as before
+    const other = chat([msg(1, "user", { content: "ถาม" }), bot(2, { roundStatus: "bot_could_not_answer", roundReason: "gateway_error" })]);
+    expect(other.failed).toBe(true);
+    expect(other.messages.map((m) => m.text)).toEqual(["ถาม"]);
+  });
+
+  test("a rejected round is not a failed bot: no alert, the sentence shows as the bot's line", () => {
+    const vm = chat([msg(1, "user", { content: "เพิ่ม feature" }), bot(2, { roundStatus: "changes_rejected", roundReason: "unknown_kind", roundNote: "feature" })]);
+    expect(vm.failed).toBe(false);
+    expect(vm.messages.at(-1)).toMatchObject({ role: "bot", text: roundRejected(rejectReason.unknown_kind("feature")) });
+  });
+});
+
+describe("REQ-110 round 2: 'saved n, not saved m' and one line per refused item (SPEC-105 E5c, E6; Q4 defaults)", () => {
+  const refused = (extra: Partial<NonNullable<ApiMessage["roundRefused"]>[number]>) => ({ item: "changes[1]", op: "part.add", kind: "step", ref: "$s", key: null, title: "ส่งอีเมล", reason: "invalid_change", detail: "x", ...extra });
+  const bot = (i: number, extra: Partial<ApiMessage>) => msg(i, "bot", { content: "เพิ่มให้ครบแล้วครับ", roundStatus: "applied", changeSetId: "cs-1", ...extra });
+  const text = (m: ApiMessage, saved?: number | null) => toMessages([msg(0, "user", { content: "เพิ่ม 5 ขั้น" }), { ...m, ...(saved === undefined ? {} : { roundSaved: saved }) }]).at(-1)?.text;
+
+  test("the Q4 words are verbatim", () => {
+    expect(savedHeader(4, 1)).toBe("บันทึกแล้ว 4 รายการ — ยังไม่ได้บันทึก 1 รายการ:");
+    expect(refusedReason.invalid_change).toBe("ข้อมูลไม่ครบหรือไม่ถูกรูปแบบ");
+    expect(refusedReason.depends_on_refused).toBe("ผูกกับรายการที่ไม่ได้บันทึก");
+    expect(refusedReason.unknown_kind("feature")).toBe("AI เสนอข้อมูลแบบ “feature” ที่ Blueprint ยังไม่รองรับ");
+    expect(refusedMore(7)).toBe("และอีก 7 รายการ");
+  });
+
+  test("applied + 1 refused → the header, then the item line; the model's own text is not shown", () => {
+    const t = text(bot(1, { roundRefused: [refused({})] }), 4)!;
+    expect(t).toBe("บันทึกแล้ว 4 รายการ — ยังไม่ได้บันทึก 1 รายการ:\nส่งอีเมล — ข้อมูลไม่ครบหรือไม่ถูกรูปแบบ");
+    expect(t).not.toContain("เพิ่มให้ครบแล้ว");
+  });
+
+  test("the item's name is its title, else its key, else its ref, else the item path; each reason has its word", () => {
+    const lines = refusedLines([
+      refused({ title: null, key: "STEP-004" }), refused({ title: null, key: null, ref: "$s2" }), refused({ title: null, key: null, ref: null, item: "links[0]" }),
+      refused({ title: "ค", reason: "unknown_kind", kind: "feature" }), refused({ title: "ง", reason: "needs_user_words" }), refused({ title: "จ", reason: "depends_on_refused" }),
+    ]);
+    expect(lines).toEqual([
+      "STEP-004 — ข้อมูลไม่ครบหรือไม่ถูกรูปแบบ", "$s2 — ข้อมูลไม่ครบหรือไม่ถูกรูปแบบ", "links[0] — ข้อมูลไม่ครบหรือไม่ถูกรูปแบบ",
+      "ค — AI เสนอข้อมูลแบบ “feature” ที่ Blueprint ยังไม่รองรับ", "ง — การแก้หรือลบสิ่งที่คุณพูดไว้เองต้องใช้คำของคุณ", "จ — ผูกกับรายการที่ไม่ได้บันทึก",
+    ]);
+  });
+
+  test("rejected + a list → the accepted 'nothing saved' sentence, then the same lines", () => {
+    const m = bot(1, { content: "", roundStatus: "changes_rejected", changeSetId: null, roundReason: "invalid_change", roundNote: null, roundRefused: [refused({ title: "ก" }), refused({ title: "ข", reason: "depends_on_refused" })] });
+    expect(text(m)).toBe([roundRejected(rejectReason.invalid_change), "ก — ข้อมูลไม่ครบหรือไม่ถูกรูปแบบ", "ข — ผูกกับรายการที่ไม่ได้บันทึก"].join("\n"));
+  });
+
+  test("past 50: the 'more' element becomes 'and n more'; m counts it", () => {
+    const list = [...Array.from({ length: 50 }, (_, i) => refused({ title: `รายการ ${i}` })), { item: "more", count: 3 }];
+    const lines = refusedLines(list);
+    expect(lines).toHaveLength(51);
+    expect(lines.at(-1)).toBe("และอีก 3 รายการ");
+    expect(refusedCount(list)).toBe(53);
+    expect(text(bot(1, { roundRefused: list }), 10)!.split("\n")[0]).toBe(savedHeader(10, 53));
+  });
+
+  test("null and [] → exactly as today (the model's reply, a failed or accepted row unchanged)", () => {
+    expect(text(bot(1, { roundRefused: null }))).toBe("เพิ่มให้ครบแล้วครับ");
+    expect(text(bot(1, { roundRefused: [] }))).toBe("เพิ่มให้ครบแล้วครับ");
+    expect(text(bot(1, {}))).toBe("เพิ่มให้ครบแล้วครับ"); // an older back end sends no field
+  });
+
+  test("n unknown (roundSaved missing, an older back end) → the list alone, no guessed header", () => {
+    expect(text(bot(1, { roundRefused: [refused({})] }))).toBe("ส่งอีเมล — ข้อมูลไม่ครบหรือไม่ถูกรูปแบบ");
+  });
+
+  test("n = the row's `roundSaved` (model items applied); 0 is a real count; null or missing → the list alone", () => {
+    expect(text(bot(1, { roundRefused: [refused({})] }), 0)).toBe("บันทึกแล้ว 0 รายการ — ยังไม่ได้บันทึก 1 รายการ:\nส่งอีเมล — ข้อมูลไม่ครบหรือไม่ถูกรูปแบบ");
+    expect(text(bot(1, { roundRefused: [refused({})] }), null)).toBe("ส่งอีเมล — ข้อมูลไม่ครบหรือไม่ถูกรูปแบบ");
+  });
+});
+
+describe("REQ-110 round 3: 'saved, but field X left out' from roundAdjusted (SPEC-105 E9, Q5 default)", () => {
+  const dropped = (extra: Partial<NonNullable<ApiMessage["roundAdjusted"]>[number]> = {}) => ({ item: "changes[2]", what: "field_dropped", field: "open", title: "กฎการจอง", key: null, ref: "$d", ...extra });
+  const bot = (extra: Partial<ApiMessage>) => msg(1, "bot", { content: "เพิ่มกฎให้แล้วครับ", roundStatus: "applied", changeSetId: "cs-1", ...extra });
+  const text = (m: ApiMessage) => toMessages([msg(0, "user", { content: "เพิ่มกฎ" }), m]).at(-1)?.text;
+
+  test("the word is the Q5 default, verbatim", () => {
+    expect(fieldDropped("กฎการจอง", "open")).toBe("กฎการจอง — บันทึกแล้ว แต่ตัดช่อง open ออก");
+  });
+
+  test("a field_dropped entry → its line under the row's text (nothing refused: the model's reply stays)", () => {
+    expect(text(bot({ roundAdjusted: [dropped()] }))).toBe("เพิ่มกฎให้แล้วครับ\nกฎการจอง — บันทึกแล้ว แต่ตัดช่อง open ออก");
+  });
+
+  test("under the saved/not-saved lines when something was refused too", () => {
+    const refused = [{ item: "changes[4]", reason: "invalid_change", title: "แจ้งเตือน" }];
+    expect(text(bot({ roundRefused: refused, roundSaved: 3, roundAdjusted: [dropped()] })))
+      .toBe("บันทึกแล้ว 3 รายการ — ยังไม่ได้บันทึก 1 รายการ:\nแจ้งเตือน — ข้อมูลไม่ครบหรือไม่ถูกรูปแบบ\nกฎการจอง — บันทึกแล้ว แต่ตัดช่อง open ออก");
+  });
+
+  test("one line per dropped field; the name falls back title → key → ref → item", () => {
+    expect(adjustedLines([dropped({ field: "open" }), dropped({ field: "cases", title: null, key: "DEC-004" }), dropped({ title: null, key: null, ref: null, item: "changes[7]", field: "x" })]))
+      .toEqual(["กฎการจอง — บันทึกแล้ว แต่ตัดช่อง open ออก", "DEC-004 — บันทึกแล้ว แต่ตัดช่อง cases ออก", "changes[7] — บันทึกแล้ว แต่ตัดช่อง x ออก"]);
+  });
+
+  test("ref_renamed / body_defaulted / wrapped_in_list / more → no line", () => {
+    const quiet = [{ item: "changes[0]", what: "ref_renamed", from: "$a-b", to: "$a_b" }, { item: "changes[1]", what: "body_defaulted" }, { item: "changes[2]", what: "wrapped_in_list", field: "cases" }, { item: "more", count: 3 }];
+    expect(adjustedLines(quiet)).toEqual([]);
+    expect(text(bot({ roundAdjusted: quiet }))).toBe("เพิ่มกฎให้แล้วครับ");
+  });
+
+  test("op_renamed only (REQ-110 round 4, TASK-130) → no extra line, same text as with no adjustments", () => {
+    const only = [{ item: "changes[0]", what: "op_renamed" }, { item: "changes[1]", what: "op_renamed" }];
+    expect(adjustedLines(only)).toEqual([]);
+    expect(text(bot({ roundAdjusted: only }))).toBe(text(bot({ roundAdjusted: null })));
+  });
+
+  test("roundRaw is never in the text", () => {
+    const m = { ...bot({ roundAdjusted: [dropped()] }), roundRaw: "SECRET-UNREADABLE-REPLY {not json" } as ApiMessage;
+    expect(text(m)).not.toContain("SECRET-UNREADABLE-REPLY");
+    expect(text({ ...m, roundAdjusted: null })).not.toContain("SECRET-UNREADABLE-REPLY");
+  });
+
+  test("null, [] or no field → exactly as today; a dropped field with no name says nothing; user rows never get one", () => {
+    expect(text(bot({ roundAdjusted: null }))).toBe("เพิ่มกฎให้แล้วครับ");
+    expect(text(bot({ roundAdjusted: [] }))).toBe("เพิ่มกฎให้แล้วครับ");
+    expect(text(bot({}))).toBe("เพิ่มกฎให้แล้วครับ");
+    expect(adjustedLines([dropped({ field: null })])).toEqual([]);
+    expect(toMessages([msg(0, "user", { content: "ถาม", roundAdjusted: [dropped()] } as Partial<ApiMessage>)]).at(-1)?.text).toBe("ถาม");
   });
 });

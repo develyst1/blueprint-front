@@ -792,7 +792,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["Message"][];
+                        "application/json": components["schemas"]["ChatMessage"][];
                     };
                 };
                 /** @description validation */
@@ -1656,6 +1656,21 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        AdjustedItem: {
+            field?: string;
+            from?: string;
+            item: string;
+            key: string | null;
+            ref: string | null;
+            title: string | null;
+            to?: string;
+            /** @enum {string} */
+            what: "ref_renamed" | "body_defaulted" | "wrapped_in_list" | "field_dropped" | "op_renamed";
+        } | {
+            count: number;
+            /** @enum {string} */
+            item: "more";
+        };
         Cause: {
             /** @enum {string} */
             kind: "operator" | "message" | "source";
@@ -1744,6 +1759,14 @@ export interface components {
             entities: string[];
             id: string;
             undoable: boolean;
+        };
+        ChatMessage: components["schemas"]["Message"] & {
+            roundAdjusted: components["schemas"]["AdjustedItem"][] | null;
+            roundNote: string | null;
+            roundRaw: string | null;
+            roundReason: string | null;
+            roundRefused: components["schemas"]["RefusedItem"][] | null;
+            roundSaved: number | null;
         };
         Error: {
             error: {
@@ -1952,13 +1975,33 @@ export interface components {
             /** @enum {string} */
             status: "answered" | "failed";
         };
+        RefusedItem: {
+            detail: string;
+            item: string;
+            key: string | null;
+            kind: string | null;
+            op: string | null;
+            /** @enum {string} */
+            reason: "unknown_kind" | "needs_user_words" | "invalid_change" | "depends_on_refused";
+            ref: string | null;
+            title: string | null;
+        } | {
+            count: number;
+            /** @enum {string} */
+            item: "more";
+        };
         Round: {
+            adjusted: components["schemas"]["AdjustedItem"][] | null;
             changeSetId: string | null;
             contradictions: string[];
             failedSources: string[];
             messageIds: string[];
+            note: string | null;
             questions: string[];
+            reason: string | null;
+            refused: components["schemas"]["RefusedItem"][] | null;
             reply: string | null;
+            saved: number | null;
             /** @enum {string} */
             status: "applied" | "no_changes" | "changes_rejected" | "bot_could_not_answer";
         };

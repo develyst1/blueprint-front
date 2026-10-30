@@ -13,12 +13,31 @@ import { loadProjectData } from "@/core/model/load";
 import type { FrameVM, RequiredItem } from "@/core/theme/contract";
 import { requiredId } from "@/core/theme/required";
 import type { ChatChangeVM, ChatContradictionVM, ChatMessageVM, ChatModelVM, ChatQuestionVM, ChatSourceVM, ChatVM } from "./contract";
-import { acceptPack, botFailed, cawAsks, contradiction, tierLabel } from "./words";
+import { acceptPack, botFailed, cawAsks, contradiction, fieldDropped, modelTimeout, refusedItem, refusedMore, refusedReason, rejectReason, roundRejected, savedHeader, tierLabel } from "./words";
 
 // ---------- API shapes not in the generated schema yet (blueprint-back src/http/routes/*.ts, read 2026-10-09) ----------
 export type ApiMessage = {
   id: string; role: "user" | "bot" | "caw"; content: string; model: string; creativity: number;
   roundStatus: string | null; changeSetId: string | null; createdAt: string;
+  /** REQ-110 (TASK-109): why a bot row failed or was rejected; null on every other row (and on rows from before it) */
+  roundReason?: string | null; roundNote?: string | null;
+  /** REQ-110 round 2 (TASK-123): every item the round refused, or null (and on rows from before it) */
+  roundRefused?: ApiRefused[] | null;
+  /** REQ-110 round 2 (TASK-123): how many of the model's proposed items were applied — the "n" of "saved n, not saved m" */
+  roundSaved?: number | null;
+  /** REQ-110 round 3 (TASK-126): what the server repaired or left out of an item before saving it — only `field_dropped` is shown */
+  roundAdjusted?: ApiAdjusted[] | null;
+};
+/** One element of `roundAdjusted` (SPEC-105 E8/E9): `what` is `ref_renamed` · `body_defaulted` · `wrapped_in_list` · `op_renamed` · `field_dropped`, or the
+ *  trailing `{ item: "more", count }`. `roundRaw` (the unreadable reply, for the team) is never read by the page at all. */
+export type ApiAdjusted = {
+  item: string; what?: string; field?: string | null; title?: string | null; key?: string | null; ref?: string | null;
+  from?: unknown; to?: unknown; count?: number;
+};
+/** One element of `roundRefused` (SPEC-105 E6); the last may be `{ item: "more", count }` past 50. Server-built text plus the model's own title. */
+export type ApiRefused = {
+  item: string; op?: string | null; kind?: string | null; ref?: string | null; key?: string | null; title?: string | null;
+  reason?: string | null; detail?: string | null; count?: number;
 };
 export type ApiModels = { models: Record<string, string[]>; tiers: string[] };
 /** TASK-A-030's route (SPEC-A-006 § C1). */
@@ -62,14 +81,67 @@ export function chatRequired(vm: ChatVM): RequiredItem[] {
 /** A park-only round (TASK-A-033) writes an empty user row and an empty `applied` bot row: nothing to word. */
 const parkOnlyBot = (m: ApiMessage | undefined) => !!m && m.role === "bot" && !m.content.trim() && m.roundStatus === "applied";
 
-/** What a row says on the page. Two rows have no content of their own: a turn that only accepted a pack (the user
- *  pressed ตามนั้น) and a bot that could not answer — each gets its REQ-004 words. A park-only turn and any other
- *  empty row are left out. */
+/** The REQ-110 sentence for a rejected round: `roundReason` (+ `roundNote` for an unknown kind) → the PM's words. A reason
+ *  this build has no word for, or an unknown kind with no name, has no sentence (null) — the row stays as it was before. */
+export function rejectedText(reason: string | null | undefined, note: string | null | undefined): string | null {
+  if (reason === "unknown_kind") return note ? roundRejected(rejectReason.unknown_kind(note)) : null;
+  if (reason === "needs_user_words" || reason === "invalid_change" || reason === "protocol") return roundRejected(rejectReason[reason]);
+  return null;
+}
+
+/** The refused items as page lines: "{name} — {reason}" (the title, else the key, the ref or the item path), then "and n more".
+ *  The model's own text is not among them (SPEC-105 E5c). A reason this build has no word for leaves the name alone. */
+export function refusedLines(list: ApiRefused[]): string[] {
+  const lines: string[] = [];
+  for (const r of list) {
+    if (r.item === "more") { if (r.count) lines.push(refusedMore(r.count)); continue; }
+    const name = r.title || r.key || r.ref || r.item;
+    const why = r.reason === "unknown_kind" ? (r.kind ? refusedReason.unknown_kind(r.kind) : null)
+      : r.reason === "needs_user_words" || r.reason === "invalid_change" || r.reason === "depends_on_refused" ? refusedReason[r.reason] : null;
+    lines.push(why ? refusedItem(name, why) : name);
+  }
+  return lines;
+}
+/** How many items were refused (the "more" element counts for its `count`). */
+export const refusedCount = (list: ApiRefused[]): number => list.reduce((n, r) => n + (r.item === "more" ? r.count ?? 0 : 1), 0);
+
+/** One line per `field_dropped` adjustment (REQ-110 round 3, Q5): the item's name (title → key → ref → item path, as the refused list does)
+ *  and the field that was left out. Every other `what` is invisible to the user; an entry with no field name has nothing to say. */
+export function adjustedLines(list: ApiAdjusted[]): string[] {
+  const lines: string[] = [];
+  for (const a of list) {
+    if (a.what !== "field_dropped" || !a.field) continue;
+    lines.push(fieldDropped(a.title || a.key || a.ref || a.item, a.field));
+  }
+  return lines;
+}
+
+/** What a row says on the page, with the round-3 lines under it. */
 function textOf(m: ApiMessage, next: ApiMessage | undefined): string {
+  const base = baseTextOf(m, next);
+  const extra = m.role === "bot" && Array.isArray(m.roundAdjusted) ? adjustedLines(m.roundAdjusted) : [];
+  return extra.length ? [base, ...extra].filter((l) => l !== "").join("\n") : base;
+}
+
+/** The row's own words. Rows with no content of their own: a turn that only accepted a pack (the user pressed
+ *  ตามนั้น), a bot that could not answer, and (REQ-110) a round whose changes were rejected or a model that timed out —
+ *  each gets its words. A park-only turn and any other empty row are left out. */
+function baseTextOf(m: ApiMessage, next: ApiMessage | undefined): string {
   if (m.role === "caw") return cawAsks(m.content);
+  // a round that refused anything (REQ-110 round 2): the model's own text is not shown — it may call a refused item saved
+  const refused = m.role === "bot" && Array.isArray(m.roundRefused) && m.roundRefused.length > 0 ? m.roundRefused : null;
+  if (refused) {
+    const lines = refusedLines(refused);
+    // nothing saved → the accepted sentence first; something saved → "saved n, not saved m" with n = `roundSaved` (null → the list alone, no guess)
+    const head = m.roundStatus === "changes_rejected" ? rejectedText(m.roundReason, m.roundNote)
+      : m.roundStatus === "applied" && typeof m.roundSaved === "number" ? savedHeader(m.roundSaved, refusedCount(refused)) : null;
+    return [head, ...lines].filter((l): l is string => !!l).join("\n");
+  }
+  // a rejected round: the stored words, never the bot row's own content (it must not read as if something was saved)
+  if (m.role === "bot" && m.roundStatus === "changes_rejected") { const t = rejectedText(m.roundReason, m.roundNote); if (t) return t; }
   if (m.content.trim()) return m.content;
   if (m.role === "user") return parkOnlyBot(next) ? "" : acceptPack;
-  if (m.roundStatus === "bot_could_not_answer") return botFailed.message;
+  if (m.roundStatus === "bot_could_not_answer") return m.roundReason === "timeout" ? modelTimeout : botFailed.message;
   return "";
 }
 
@@ -161,8 +233,10 @@ export function buildChatVM(input: {
   const failed = newestBot?.roundStatus === "bot_could_not_answer";
   return {
     frame: chatFrame(data),
-    // The failed alert already says "บอทตอบไม่ได้ตอนนี้": the newest failed bot row is not shown a second time (older ones stay).
-    messages: toMessages(input.messages).filter((m) => !(failed && m.id === newestBot!.id)),
+    // The failed alert already says "บอทตอบไม่ได้ตอนนี้": the newest failed bot row is not shown a second time (older ones stay) —
+    // except a timeout (REQ-110): its row carries the timeout sentence the alert does not, so it stays; the alert's retry and
+    // change-model controls are the ones the sentence points at.
+    messages: toMessages(input.messages).filter((m) => !(failed && newestBot!.roundReason !== "timeout" && m.id === newestBot!.id)),
     pack: toPack(data, input.focus),
     contradictions: toContradictions(data),
     focus: input.focus,

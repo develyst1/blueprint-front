@@ -479,6 +479,7 @@
 }
 
 .messages .bot {
+  white-space: pre-line; /* REQ-110 round 2: a refused list is one line per item */
   background: #ffffff;
   border-color: #8a8a8a;
 }
