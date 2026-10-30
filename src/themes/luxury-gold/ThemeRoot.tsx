@@ -4,21 +4,20 @@
 // its CSS variables, its fonts and — through UNSAFE_PortalProvider — every HeroUI overlay
 // (Popover, Drawer, Modal), which would otherwise portal to <body> and lose the variables (SPEC-B-001 rule).
 import "./theme.css";
-import localFont from "next/font/local";
+import { Noto_Sans_Thai_Looped, Noto_Serif_Thai } from "next/font/google";
 import { createContext, useCallback, useContext, useRef, type ReactNode, type RefObject } from "react";
 import { UNSAFE_PortalProvider } from "react-aria";
 
-// Local files, so the build needs no internet (REQ-123 round 2, SPEC-122): Google's own faces, the weights below.
-const serif = localFont({
-  src: "./fonts/noto-serif-thai.woff2",
-  weight: "500 700",
+const serif = Noto_Serif_Thai({
+  weight: ["500", "600", "700"],
+  subsets: ["thai", "latin"],
   variable: "--lg-font-serif",
   display: "swap",
 });
 
-const sans = localFont({
-  src: "./fonts/noto-sans-thai-looped.woff2",
-  weight: "400 600",
+const sans = Noto_Sans_Thai_Looped({
+  weight: ["400", "500", "600"],
+  subsets: ["thai", "latin"],
   variable: "--lg-font-sans",
   display: "swap",
 });
