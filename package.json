@@ -10,7 +10,7 @@
     "dev": "next dev -p 3100",
     "prebuild": "bun run gen:themes",
     "build": "next build",
-    "start": "next start -p 3100",
+    "start": "node scripts/start.mjs",
     "typecheck": "bun run gen:themes && tsc --noEmit",
     "test:isolation": "playwright test tests/isolation.spec.ts",
     "test:required": "playwright test tests/required.spec.ts",
