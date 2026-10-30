@@ -23,7 +23,7 @@ const data = (stuck: ProjectData["stuck"] = []): ProjectData => ({
 });
 const item = (i: number, extra: Partial<ApiQuizItem> = {}): ApiQuizItem => ({
   id: `i-${i}`, position: i, question: `คำถามที่ ${i}`, status: "answered", answer: `คำตอบที่ ${i}`, notInSpec: false,
-  parts: [], mark: null, note: null, questionKey: null, createdAt: "2026-10-09T02:00:00.000Z", ...extra,
+  parts: [], mark: null, note: null, questionKey: null, createdAt: "2026-10-09T02:00:00.000Z", calls: null, ...extra,
 });
 const quiz = (items: ApiQuizItem[], extra: Partial<ApiQuiz> = {}): ApiQuiz => {
   const marked = items.filter((i) => i.mark).length;

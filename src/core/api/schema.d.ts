@@ -1883,6 +1883,17 @@ export interface components {
             /** @enum {string} */
             item: "more";
         };
+        Call: {
+            asked: string;
+            fallback: boolean;
+            model: string | null;
+            ok: boolean;
+            reason: string | null;
+            /** @enum {string} */
+            step: "first" | "reask" | "correction" | "answer";
+            /** @enum {string} */
+            weight: "heavy" | "light";
+        };
         Cause: {
             /** @enum {string} */
             kind: "operator" | "message" | "source";
@@ -1974,6 +1985,7 @@ export interface components {
         };
         ChatMessage: components["schemas"]["Message"] & {
             roundAdjusted: components["schemas"]["AdjustedItem"][] | null;
+            roundCalls: components["schemas"]["Call"][] | null;
             roundNote: string | null;
             roundRaw: string | null;
             roundReason: string | null;
@@ -2192,6 +2204,7 @@ export interface components {
         };
         QuizItem: {
             answer: string | null;
+            calls: components["schemas"]["Call"][] | null;
             createdAt: string;
             id: string;
             /** @enum {string|null} */
@@ -2222,6 +2235,7 @@ export interface components {
         };
         Round: {
             adjusted: components["schemas"]["AdjustedItem"][] | null;
+            calls: components["schemas"]["Call"][] | null;
             changeSetId: string | null;
             contradictions: string[];
             failedSources: string[];
