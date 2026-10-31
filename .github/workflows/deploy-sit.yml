@@ -30,6 +30,9 @@ jobs:
       - run: bun run --if-present lint
       # `build` runs next build and copies .next/static + public into .next/standalone.
       - run: bun run build
+      # Playwright isolation spec against this build (uses the runner's Google Chrome, channel "chrome").
+      # A failure stops the deploy. states/required specs need blueprint-back too: not run here yet.
+      - run: bun run test:isolation
       - run: tar -czf app.tgz -C .next/standalone .
       - name: deploy
         env:
