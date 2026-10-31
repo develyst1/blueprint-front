@@ -47,3 +47,4 @@ src/core/theme/registry.generated.ts
 /.next-c/
 /.next-*/
 *.zip
+.env.production
