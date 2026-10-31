@@ -46,3 +46,4 @@ src/core/theme/registry.generated.ts
 /.next-a/
 /.next-c/
 /.next-*/
+*.zip

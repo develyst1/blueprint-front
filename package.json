@@ -9,7 +9,7 @@
     "predev": "bun run gen:themes",
     "dev": "next dev -p 3100",
     "prebuild": "bun run gen:themes",
-    "build": "next build",
+    "build": "next build && node scripts/copy-standalone-assets.mjs",
     "start": "next start -p 3100",
     "typecheck": "bun run gen:themes && tsc --noEmit",
     "test:isolation": "playwright test tests/isolation.spec.ts",
